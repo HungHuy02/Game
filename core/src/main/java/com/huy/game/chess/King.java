@@ -11,6 +11,15 @@ public class King extends Piece{
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
-        return false;
+        if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
+            return false;
+        }
+        int x = Math.abs(end.getX() - start.getX());
+        int y = Math.abs(end.getY() - start.getY());
+        if(x > 1 || y > 1) {
+            return false;
+        }else {
+            return true;
+        }
     }
 }

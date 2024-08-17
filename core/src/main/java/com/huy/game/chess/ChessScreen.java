@@ -1,13 +1,15 @@
 package com.huy.game.chess;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class ChessScreen implements Screen {
+public class ChessScreen extends InputAdapter implements Screen {
 
     private SpriteBatch batch;
     private Texture chessBoard;
@@ -32,12 +34,14 @@ public class ChessScreen implements Screen {
     private float spotSide;
     private Board board;
     private float pieceSide;
+    private Spot selectedSpot;
 
     @Override
     public void show() {
         batch = new SpriteBatch();
         board = new Board();
         chessBoard = new Texture("chess/images/chess_board.png");
+        selectedSpot = null;
 
         float boardWidth = chessBoard.getWidth();
         float boardHeight = chessBoard.getHeight();
@@ -70,6 +74,7 @@ public class ChessScreen implements Screen {
         bRock = new Texture("chess/images/brook.png");
         pieceSide = bRock.getHeight();
         board.resetBoard(wRock, wKnight,wBishop, wQueen, wKing, wPawn, bRock, bKnight, bBishop, bQueen, bKing, bPawn);
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
@@ -79,6 +84,40 @@ public class ChessScreen implements Screen {
         batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
         board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
         batch.end();
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        int boardX = (int) Math.floor((screenX - centerX) / spotSide);
+        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / spotSide);
+
+        if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
+            if (selectedSpot == null) {
+                selectedSpot = board.getSpot(boardY, boardX);
+                if(selectedSpot.getPiece() == null) {
+                    selectedSpot = null;
+                }
+            } else {
+                Spot secondSpot = board.getSpot(boardY, boardX);
+                boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
+                if(canMove) {
+                    board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY()));
+                    board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX));
+                    selectedSpot = null;
+                    batch.begin();
+                    batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
+                    board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
+                    batch.end();
+                }else {
+                    if(selectedSpot.getPiece() != null) {
+                        selectedSpot = secondSpot;
+                    }else {
+                        selectedSpot = null;
+                    }
+                }
+            }
+        }
+        return super.touchDown(screenX, screenY, pointer, button);
     }
 
     @Override

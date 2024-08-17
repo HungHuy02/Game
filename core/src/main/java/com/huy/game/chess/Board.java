@@ -6,11 +6,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Board {
     private Spot[][] spots = new Spot[8][8];
 
-    public Spot getSpot(int x, int y) throws Exception {
-        if(x < 0 || x > 7 || y < 0 || y > 7) {
-            throw new Exception("Index out of bound");
-        }
+    public Spot getSpot(int x, int y) {
         return spots[x][y];
+    }
+
+    public void setSpot(int x, int y, Spot spot) {
+        spots[x][y] = spot;
     }
 
     public void resetBoard(Texture wRook, Texture wKnight, Texture wBishop,
