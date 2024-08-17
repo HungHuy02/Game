@@ -31,7 +31,14 @@ public class FirstScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         batch.begin();
-        batch.draw(image, 140, 210);
+        int screenWidth = Gdx.graphics.getWidth();
+        int screenHeight = Gdx.graphics.getHeight();
+        float widthRatio = (float) (screenWidth - screenWidth / 3) / image.getWidth();
+        float heightRatio = (float) (screenHeight - screenHeight/ 3) / image.getHeight();
+        float scale = Math.min(widthRatio, heightRatio);
+        float imageWidth = image.getWidth() * scale;
+        float imageHeight = image.getHeight() * scale;
+        batch.draw(image, (screenWidth - imageWidth) / 2, (screenHeight - imageHeight) / 2, imageWidth, imageHeight);
         batch.end();
         timer += delta;
         if(timer >= 3f) {
