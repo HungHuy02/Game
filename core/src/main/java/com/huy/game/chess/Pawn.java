@@ -14,18 +14,27 @@ public class Pawn extends Piece{
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }
-        int x = Math.abs(end.getX() - start.getX());
-        int y = end.getY() - start.getY();
+        int x = end.getX() - start.getX();
+        int y = Math.abs(end.getY() - start.getY());
         if(this.isWhite()) {
-            if(y < 0) {
+            if(x < 0) {
                 return false;
             }
         }else {
-            if(y > 0) {
+            if(x > 0) {
                 return false;
             }
         }
-        if(x > 1 || y > 1) {
+        x = Math.abs(x);
+        if(x > 2 || y > 2) {
+            return false;
+        } else if(x > 1 || y > 1){
+            if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
+                return true;
+            }
+            if(!this.isWhite() && start.getX() == 6 && end.getPiece() == null) {
+                return true;
+            }
             return false;
         }else if(x == 1 && y == 1){
             return end.getPiece() != null;

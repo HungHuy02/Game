@@ -109,7 +109,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                     board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
                     batch.end();
                 }else {
-                    if(selectedSpot.getPiece() != null) {
+                    if(secondSpot.getPiece() != null) {
                         selectedSpot = secondSpot;
                     }else {
                         selectedSpot = null;

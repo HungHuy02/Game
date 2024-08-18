@@ -22,7 +22,7 @@ public class Bishop extends Piece{
             int currentX = start.getX() + directionX;
             int currentY = start.getY() + directionY;
             while(currentX != end.getX() || currentY != end.getY()) {
-                if(board.getSpot(currentX, currentY).getPiece() == null) {
+                if(board.getSpot(currentX, currentY).getPiece() != null) {
                     return false;
                 }
                 currentX += directionX;
