@@ -103,11 +103,16 @@ public class ChessScreen extends InputAdapter implements Screen {
                 if(canMove) {
                     board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY()));
                     board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX));
-                    selectedSpot = null;
-                    batch.begin();
-                    batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
-                    board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
-                    batch.end();
+                    if(board.isKingSafe(true)) {
+                        selectedSpot = null;
+                        batch.begin();
+                        batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
+                        board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
+                        batch.end();
+                    }else {
+                        board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
+                        board.setSpot(boardY, boardX, secondSpot);
+                    }
                 }else {
                     if(secondSpot.getPiece() != null) {
                         selectedSpot = secondSpot;
