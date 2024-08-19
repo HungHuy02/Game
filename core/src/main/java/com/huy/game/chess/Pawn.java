@@ -38,6 +38,8 @@ public class Pawn extends Piece{
             return false;
         }else if(x == 1 && y == 1){
             return end.getPiece() != null;
+        }else if(x == 0 && y != 0) {
+            return false;
         }else {
             return end.getPiece() == null;
         }

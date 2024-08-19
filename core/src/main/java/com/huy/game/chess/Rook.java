@@ -4,6 +4,15 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Rook extends Piece {
 
+    private boolean hasMove = false;
+
+    public boolean isHasMove() {
+        return hasMove;
+    }
+
+    public void setHasMove() {
+        this.hasMove = true;
+    }
 
     public Rook(boolean isWhite, Texture texture) {
         super(isWhite, texture);

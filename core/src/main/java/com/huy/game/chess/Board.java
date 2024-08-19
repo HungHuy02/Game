@@ -23,6 +23,10 @@ public class Board {
         }
     }
 
+    public Spot getKingSpot(boolean isWhite) {
+        return isWhite ? wKingSpot : bKingSpot;
+    }
+
     public void resetBoard(Texture wRook, Texture wKnight, Texture wBishop,
                            Texture wQueen, Texture wKing, Texture wPawn,
                            Texture bRook, Texture bKnight, Texture bBishop,
@@ -84,6 +88,10 @@ public class Board {
         Spot kingSpot = isWhite ? wKingSpot : bKingSpot;
         int kingX = kingSpot.getX();
         int kingY = kingSpot.getY();
+        return isPositionSafe(kingX, kingY, isWhite);
+    }
+
+    public boolean isPositionSafe(int positionX, int positionY, boolean isWhite) {
         for(int i = 1; i <= 2; i++) {
             int coordinates = i == 1 ? 2 : 1;
             int temp = coordinates;
@@ -93,16 +101,16 @@ public class Board {
                 int x;
                 int y;
                 if(isChange) {
-                    x = kingX + coordinates;
-                    y = kingY + i;
+                    x = positionX + coordinates;
+                    y = positionY + i;
                 }else {
-                    x = kingX + i;
-                    y = kingY + coordinates;
+                    x = positionX + i;
+                    y = positionY + coordinates;
                 }
                 if(x >= 0 && x <= 7 && y >=0 && y <= 7) {
                     checkSpot = getSpot(x, y);
                 }
-                if(checkSpot != null && checkSpot.getPiece() != null && checkSpot.getPiece().isWhite() != kingSpot.getPiece().isWhite() && checkSpot.getPiece() instanceof Knight) {
+                if(checkSpot != null && checkSpot.getPiece() != null && checkSpot.getPiece().isWhite() != isWhite && checkSpot.getPiece() instanceof Knight) {
                     return false;
                 }
                 if(coordinates != temp) {
@@ -116,9 +124,9 @@ public class Board {
             }
         }
         for(int i = -1; i <= 1; i++) {
-            int x = kingX + i;
+            int x = positionX + i;
             for(int j = -1; j <= 1; j++) {
-                int y = kingY + j;
+                int y = positionY + j;
                 if(x >= 0 && x <= 7 && y >=0 && y <= 7) {
                     Piece checkPiece = getSpot(x, y).getPiece();
                     if(checkPiece != null) {
@@ -137,6 +145,9 @@ public class Board {
                             }
                         }
                     }else {
+                        if(i == 0 && j == 0) {
+                            continue;
+                        }
                         int coordinatesX = x + i;
                         int coordinatesY = y + j;
                         while(coordinatesX >= 0 && coordinatesX < 8 && coordinatesY >=0 && coordinatesY < 8) {
