@@ -4,11 +4,19 @@ public class Spot {
     private Piece piece;
     private int x;
     private int y;
+    private boolean showColor = false;
 
     public Spot(Piece piece, int x, int y) {
         this.piece = piece;
         this.x = x;
         this.y = y;
+    }
+
+    public Spot(Piece piece, int x, int y, boolean showColor) {
+        this.piece = piece;
+        this.x = x;
+        this.y = y;
+        this.showColor = showColor;
     }
 
     public Piece getPiece() {
@@ -33,5 +41,13 @@ public class Spot {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public boolean isShowColor() {
+        return showColor;
+    }
+
+    public void setShowColor(boolean showColor) {
+        this.showColor = showColor;
     }
 }

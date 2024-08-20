@@ -1,17 +1,17 @@
 package com.huy.game.chess;
 
 public class ChessPlayer {
-    private boolean isWhile;
+    private boolean isWhite;
 
-    public ChessPlayer(boolean isWhile) {
-        this.isWhile = isWhile;
+    public ChessPlayer(boolean isWhite) {
+        this.isWhite = isWhite;
     }
 
-    public boolean isWhile() {
-        return isWhile;
+    public boolean isWhite() {
+        return isWhite;
     }
 
-    public void setWhile(boolean aWhile) {
-        isWhile = aWhile;
+    public void setWhite(boolean isWhite) {
+        isWhite = isWhite;
     }
 }

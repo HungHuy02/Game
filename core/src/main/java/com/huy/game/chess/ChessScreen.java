@@ -5,14 +5,16 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ChessScreen extends InputAdapter implements Screen {
 
     private SpriteBatch batch;
+    private ShapeRenderer shapeRenderer;
     private Texture chessBoard;
     private Texture wBishop;
     private Texture wKing;
@@ -41,6 +43,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     private ChessPlayer currentPlayer;
 
     private Sound moveSound;
+    private int turn;
 
     @Override
     public void show() {
@@ -49,6 +52,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         currentPlayer = player1;
         moveSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/move-self.mp3"));
         batch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
         board = new Board();
         chessBoard = new Texture("chess/images/chess_board.png");
         selectedSpot = null;
@@ -92,6 +96,15 @@ public class ChessScreen extends InputAdapter implements Screen {
         ScreenUtils.clear(Color.BLACK);
         batch.begin();
         batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
+        batch.end();
+
+        Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        board.renderColor(shapeRenderer, spotSide, centerX, centerY);
+        shapeRenderer.end();
+        Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+
+        batch.begin();
         board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
         batch.end();
     }
@@ -104,25 +117,32 @@ public class ChessScreen extends InputAdapter implements Screen {
         if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
             if (selectedSpot == null) {
                 selectedSpot = board.getSpot(boardY, boardX);
-                if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != currentPlayer.isWhile()) {
+                selectedSpot.setShowColor(true);
+                if(selectedSpot.getPiece() instanceof Pawn) {
+                    ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+                }
+                if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != currentPlayer.isWhite()) {
+                    selectedSpot.setShowColor(false);
                     selectedSpot = null;
                 }
             } else {
                 Spot secondSpot = board.getSpot(boardY, boardX);
                 boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
                 if(canMove) {
-                    board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY()));
-                    board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX));
-                    if(board.isKingSafe(currentPlayer.isWhile())) {
+                    board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY(), true));
+                    board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX, true));
+                    if(board.isKingSafe(currentPlayer.isWhite())) {
+                        if(selectedSpot.getPiece() instanceof Pawn) {
+                            if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
+                                ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+                            }
+                        }
                         selectedSpot = null;
-                        batch.begin();
-                        batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
-                        board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
-                        batch.end();
                         if(currentPlayer == player1) {
                             currentPlayer = player2;
                         }else {
                             currentPlayer = player1;
+                            turn++;
                         }
                         moveSound.play();
                     }else {

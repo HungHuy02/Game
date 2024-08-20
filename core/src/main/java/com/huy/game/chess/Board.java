@@ -1,7 +1,9 @@
 package com.huy.game.chess;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Board {
     private Spot[][] spots = new Spot[8][8];
@@ -84,6 +86,28 @@ public class Board {
         }
     }
 
+    public void renderColor(ShapeRenderer shapeRenderer, float spotSize, float centerX, float centerY) {
+        for(int i = 0; i <= 7; i++) {
+            float distanceY = spotSize * i + centerY;
+            for (int j = 0;j <= 7; j++) {
+                float distance = spotSize * j;
+                if(spots[i][j].isShowColor()) {
+                    shapeRenderer.setColor(178 / 255f, 224 / 255f, 104 / 255f, 0.5f);
+                    shapeRenderer.rect(centerX + distance, distanceY, spotSize, spotSize);
+                }
+            }
+        }
+    }
+
+    public void clearColor() {
+        for (int i = 0; i <= 7; i++) {
+            for(int j = 0; j <= 7; j++) {
+                spots[i][j].setShowColor(false);
+            }
+        }
+    }
+
+
     public boolean isKingSafe(boolean isWhite) {
         Spot kingSpot = isWhite ? wKingSpot : bKingSpot;
         int kingX = kingSpot.getX();
@@ -134,11 +158,8 @@ public class Board {
                             if(i != 0 && j != 0) {
                                 if(checkPiece instanceof Bishop || checkPiece instanceof Queen || checkPiece instanceof Pawn || checkPiece instanceof King) {
                                     return false;
-                                }else {
-                                    continue;
                                 }
-                            }
-                            if(i == 0 || j == 0) {
+                            }else {
                                 if(checkPiece instanceof Rook || checkPiece instanceof Queen) {
                                     return false;
                                 }
@@ -162,8 +183,7 @@ public class Board {
                                         }else {
                                             break;
                                         }
-                                    }
-                                    if(i == 0 || j == 0) {
+                                    }else {
                                         if(testPiece instanceof Rook || testPiece instanceof Queen) {
                                             return false;
                                         }else {
