@@ -3,6 +3,7 @@ package com.huy.game.chess;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
@@ -35,9 +36,18 @@ public class ChessScreen extends InputAdapter implements Screen {
     private Board board;
     private float pieceSide;
     private Spot selectedSpot;
+    private ChessPlayer player1;
+    private ChessPlayer player2;
+    private ChessPlayer currentPlayer;
+
+    private Sound moveSound;
 
     @Override
     public void show() {
+        player1 = new ChessPlayer(true);
+        player2 = new ChessPlayer(false);
+        currentPlayer = player1;
+        moveSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/move-self.mp3"));
         batch = new SpriteBatch();
         board = new Board();
         chessBoard = new Texture("chess/images/chess_board.png");
@@ -94,7 +104,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
             if (selectedSpot == null) {
                 selectedSpot = board.getSpot(boardY, boardX);
-                if(selectedSpot.getPiece() == null) {
+                if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != currentPlayer.isWhile()) {
                     selectedSpot = null;
                 }
             } else {
@@ -103,12 +113,18 @@ public class ChessScreen extends InputAdapter implements Screen {
                 if(canMove) {
                     board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY()));
                     board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX));
-                    if(board.isKingSafe(true)) {
+                    if(board.isKingSafe(currentPlayer.isWhile())) {
                         selectedSpot = null;
                         batch.begin();
                         batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
                         board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
                         batch.end();
+                        if(currentPlayer == player1) {
+                            currentPlayer = player2;
+                        }else {
+                            currentPlayer = player1;
+                        }
+                        moveSound.play();
                     }else {
                         board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
                         board.setSpot(boardY, boardX, secondSpot);
