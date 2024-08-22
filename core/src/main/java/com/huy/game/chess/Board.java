@@ -9,9 +9,23 @@ public class Board {
     private Spot[][] spots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
+    private Spot promotingSpot;
+    private boolean isPromoting = false;
+
+    public void setPromoting(boolean isPromoting) {
+        this.isPromoting = isPromoting;
+    }
 
     public Spot getSpot(int x, int y) {
         return spots[x][y];
+    }
+
+    public Spot getPromotingSpot() {
+        return promotingSpot;
+    }
+
+    public void setPromotingSpot(Spot promotingSpot) {
+        this.promotingSpot = promotingSpot;
     }
 
     public void setSpot(int x, int y, Spot spot) {
@@ -92,7 +106,7 @@ public class Board {
             for (int j = 0;j <= 7; j++) {
                 float distance = spotSize * j;
                 if(spots[i][j].isShowColor()) {
-                    shapeRenderer.setColor(178 / 255f, 224 / 255f, 104 / 255f, 0.5f);
+                    shapeRenderer.setColor(Colors.MOVE_COLOR);
                     shapeRenderer.rect(centerX + distance, distanceY, spotSize, spotSize);
                 }
             }
@@ -202,5 +216,4 @@ public class Board {
         }
         return true;
     }
-
 }

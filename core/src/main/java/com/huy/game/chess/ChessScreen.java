@@ -129,6 +129,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 Spot secondSpot = board.getSpot(boardY, boardX);
                 boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
                 if(canMove) {
+                    board.clearColor();
                     board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY(), true));
                     board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX, true));
                     if(board.isKingSafe(currentPlayer.isWhite())) {
