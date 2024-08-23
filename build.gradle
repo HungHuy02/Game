@@ -11,7 +11,7 @@ buildscript {
   dependencies {
     classpath "com.android.tools.build:gradle:8.1.4"
     classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
-
+    classpath "com.google.gms:google-services:4.3.15"
   }
 }
 
@@ -68,3 +68,4 @@ subprojects {
 }
 
 eclipse.project.name = 'Game' + '-parent'
+

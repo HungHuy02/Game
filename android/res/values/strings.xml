@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">Game</string>
+    <string name="app_name">Game</string>
+    <string name="login_text">Đăng nhập</string>
+    <string name="continue_email">Tiếp tục bằng email</string>
+    <string name="or_text">Hoặc</string>
+    <string name="continue_google">Tiệp tục với Google</string>
+    <string name="email_address">Địa chỉ email*</string>
+    <string name="password">Mật khẩu*</string>
+    <string name="forgot_password"><u>Bạn đã quên mật khẩu?</u></string>
+    <string name="create_account">Tạo một tài khoản</string>
+    <string name="display_name">Tên hiển thị*</string>
+    <string name="continue_text">Tiếp tục</string>
 </resources>
