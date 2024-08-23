@@ -1,10 +1,13 @@
 package com.huy.game.chess;
 
+import com.badlogic.gdx.graphics.Color;
+
 public class Spot {
     private Piece piece;
     private int x;
     private int y;
     private boolean showColor = false;
+    private Color spotColor = Colors.MOVE_COLOR;
 
     public Spot(Piece piece, int x, int y) {
         this.piece = piece;
@@ -49,5 +52,13 @@ public class Spot {
 
     public void setShowColor(boolean showColor) {
         this.showColor = showColor;
+    }
+
+    public Color getSpotColor() {
+        return spotColor;
+    }
+
+    public void setSpotColor(Color spotColor) {
+        this.spotColor = spotColor;
     }
 }

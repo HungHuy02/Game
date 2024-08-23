@@ -42,7 +42,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     private ChessPlayer player2;
     private ChessPlayer currentPlayer;
 
-    private Sound moveSound;
+    private ChessSound chessSound;
     private int turn;
 
     @Override
@@ -50,7 +50,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         player1 = new ChessPlayer(true);
         player2 = new ChessPlayer(false);
         currentPlayer = player1;
-        moveSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/move-self.mp3"));
+        chessSound = new ChessSound();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         board = new Board();
@@ -138,6 +138,16 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 ((Pawn) selectedSpot.getPiece()).setTurn(turn);
                             }
                         }
+                        if(selectedSpot.getPiece() instanceof King) {
+                            if(((King) selectedSpot.getPiece()).isCastling()) {
+                                ((King) selectedSpot.getPiece()).setCastling(false);
+                                chessSound.playCastleSound();
+                            }
+                        }else if(secondSpot.getPiece() != null) {
+                            chessSound.playCaptureSound();
+                        }else {
+                            chessSound.playMoveSound();
+                        }
                         selectedSpot = null;
                         if(currentPlayer == player1) {
                             currentPlayer = player2;
@@ -145,14 +155,18 @@ public class ChessScreen extends InputAdapter implements Screen {
                             currentPlayer = player1;
                             turn++;
                         }
-                        moveSound.play();
                     }else {
+                        board.warnIllegalMove(selectedSpot.getPiece().isWhite());
+                        selectedSpot.setShowColor(true);
                         board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
                         board.setSpot(boardY, boardX, secondSpot);
+                        chessSound.playIllegalSound();
                     }
                 }else {
                     if(secondSpot.getPiece() != null) {
+                        selectedSpot.setShowColor(false);
                         selectedSpot = secondSpot;
+                        selectedSpot.setShowColor(true);
                     }else {
                         selectedSpot = null;
                     }
@@ -199,5 +213,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         bPawn.dispose();
         bQueen.dispose();
         bRock.dispose();
+
+        chessSound.dispose();
     }
 }

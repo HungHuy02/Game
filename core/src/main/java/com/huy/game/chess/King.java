@@ -6,6 +6,7 @@ public class King extends Piece{
 
     private boolean hasMove = false;
     private boolean isSafe = true;
+    private boolean isCastling = false;
 
     public void setHasMove() {
         hasMove = true;
@@ -13,6 +14,14 @@ public class King extends Piece{
 
     public void setSafe(boolean isSafe) {
         this.isSafe = isSafe;
+    }
+
+    public void setCastling(boolean castling) {
+        isCastling = castling;
+    }
+
+    public boolean isCastling() {
+        return isCastling;
     }
 
     public King(boolean isWhite, Texture texture) {
@@ -57,6 +66,7 @@ public class King extends Piece{
                         board.setSpot(start.getX(), 0, new Spot(null, start.getX(), 0));
                         board.setSpot(start.getX(), start.getY() - 1, new Spot(rookPiece, start.getX(), start.getY() - 1));
                     }
+                    isCastling = true;
                     return true;
                 }else {
                     return false;

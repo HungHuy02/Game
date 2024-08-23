@@ -1,5 +1,6 @@
 package com.huy.game.chess;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
 public abstract class Piece {

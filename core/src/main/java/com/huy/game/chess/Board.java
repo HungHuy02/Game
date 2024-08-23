@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Timer;
 
 public class Board {
     private Spot[][] spots = new Spot[8][8];
@@ -106,7 +107,7 @@ public class Board {
             for (int j = 0;j <= 7; j++) {
                 float distance = spotSize * j;
                 if(spots[i][j].isShowColor()) {
-                    shapeRenderer.setColor(Colors.MOVE_COLOR);
+                    shapeRenderer.setColor(spots[i][j].getSpotColor());
                     shapeRenderer.rect(centerX + distance, distanceY, spotSize, spotSize);
                 }
             }
@@ -215,5 +216,23 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public void warnIllegalMove(boolean isWhite) {
+        Timer.schedule(new Timer.Task() {
+            int count = 1;
+            @Override
+            public void run() {
+                if(count++ <= 5) {
+                    Spot kingSpot = getKingSpot(isWhite);
+                    if(kingSpot.isShowColor()) {
+                        kingSpot.setShowColor(false);
+                    }else {
+                        kingSpot.setShowColor(true);
+                        kingSpot.setSpotColor(Colors.ILLEGAL_MOVE);
+                    }
+                }
+            }
+        }, 0, 0.5f);
     }
 }
