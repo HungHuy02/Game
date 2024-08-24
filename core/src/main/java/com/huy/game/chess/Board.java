@@ -1,6 +1,8 @@
 package com.huy.game.chess;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,6 +17,10 @@ public class Board {
 
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
+    }
+
+    public boolean isPromoting() {
+        return isPromoting;
     }
 
     public Spot getSpot(int x, int y) {
@@ -44,37 +50,33 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public void resetBoard(Texture wRook, Texture wKnight, Texture wBishop,
-                           Texture wQueen, Texture wKing, Texture wPawn,
-                           Texture bRook, Texture bKnight, Texture bBishop,
-                           Texture bQueen, Texture bKing, Texture bPawn
-    ) {
-        spots[0][0] = new Spot(new Rook(true, wRook), 0, 0);
-        spots[0][1] = new Spot(new Knight(true, wKnight), 0, 1);
-        spots[0][2] = new Spot(new Bishop(true, wBishop), 0, 2);
-        spots[0][3] = new Spot(new Queen(true, wQueen), 0, 3);
-        spots[0][4] = new Spot(new King(true, wKing), 0, 4);
+    public void resetBoard(ChessImage chessImage ) {
+        spots[0][0] = new Spot(new Rook(true, chessImage.getwRock()), 0, 0);
+        spots[0][1] = new Spot(new Knight(true, chessImage.getwKnight()), 0, 1);
+        spots[0][2] = new Spot(new Bishop(true, chessImage.getwBishop()), 0, 2);
+        spots[0][3] = new Spot(new Queen(true, chessImage.getwQueen()), 0, 3);
+        spots[0][4] = new Spot(new King(true, chessImage.getwKing()), 0, 4);
         wKingSpot = spots[0][4];
-        spots[0][5] = new Spot(new Bishop(true, wBishop), 0, 5);
-        spots[0][6] = new Spot(new Knight(true, wKnight), 0, 6);
-        spots[0][7] = new Spot(new Rook(true, wRook), 0, 7);
+        spots[0][5] = new Spot(new Bishop(true, chessImage.getwBishop()), 0, 5);
+        spots[0][6] = new Spot(new Knight(true, chessImage.getwKnight()), 0, 6);
+        spots[0][7] = new Spot(new Rook(true, chessImage.getwRock()), 0, 7);
 
         for(int i = 0; i <= 7; i++) {
-            spots[1][i] = new Spot(new Pawn(true, wPawn), 1, i);
+            spots[1][i] = new Spot(new Pawn(true, chessImage.getwPawn()), 1, i);
         }
 
-        spots[7][0] = new Spot(new Rook(false, bRook), 7, 0);
-        spots[7][1] = new Spot(new Knight(false, bKnight), 7, 1);
-        spots[7][2] = new Spot(new Bishop(false, bBishop), 7, 2);
-        spots[7][3] = new Spot(new Queen(false, bQueen), 7, 3);
-        spots[7][4] = new Spot(new King(false, bKing), 7, 4);
+        spots[7][0] = new Spot(new Rook(false, chessImage.getbRock()), 7, 0);
+        spots[7][1] = new Spot(new Knight(false, chessImage.getbKnight()), 7, 1);
+        spots[7][2] = new Spot(new Bishop(false, chessImage.getbBishop()), 7, 2);
+        spots[7][3] = new Spot(new Queen(false, chessImage.getbQueen()), 7, 3);
+        spots[7][4] = new Spot(new King(false, chessImage.getbKing()), 7, 4);
         bKingSpot = spots[7][4];
-        spots[7][5] = new Spot(new Bishop(false, bBishop), 7, 5);
-        spots[7][6] = new Spot(new Knight(false, bKnight), 7, 6);
-        spots[7][7] = new Spot(new Rook(false, bRook), 7, 7);
+        spots[7][5] = new Spot(new Bishop(false, chessImage.getbBishop()), 7, 5);
+        spots[7][6] = new Spot(new Knight(false, chessImage.getbKnight()), 7, 6);
+        spots[7][7] = new Spot(new Rook(false, chessImage.getbRock()), 7, 7);
 
         for(int i = 0; i <= 7; i++) {
-            spots[6][i] = new Spot(new Pawn(false, bPawn), 6, i);
+            spots[6][i] = new Spot(new Pawn(false, chessImage.getbPawn()), 6, i);
         }
 
         for (int i = 2; i < 6; i++) {
@@ -234,5 +236,29 @@ public class Board {
                 }
             }
         }, 0, 0.5f);
+    }
+
+    public void showPromoteSelection(SpriteBatch batch,ShapeRenderer shapeRenderer,float centerX, float centerY, ChessImage chessImage) {
+        float padding = chessImage.getSpotSize() / 10f;
+        float scale = (chessImage.getSpotSize() - (2 * padding)) / chessImage.getPieceSize();
+        float xPiece = centerX + padding;
+        float yPiece = centerY + padding;
+        float scaledSide = scale * chessImage.getPieceSize();
+        if(promotingSpot.getX() == 7) {
+            float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
+            float y = centerY + chessImage.getSpotSize() * promotingSpot.getX() - 3 * chessImage.getSpotSize();
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
+            shapeRenderer.end();
+
+            batch.begin();
+            batch.draw(chessImage.getwRock(), x + padding, y + padding , scaledSide, scaledSide);
+            batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
+            batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
+            batch.draw(chessImage.getwQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
+            batch.end();
+        }
     }
 }

@@ -15,28 +15,11 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
-    private Texture chessBoard;
-    private Texture wBishop;
-    private Texture wKing;
-    private Texture wKnight;
-    private Texture wPawn;
-    private Texture wQueen;
-    private Texture wRock;
-
-    private Texture bBishop;
-    private Texture bKing;
-    private Texture bKnight;
-    private Texture bPawn;
-    private Texture bQueen;
-    private Texture bRock;
+    private ChessImage chessImage;
 
     private float centerX;
     private float centerY;
-    private float scaledBoardWidth;
-    private float scaledBoardHeight;
-    private float spotSide;
     private Board board;
-    private float pieceSide;
     private Spot selectedSpot;
     private ChessPlayer player1;
     private ChessPlayer player2;
@@ -54,40 +37,13 @@ public class ChessScreen extends InputAdapter implements Screen {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         board = new Board();
-        chessBoard = new Texture("chess/images/chess_board.png");
+        chessImage = new ChessImage();
         selectedSpot = null;
 
-        float boardWidth = chessBoard.getWidth();
-        float boardHeight = chessBoard.getHeight();
-        int screenWidth = Gdx.graphics.getWidth();
-        int screenHeight = Gdx.graphics.getHeight();
+        centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
+        centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
 
-        float widthRatio = (float) screenWidth / boardWidth;
-        float heightRatio = (float) screenHeight / boardHeight;
-        float scale = Math.min(widthRatio, heightRatio);
-
-        scaledBoardWidth = boardWidth * scale;
-        scaledBoardHeight = boardHeight * scale;
-        centerX = (screenWidth - scaledBoardWidth) / 2;
-        centerY = (screenHeight - scaledBoardHeight) / 2;
-
-        spotSide = scaledBoardWidth / 8;
-
-        wBishop = new Texture("chess/images/wbishop.png");
-        wKing = new Texture("chess/images/wking.png");
-        wKnight = new Texture("chess/images/wknight.png");
-        wPawn = new Texture("chess/images/wpawn.png");
-        wQueen = new Texture("chess/images/wqueen.png");
-        wRock = new Texture("chess/images/wrook.png");
-
-        bBishop = new Texture("chess/images/bbishop.png");
-        bKing = new Texture("chess/images/bking.png");
-        bKnight = new Texture("chess/images/bknight.png");
-        bPawn = new Texture("chess/images/bpawn.png");
-        bQueen = new Texture("chess/images/bqueen.png");
-        bRock = new Texture("chess/images/brook.png");
-        pieceSide = bRock.getHeight();
-        board.resetBoard(wRock, wKnight,wBishop, wQueen, wKing, wPawn, bRock, bKnight, bBishop, bQueen, bKing, bPawn);
+        board.resetBoard(chessImage);
         Gdx.input.setInputProcessor(this);
     }
 
@@ -95,24 +51,28 @@ public class ChessScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
         batch.begin();
-        batch.draw(chessBoard, centerX, centerY, scaledBoardWidth, scaledBoardHeight);
+        batch.draw(chessImage.getChessBoard(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
         batch.end();
 
         Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        board.renderColor(shapeRenderer, spotSide, centerX, centerY);
+        board.renderColor(shapeRenderer, chessImage.getSpotSize(), centerX, centerY);
         shapeRenderer.end();
         Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
         batch.begin();
-        board.renderBoard(batch, spotSide, pieceSide, centerX, centerY);
+        board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getPieceSize(), centerX, centerY);
         batch.end();
+
+        if(board.isPromoting()) {
+            board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage);
+        }
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        int boardX = (int) Math.floor((screenX - centerX) / spotSide);
-        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / spotSide);
+        int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
+        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / chessImage.getSpotSize());
 
         if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
             if (selectedSpot == null) {
@@ -128,7 +88,11 @@ public class ChessScreen extends InputAdapter implements Screen {
             } else {
                 Spot secondSpot = board.getSpot(boardY, boardX);
                 boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
-                if(canMove) {
+                if(canMove && selectedSpot.getPiece().isWhite() == currentPlayer.isWhite()) {
+                    if(selectedSpot.getPiece() instanceof Pawn && selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) {
+                        board.setPromoting(true);
+                        board.setPromotingSpot(secondSpot);
+                    }
                     board.clearColor();
                     board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY(), true));
                     board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX, true));
@@ -138,10 +102,14 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 ((Pawn) selectedSpot.getPiece()).setTurn(turn);
                             }
                         }
-                        if(selectedSpot.getPiece() instanceof King) {
+                        if(!board.isKingSafe(!currentPlayer.isWhite())) {
+                            chessSound.playCheckSound();
+                        }else if(selectedSpot.getPiece() instanceof King) {
                             if(((King) selectedSpot.getPiece()).isCastling()) {
                                 ((King) selectedSpot.getPiece()).setCastling(false);
                                 chessSound.playCastleSound();
+                            }else {
+                                chessSound.playMoveSound();
                             }
                         }else if(secondSpot.getPiece() != null) {
                             chessSound.playCaptureSound();
@@ -199,21 +167,8 @@ public class ChessScreen extends InputAdapter implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        chessBoard.dispose();
-        wBishop.dispose();
-        wKing.dispose();
-        wKnight.dispose();
-        wPawn.dispose();
-        wQueen.dispose();
-        wRock.dispose();
-
-        bBishop.dispose();
-        bKing.dispose();
-        bKnight.dispose();
-        bPawn.dispose();
-        bQueen.dispose();
-        bRock.dispose();
-
+        shapeRenderer.dispose();
+        chessImage.dispose();
         chessSound.dispose();
     }
 }
