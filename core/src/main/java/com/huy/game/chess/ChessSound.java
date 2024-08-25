@@ -9,6 +9,7 @@ public class ChessSound {
     private Sound castleSound;
     private Sound captureSound;
     private Sound checkSound;
+    private Sound promoteSound;
 
     public ChessSound() {
         moveSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/move-self.mp3"));
@@ -16,6 +17,7 @@ public class ChessSound {
         castleSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/castle.mp3"));
         captureSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/capture.mp3"));
         checkSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/move-check.mp3"));
+        promoteSound = Gdx.audio.newSound(Gdx.files.internal("chess/sounds/promote.mp3"));
     }
 
     public void playMoveSound() {
@@ -38,11 +40,16 @@ public class ChessSound {
         checkSound.play();
     }
 
+    public void playPromoteSound() {
+        promoteSound.play();
+    }
+
     public void dispose() {
         moveSound.dispose();
         illegalSound.dispose();
         castleSound.dispose();
         captureSound.dispose();
         checkSound.dispose();
+        promoteSound.dispose();
     }
 }

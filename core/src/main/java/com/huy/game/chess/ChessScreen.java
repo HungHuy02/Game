@@ -3,10 +3,8 @@ package com.huy.game.chess;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -75,68 +73,96 @@ public class ChessScreen extends InputAdapter implements Screen {
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / chessImage.getSpotSize());
 
         if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
-            if (selectedSpot == null) {
-                selectedSpot = board.getSpot(boardY, boardX);
-                selectedSpot.setShowColor(true);
-                if(selectedSpot.getPiece() instanceof Pawn) {
-                    ((Pawn) selectedSpot.getPiece()).setTurn(turn);
-                }
-                if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != currentPlayer.isWhite()) {
-                    selectedSpot.setShowColor(false);
-                    selectedSpot = null;
-                }
-            } else {
-                Spot secondSpot = board.getSpot(boardY, boardX);
-                boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
-                if(canMove && selectedSpot.getPiece().isWhite() == currentPlayer.isWhite()) {
-                    if(selectedSpot.getPiece() instanceof Pawn && selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) {
-                        board.setPromoting(true);
-                        board.setPromotingSpot(secondSpot);
+            if(board.isPromoting()) {
+                if(boardX != board.getPromotingSpot().getY() || boardY <= 3) {
+                    board.setPromoting(false);
+                    board.setPromotingSpot(null);
+                }else {
+                    board.setPromoting(false);
+                    Spot newSpot = new Spot(null, board.getPromotingSpot().getX(), board.getPromotingSpot().getY());
+                    switch (boardY) {
+                        case 7:
+                            newSpot.setPiece(new Queen(true, chessImage.getwQueen()));
+                            break;
+                        case 6:
+                            newSpot.setPiece(new Knight(true, chessImage.getwKnight()));
+                            break;
+                        case 5:
+                            newSpot.setPiece(new Bishop(true, chessImage.getwBishop()));
+                            break;
+                        case 4:
+                            newSpot.setPiece(new Rook(true, chessImage.getwRock()));
+                            break;
                     }
-                    board.clearColor();
-                    board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY(), true));
-                    board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX, true));
-                    if(board.isKingSafe(currentPlayer.isWhite())) {
-                        if(selectedSpot.getPiece() instanceof Pawn) {
-                            if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
-                                ((Pawn) selectedSpot.getPiece()).setTurn(turn);
-                            }
+                    board.setSpot(newSpot.getX(), newSpot.getY(), newSpot);
+                    chessSound.playPromoteSound();
+                }
+            }else {
+                if (selectedSpot == null) {
+                    selectedSpot = board.getSpot(boardY, boardX);
+                    selectedSpot.setShowColor(true);
+                    if(selectedSpot.getPiece() instanceof Pawn) {
+                        ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+                    }
+                    if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != currentPlayer.isWhite()) {
+                        if(!selectedSpot.isIdentificationColor()) {
+                            selectedSpot.setShowColor(false);
                         }
-                        if(!board.isKingSafe(!currentPlayer.isWhite())) {
-                            chessSound.playCheckSound();
-                        }else if(selectedSpot.getPiece() instanceof King) {
-                            if(((King) selectedSpot.getPiece()).isCastling()) {
-                                ((King) selectedSpot.getPiece()).setCastling(false);
-                                chessSound.playCastleSound();
+                        selectedSpot = null;
+                    }
+                } else {
+                    Spot secondSpot = board.getSpot(boardY, boardX);
+                    boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
+                    if(canMove && selectedSpot.getPiece().isWhite() == currentPlayer.isWhite()) {
+                        if(selectedSpot.getPiece() instanceof Pawn && selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) {
+                            board.setPromoting(true);
+                            board.setPromotingSpot(secondSpot);
+                        }
+                        board.clearColor();
+                        board.setSpot(selectedSpot.getX(), selectedSpot.getY(), new Spot(null, selectedSpot.getX(), selectedSpot.getY(), true, true));
+                        board.setSpot(boardY, boardX, new Spot(selectedSpot.getPiece(), boardY, boardX, true, true));
+                        if(board.isKingSafe(currentPlayer.isWhite())) {
+                            if(selectedSpot.getPiece() instanceof Pawn) {
+                                if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
+                                    ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+                                }
+                            }
+                            if(!board.isKingSafe(!currentPlayer.isWhite())) {
+                                chessSound.playCheckSound();
+                            }else if(selectedSpot.getPiece() instanceof King) {
+                                if(((King) selectedSpot.getPiece()).isCastling()) {
+                                    ((King) selectedSpot.getPiece()).setCastling(false);
+                                    chessSound.playCastleSound();
+                                }else {
+                                    chessSound.playMoveSound();
+                                }
+                            }else if(secondSpot.getPiece() != null) {
+                                chessSound.playCaptureSound();
                             }else {
                                 chessSound.playMoveSound();
                             }
-                        }else if(secondSpot.getPiece() != null) {
-                            chessSound.playCaptureSound();
+                            selectedSpot = null;
+                            if(currentPlayer == player1) {
+                                currentPlayer = player2;
+                            }else {
+                                currentPlayer = player1;
+                                turn++;
+                            }
                         }else {
-                            chessSound.playMoveSound();
-                        }
-                        selectedSpot = null;
-                        if(currentPlayer == player1) {
-                            currentPlayer = player2;
-                        }else {
-                            currentPlayer = player1;
-                            turn++;
+                            board.warnIllegalMove(selectedSpot.getPiece().isWhite());
+                            selectedSpot.setShowColor(true);
+                            board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
+                            board.setSpot(boardY, boardX, secondSpot);
+                            chessSound.playIllegalSound();
                         }
                     }else {
-                        board.warnIllegalMove(selectedSpot.getPiece().isWhite());
-                        selectedSpot.setShowColor(true);
-                        board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
-                        board.setSpot(boardY, boardX, secondSpot);
-                        chessSound.playIllegalSound();
-                    }
-                }else {
-                    if(secondSpot.getPiece() != null) {
-                        selectedSpot.setShowColor(false);
-                        selectedSpot = secondSpot;
-                        selectedSpot.setShowColor(true);
-                    }else {
-                        selectedSpot = null;
+                        if(secondSpot.getPiece() != null) {
+                            selectedSpot.setShowColor(false);
+                            selectedSpot = secondSpot;
+                            selectedSpot.setShowColor(true);
+                        }else {
+                            selectedSpot = null;
+                        }
                     }
                 }
             }

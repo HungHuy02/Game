@@ -27,5 +27,10 @@ public class LoginWayActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
         });
+
+        binding.guestBtn.setOnClickListener((v) -> {
+            Intent intent = new Intent(this, AndroidLauncher.class);
+            startActivity(intent);
+        });
     }
 }

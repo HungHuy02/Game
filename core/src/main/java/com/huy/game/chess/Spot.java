@@ -7,6 +7,7 @@ public class Spot {
     private int x;
     private int y;
     private boolean showColor = false;
+    private boolean isIdentificationColor = false;
     private Color spotColor = Colors.MOVE_COLOR;
 
     public Spot(Piece piece, int x, int y) {
@@ -20,6 +21,14 @@ public class Spot {
         this.x = x;
         this.y = y;
         this.showColor = showColor;
+    }
+
+    public Spot(Piece piece, int x, int y, boolean showColor, boolean isIdentificationColor) {
+        this.piece = piece;
+        this.x = x;
+        this.y = y;
+        this.showColor = showColor;
+        this.isIdentificationColor = isIdentificationColor;
     }
 
     public Piece getPiece() {
@@ -60,5 +69,13 @@ public class Spot {
 
     public void setSpotColor(Color spotColor) {
         this.spotColor = spotColor;
+    }
+
+    public boolean isIdentificationColor() {
+        return isIdentificationColor;
+    }
+
+    public void setIdentificationColor(boolean identificationColor) {
+        isIdentificationColor = identificationColor;
     }
 }

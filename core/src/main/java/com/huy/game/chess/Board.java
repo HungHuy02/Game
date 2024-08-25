@@ -1,9 +1,6 @@
 package com.huy.game.chess;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
@@ -120,6 +117,7 @@ public class Board {
         for (int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
                 spots[i][j].setShowColor(false);
+                spots[i][j].setIdentificationColor(false);
             }
         }
     }
@@ -233,6 +231,8 @@ public class Board {
                         kingSpot.setShowColor(true);
                         kingSpot.setSpotColor(Colors.ILLEGAL_MOVE);
                     }
+                }else {
+                    this.cancel();
                 }
             }
         }, 0, 0.5f);
@@ -241,8 +241,6 @@ public class Board {
     public void showPromoteSelection(SpriteBatch batch,ShapeRenderer shapeRenderer,float centerX, float centerY, ChessImage chessImage) {
         float padding = chessImage.getSpotSize() / 10f;
         float scale = (chessImage.getSpotSize() - (2 * padding)) / chessImage.getPieceSize();
-        float xPiece = centerX + padding;
-        float yPiece = centerY + padding;
         float scaledSide = scale * chessImage.getPieceSize();
         if(promotingSpot.getX() == 7) {
             float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
@@ -258,6 +256,21 @@ public class Board {
             batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
             batch.draw(chessImage.getwQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
+            batch.end();
+        }else {
+            float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
+            float y = centerY + chessImage.getSpotSize() * promotingSpot.getX() + 3 * chessImage.getSpotSize();
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
+            shapeRenderer.end();
+
+            batch.begin();
+            batch.draw(chessImage.getbRock(), x + padding, y + padding , scaledSide, scaledSide);
+            batch.draw(chessImage.getbBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
+            batch.draw(chessImage.getbKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
+            batch.draw(chessImage.getbQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
             batch.end();
         }
     }
