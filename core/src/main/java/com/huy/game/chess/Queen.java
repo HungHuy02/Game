@@ -33,4 +33,25 @@ public class Queen extends Piece{
             return false;
         }
     }
+
+    @Override
+    public boolean calculateMove(Board board, Spot checkSpot) {
+        int[][] queenMoves =  {
+            {1, -1}, {1, 0}, {1, 1},{0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}
+        };
+        for (int[] move: queenMoves) {
+            for(int i = 1; i <= 7; i++) {
+                int x = move[0] + checkSpot.getX();
+                int y = move[1] + checkSpot.getY();
+                if(board.isWithinBoard(x, y)) {
+                    if(calculateOneMove(board, checkSpot, x, y)) {
+                        return true;
+                    }
+                }else {
+                    break;
+                }
+            }
+        }
+        return false;
+    }
 }

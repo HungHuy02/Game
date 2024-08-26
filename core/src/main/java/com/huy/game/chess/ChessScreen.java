@@ -65,6 +65,12 @@ public class ChessScreen extends InputAdapter implements Screen {
         if(board.isPromoting()) {
             board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage);
         }
+
+        if(board.isEnd()) {
+            batch.begin();
+            batch.draw(chessImage.getChessBoard(), 0, 0);
+            batch.end();
+        }
     }
 
     @Override
@@ -147,6 +153,10 @@ public class ChessScreen extends InputAdapter implements Screen {
                             }else {
                                 currentPlayer = player1;
                                 turn++;
+                            }
+                            if(board.isCheckmate(currentPlayer.isWhite())) {
+                                chessSound.playGameEndSound();
+                                board.setEnd();
                             }
                         }else {
                             board.warnIllegalMove(selectedSpot.getPiece().isWhite());

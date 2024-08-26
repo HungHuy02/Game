@@ -76,4 +76,35 @@ public class King extends Piece{
             }
         }else return x <= 1 && y <= 1;
     }
+
+    @Override
+    public boolean calculateMove(Board board, Spot checkSpot) {
+        for(int i = -1; i <= 1; i++) {
+            int x = checkSpot.getX() + i;
+            for(int j = -1; j <= 1; j++) {
+                if(i == 0 && j == 0) {
+                    continue;
+                }
+                int y = checkSpot.getY() + j;
+                if(board.isWithinBoard(x, y)) {
+                    if(calculateOneMove(board, checkSpot, x, y)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean calculateOneMove(Board board, Spot checkSpot, int x, int y) {
+        Spot testSpot = board.getSpot(x, y);
+        if(canMove(board, checkSpot, testSpot)) {
+            if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
+                testSpot.setShowMovePoint(true);
+                return true;
+            }
+        }
+        return false;
+    }
 }

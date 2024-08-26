@@ -83,4 +83,29 @@ public class Pawn extends Piece{
             return end.getPiece() == null;
         }
     }
+
+    @Override
+    public boolean calculateMove(Board board, Spot checkSpot) {
+        int[][] pawnMoves;
+        if(checkSpot.getPiece().isWhite()) {
+            pawnMoves = new int[][]{
+                {1, 0}, {1, -1}, {1, 1}, {2, 0}
+            };
+        }else {
+            pawnMoves = new int[][]{
+                {-1, 0}, {-1, -1}, {-1, 1}, {-2, 0}
+            };
+        }
+
+        for (int[] move: pawnMoves) {
+            int x = move[0] + checkSpot.getX();
+            int y = move[1] + checkSpot.getY();
+            if(board.isWithinBoard(x, y)) {
+                if(calculateOneMove(board, checkSpot, x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

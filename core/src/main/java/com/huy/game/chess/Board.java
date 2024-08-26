@@ -11,6 +11,7 @@ public class Board {
     private Spot bKingSpot;
     private Spot promotingSpot;
     private boolean isPromoting = false;
+    private boolean isEnd = false;
 
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
@@ -30,6 +31,14 @@ public class Board {
 
     public void setPromotingSpot(Spot promotingSpot) {
         this.promotingSpot = promotingSpot;
+    }
+
+    public void setEnd(){
+        isEnd = true;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
     }
 
     public void setSpot(int x, int y, Spot spot) {
@@ -122,51 +131,61 @@ public class Board {
         }
     }
 
+    public boolean isWithinBoard(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
+    }
+
+    public boolean isCheckmate(boolean isWhite) {
+        if(!isKingSafe(isWhite)) {
+            if(canKingMove(isWhite)) {
+                return false;
+            }else {
+                for(int i = 0; i <= 7; i++) {
+                    for(int j = 0; j <= 7; j++) {
+                        Spot checkSpot = getSpot(i, j);
+                        Piece checkPiece = checkSpot.getPiece();
+                        if(checkPiece != null) {
+                            if(checkPiece.isWhite() == isWhite) {
+                                if(checkPiece.calculateMove(this,checkSpot)) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public boolean canKingMove(boolean isWhite) {
+        Spot kingSpot = getKingSpot(isWhite);
+        return kingSpot.getPiece().calculateMove(this, kingSpot);
+    }
+
 
     public boolean isKingSafe(boolean isWhite) {
-        Spot kingSpot = isWhite ? wKingSpot : bKingSpot;
+        Spot kingSpot = getKingSpot(isWhite);
         int kingX = kingSpot.getX();
         int kingY = kingSpot.getY();
         return isPositionSafe(kingX, kingY, isWhite);
     }
 
     public boolean isPositionSafe(int positionX, int positionY, boolean isWhite) {
-        for(int i = 1; i <= 2; i++) {
-            int coordinates = i == 1 ? 2 : 1;
-            int temp = coordinates;
-            boolean isChange = false;
-            while (true) {
-                Spot checkSpot = null;
-                int x;
-                int y;
-                if(isChange) {
-                    x = positionX + coordinates;
-                    y = positionY + i;
-                }else {
-                    x = positionX + i;
-                    y = positionY + coordinates;
-                }
-                if(x >= 0 && x <= 7 && y >=0 && y <= 7) {
-                    checkSpot = getSpot(x, y);
-                }
-                if(checkSpot != null && checkSpot.getPiece() != null && checkSpot.getPiece().isWhite() != isWhite && checkSpot.getPiece() instanceof Knight) {
-                    return false;
-                }
-                if(coordinates != temp) {
-                    if(isChange) {
-                        break;
-                    }else {
-                        isChange = true;
-                    }
-                }
-                coordinates = -coordinates;
-            }
+        if(isKingInCheckByKnight(positionX, positionY, isWhite)) {
+            return false;
         }
+
         for(int i = -1; i <= 1; i++) {
             int x = positionX + i;
             for(int j = -1; j <= 1; j++) {
+                if(i == 0 && j == 0) {
+                    continue;
+                }
                 int y = positionY + j;
-                if(x >= 0 && x <= 7 && y >=0 && y <= 7) {
+                if(isWithinBoard(x, y)) {
                     Piece checkPiece = getSpot(x, y).getPiece();
                     if(checkPiece != null) {
                         if(checkPiece.isWhite() != isWhite) {
@@ -181,12 +200,9 @@ public class Board {
                             }
                         }
                     }else {
-                        if(i == 0 && j == 0) {
-                            continue;
-                        }
                         int coordinatesX = x + i;
                         int coordinatesY = y + j;
-                        while(coordinatesX >= 0 && coordinatesX < 8 && coordinatesY >=0 && coordinatesY < 8) {
+                        while(isWithinBoard(coordinatesX, coordinatesY)) {
                             Piece testPiece = getSpot(coordinatesX, coordinatesY).getPiece();
                             if(testPiece != null) {
                                 if(testPiece.isWhite() == isWhite) {
@@ -216,6 +232,24 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public boolean isKingInCheckByKnight(int positionX, int positionY, boolean isWhite) {
+        int[][] knightMoves = {
+            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+            {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+        };
+        for (int[] move : knightMoves) {
+            int x = positionX + move[0];
+            int y = positionY + move[1];
+            if(isWithinBoard(x, y)) {
+                Piece checkPiece = spots[x][y].getPiece();
+                if(checkPiece instanceof Knight && checkPiece.isWhite() != isWhite) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void warnIllegalMove(boolean isWhite) {

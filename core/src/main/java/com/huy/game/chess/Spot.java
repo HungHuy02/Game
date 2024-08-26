@@ -9,6 +9,8 @@ public class Spot {
     private boolean showColor = false;
     private boolean isIdentificationColor = false;
     private Color spotColor = Colors.MOVE_COLOR;
+    private boolean canBeCaptured = false;
+    private boolean showMovePoint = false;
 
     public Spot(Piece piece, int x, int y) {
         this.piece = piece;
@@ -77,5 +79,21 @@ public class Spot {
 
     public void setIdentificationColor(boolean identificationColor) {
         isIdentificationColor = identificationColor;
+    }
+
+    public boolean isCanBeCaptured() {
+        return canBeCaptured;
+    }
+
+    public void setCanBeCaptured(boolean canBeCaptured) {
+        this.canBeCaptured = canBeCaptured;
+    }
+
+    public boolean isShowMovePoint() {
+        return showMovePoint;
+    }
+
+    public void setShowMovePoint(boolean showMovePoint) {
+        this.showMovePoint = showMovePoint;
     }
 }
