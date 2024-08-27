@@ -9,6 +9,14 @@ public class Knight extends Piece{
         super(isWhite, texture);
     }
 
+    private int[][] knightMoves() {
+        int[][] knightMoves = {
+            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+            {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+        };
+        return knightMoves;
+    }
+
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
@@ -21,11 +29,7 @@ public class Knight extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        int[][] knightMoves = {
-            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
-            {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
-        };
-        for (int[] move: knightMoves) {
+        for (int[] move: knightMoves()) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
@@ -35,5 +39,16 @@ public class Knight extends Piece{
             }
         }
         return false;
+    }
+
+    @Override
+    public void calculateForPoint(Board board, Spot checkSpot) {
+        for (int[] move: knightMoves()) {
+            int x = move[0] + checkSpot.getX();
+            int y = move[1] + checkSpot.getY();
+            if(board.isWithinBoard(x, y)) {
+                calculateForOnePoint(board, checkSpot, x, y);
+            }
+        }
     }
 }

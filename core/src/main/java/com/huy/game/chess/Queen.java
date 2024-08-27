@@ -9,6 +9,13 @@ public class Queen extends Piece{
         super(isWhite, texture);
     }
 
+    private int[][] queenMoves() {
+        int[][] queenMoves =  {
+            {1, -1}, {1, 0}, {1, 1},{0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}
+        };
+        return queenMoves;
+    }
+
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
@@ -36,10 +43,7 @@ public class Queen extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        int[][] queenMoves =  {
-            {1, -1}, {1, 0}, {1, 1},{0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}
-        };
-        for (int[] move: queenMoves) {
+        for (int[] move: queenMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] + checkSpot.getX();
                 int y = move[1] + checkSpot.getY();
@@ -54,4 +58,21 @@ public class Queen extends Piece{
         }
         return false;
     }
+
+    @Override
+    public void calculateForPoint(Board board, Spot checkSpot) {
+        for (int[] move: queenMoves()) {
+            for(int i = 1; i <= 7; i++) {
+                int x = move[0] + checkSpot.getX();
+                int y = move[1] + checkSpot.getY();
+                if(board.isWithinBoard(x, y)) {
+                    calculateForOnePoint(board, checkSpot, x, y);
+                }else {
+                    break;
+                }
+            }
+        }
+    }
+
+
 }

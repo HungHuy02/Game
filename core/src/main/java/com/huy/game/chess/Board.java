@@ -13,6 +13,10 @@ public class Board {
     private boolean isPromoting = false;
     private boolean isEnd = false;
 
+    public Spot[][] getSpots() {
+        return spots;
+    }
+
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
     }
@@ -109,7 +113,8 @@ public class Board {
         }
     }
 
-    public void renderColor(ShapeRenderer shapeRenderer, float spotSize, float centerX, float centerY) {
+    public void renderColorAndPoint(ShapeRenderer shapeRenderer, float spotSize, float centerX, float centerY) {
+        float circlePointRadius = spotSize / 5;
         for(int i = 0; i <= 7; i++) {
             float distanceY = spotSize * i + centerY;
             for (int j = 0;j <= 7; j++) {
@@ -118,15 +123,28 @@ public class Board {
                     shapeRenderer.setColor(spots[i][j].getSpotColor());
                     shapeRenderer.rect(centerX + distance, distanceY, spotSize, spotSize);
                 }
+                if(spots[i][j].isShowMovePoint()) {
+                    if(spots[i][j].isCanBeCaptured()) {
+                        shapeRenderer.setColor(Color.WHITE);
+                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, circlePointRadius);
+                    }else  {
+                        shapeRenderer.setColor(Color.WHITE);
+                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, circlePointRadius);
+                    }
+
+                }
+
             }
         }
     }
 
-    public void clearColor() {
+    public void clearColorAndPoint() {
         for (int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
                 spots[i][j].setShowColor(false);
                 spots[i][j].setIdentificationColor(false);
+                spots[i][j].setShowMovePoint(false);
+                spots[i][j].setCanBeCaptured(false);
             }
         }
     }

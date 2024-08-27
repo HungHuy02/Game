@@ -23,6 +23,20 @@ public class Pawn extends Piece{
         return isMoveTwo;
     }
 
+    private int[][] pawnMoves(Spot checkSpot) {
+        int[][] pawnMoves;
+        if(checkSpot.getPiece().isWhite()) {
+            pawnMoves = new int[][]{
+                {1, 0}, {1, -1}, {1, 1}, {2, 0}
+            };
+        }else {
+            pawnMoves = new int[][]{
+                {-1, 0}, {-1, -1}, {-1, 1}, {-2, 0}
+            };
+        }
+        return pawnMoves;
+    }
+
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
@@ -86,18 +100,7 @@ public class Pawn extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        int[][] pawnMoves;
-        if(checkSpot.getPiece().isWhite()) {
-            pawnMoves = new int[][]{
-                {1, 0}, {1, -1}, {1, 1}, {2, 0}
-            };
-        }else {
-            pawnMoves = new int[][]{
-                {-1, 0}, {-1, -1}, {-1, 1}, {-2, 0}
-            };
-        }
-
-        for (int[] move: pawnMoves) {
+        for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
@@ -107,5 +110,16 @@ public class Pawn extends Piece{
             }
         }
         return false;
+    }
+
+    @Override
+    public void calculateForPoint(Board board, Spot checkSpot) {
+        for (int[] move: pawnMoves(checkSpot)) {
+            int x = move[0] + checkSpot.getX();
+            int y = move[1] + checkSpot.getY();
+            if(board.isWithinBoard(x, y)) {
+                calculateForOnePoint(board, checkSpot, x, y);
+            }
+        }
     }
 }

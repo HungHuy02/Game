@@ -4,6 +4,12 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Bishop extends Piece{
 
+    private int[][] bishopMoves() {
+        int[][] bishopMoves = {
+            {1, -1}, {1, 1}, {-1, 1}, {-1, -1}
+        };
+        return bishopMoves;
+    }
 
     public Bishop(boolean isWhite, Texture texture) {
         super(isWhite, texture);
@@ -36,10 +42,7 @@ public class Bishop extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        int[][] bishopMoves = {
-            {1, -1}, {1, 1}, {-1, 1}, {-1, -1}
-        };
-        for (int[] move: bishopMoves) {
+        for (int[] move: bishopMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] + checkSpot.getX();
                 int y = move[1] + checkSpot.getY();
@@ -53,5 +56,20 @@ public class Bishop extends Piece{
             }
         }
         return false;
+    }
+
+    @Override
+    public void calculateForPoint(Board board, Spot checkSpot) {
+        for (int[] move: bishopMoves()) {
+            for(int i = 1; i <= 7; i++) {
+                int x = move[0] + checkSpot.getX();
+                int y = move[1] + checkSpot.getY();
+                if(board.isWithinBoard(x, y)) {
+                   calculateForOnePoint(board, checkSpot, x, y);
+                }else {
+                    break;
+                }
+            }
+        }
     }
 }
