@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 public class Bishop extends Piece{
 
     private int[][] bishopMoves() {
-        int[][] bishopMoves = {
+        return new int[][]{
             {1, -1}, {1, 1}, {-1, 1}, {-1, -1}
         };
-        return bishopMoves;
     }
 
     public Bishop(boolean isWhite, Texture texture) {
@@ -34,6 +33,9 @@ public class Bishop extends Piece{
                 currentX += directionX;
                 currentY += directionY;
             }
+            if(end.getPiece() != null) {
+                end.setCanBeCaptured(true);
+            }
             return true;
         }else {
             return false;
@@ -44,8 +46,8 @@ public class Bishop extends Piece{
     public boolean calculateMove(Board board, Spot checkSpot) {
         for (int[] move: bishopMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                     if(calculateOneMove(board, checkSpot, x, y)) {
                         return true;
@@ -62,8 +64,8 @@ public class Bishop extends Piece{
     public void calculateForPoint(Board board, Spot checkSpot) {
         for (int[] move: bishopMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                    calculateForOnePoint(board, checkSpot, x, y);
                 }else {

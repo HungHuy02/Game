@@ -10,11 +10,10 @@ public class Knight extends Piece{
     }
 
     private int[][] knightMoves() {
-        int[][] knightMoves = {
+        return new int[][]{
             {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
             {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
         };
-        return knightMoves;
     }
 
     @Override
@@ -24,7 +23,14 @@ public class Knight extends Piece{
         }
         int x = Math.abs(start.getX() - end.getX());
         int y = Math.abs(start.getY() - end.getY());
-        return x * y == 2;
+        if(x * y == 2) {
+            if(end.getPiece() != null) {
+                end.setCanBeCaptured(true);
+            }
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override

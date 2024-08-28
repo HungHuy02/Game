@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Timer;
 
 public class Board {
     private Spot[][] spots = new Spot[8][8];
+    private Spot[][] tempSpots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
     private Spot promotingSpot;
@@ -15,6 +16,14 @@ public class Board {
 
     public Spot[][] getSpots() {
         return spots;
+    }
+
+    public void setTempSpots() {
+        for (int i = 0; i <= 7; i++) {
+            for (int j = 0; j <= 7; j++) {
+                tempSpots[i][j] = spots[i][j];
+            }
+        }
     }
 
     public void setPromoting(boolean isPromoting) {
@@ -27,6 +36,10 @@ public class Board {
 
     public Spot getSpot(int x, int y) {
         return spots[x][y];
+    }
+
+    public Spot getTempSpot(int x, int y) {
+        return tempSpots[x][y];
     }
 
     public Spot getPromotingSpot() {
@@ -113,8 +126,12 @@ public class Board {
         }
     }
 
-    public void renderColorAndPoint(ShapeRenderer shapeRenderer, float spotSize, float centerX, float centerY) {
-        float circlePointRadius = spotSize / 5;
+    public void renderColorAndPoint(ShapeRenderer shapeRenderer, float circlePointRadius, float pieceSide, float spotSize, float centerX, float centerY) {
+        float padding = spotSize / 10f;
+        float scale = (spotSize - (2 * padding)) / pieceSide;
+        float x = centerX + padding;
+        float y = centerY + padding;
+        float scaledSide = scale * pieceSide;
         for(int i = 0; i <= 7; i++) {
             float distanceY = spotSize * i + centerY;
             for (int j = 0;j <= 7; j++) {
@@ -125,8 +142,12 @@ public class Board {
                 }
                 if(spots[i][j].isShowMovePoint()) {
                     if(spots[i][j].isCanBeCaptured()) {
+                        shapeRenderer.end();
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                         shapeRenderer.setColor(Color.WHITE);
-                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, circlePointRadius);
+                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, scaledSide / 2);
+                        shapeRenderer.end();
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     }else  {
                         shapeRenderer.setColor(Color.WHITE);
                         shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, circlePointRadius);
@@ -192,6 +213,8 @@ public class Board {
     }
 
     public boolean isPositionSafe(int positionX, int positionY, boolean isWhite) {
+        setTempSpots();
+
         if(isKingInCheckByKnight(positionX, positionY, isWhite)) {
             return false;
         }

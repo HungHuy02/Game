@@ -54,7 +54,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        board.renderColorAndPoint(shapeRenderer, chessImage.getSpotSize(), centerX, centerY);
+        board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
         shapeRenderer.end();
         Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
@@ -172,6 +172,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                             selectedSpot.setShowColor(false);
                             selectedSpot = secondSpot;
                             selectedSpot.setShowColor(true);
+                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
                         }else {
                             selectedSpot = null;
                         }

@@ -10,10 +10,9 @@ public class Queen extends Piece{
     }
 
     private int[][] queenMoves() {
-        int[][] queenMoves =  {
+        return new int[][]{
             {1, -1}, {1, 0}, {1, 1},{0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}
         };
-        return queenMoves;
     }
 
     @Override
@@ -35,6 +34,9 @@ public class Queen extends Piece{
                 currentX += directionX;
                 currentY += directionY;
             }
+            if(end.getPiece() != null) {
+                end.setCanBeCaptured(true);
+            }
             return true;
         }else {
             return false;
@@ -45,8 +47,8 @@ public class Queen extends Piece{
     public boolean calculateMove(Board board, Spot checkSpot) {
         for (int[] move: queenMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                     if(calculateOneMove(board, checkSpot, x, y)) {
                         return true;
@@ -63,8 +65,8 @@ public class Queen extends Piece{
     public void calculateForPoint(Board board, Spot checkSpot) {
         for (int[] move: queenMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                     calculateForOnePoint(board, checkSpot, x, y);
                 }else {

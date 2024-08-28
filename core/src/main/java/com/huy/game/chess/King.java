@@ -7,6 +7,7 @@ public class King extends Piece{
     private boolean hasMove = false;
     private boolean isSafe = true;
     private boolean isCastling = false;
+    private boolean isCalculate = false;
 
     public void setHasMove() {
         hasMove = true;
@@ -58,15 +59,18 @@ public class King extends Piece{
                             }
                         }
                     }
-                    this.setHasMove();
-                    if(directionY > 0) {
-                        board.setSpot(start.getX(), 7, new Spot(null, start.getX(), 7));
-                        board.setSpot(start.getX(), start.getY() + 1, new Spot(rookPiece, start.getX(), start.getY() + 1));
-                    }else {
-                        board.setSpot(start.getX(), 0, new Spot(null, start.getX(), 0));
-                        board.setSpot(start.getX(), start.getY() - 1, new Spot(rookPiece, start.getX(), start.getY() - 1));
+                    if(!isCalculate) {
+                        this.setHasMove();
+                        if(directionY > 0) {
+                            board.setSpot(start.getX(), 7, new Spot(null, start.getX(), 7));
+                            board.setSpot(start.getX(), start.getY() + 1, new Spot(rookPiece, start.getX(), start.getY() + 1));
+                        }else {
+                            board.setSpot(start.getX(), 0, new Spot(null, start.getX(), 0));
+                            board.setSpot(start.getX(), start.getY() - 1, new Spot(rookPiece, start.getX(), start.getY() - 1));
+                        }
+                        isCastling = true;
                     }
-                    isCastling = true;
+                    board.getSpot(start.getX(), start.getY() + directionY * 2).setShowMovePoint(true);
                     return true;
                 }else {
                     return false;
@@ -74,7 +78,14 @@ public class King extends Piece{
             }else {
                 return false;
             }
-        }else return x <= 1 && y <= 1;
+        }else {
+            if (x <= 1 && y <= 1) {
+                end.setShowMovePoint(true);
+                return true;
+            }else {
+                return false;
+            }
+        }
     }
 
     @Override
@@ -110,6 +121,10 @@ public class King extends Piece{
                 }
             }
         }
+        isCalculate = true;
+        calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
+        calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
+        isCalculate = false;
     }
 
     @Override

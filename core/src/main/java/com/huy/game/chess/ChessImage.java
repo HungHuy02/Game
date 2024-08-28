@@ -24,6 +24,7 @@ public class ChessImage {
     private float pieceSize;
     private float scaledBoardWidth;
     private float scaledBoardHeight;
+    private float circleRadius;
 
     public ChessImage() {
         chessBoard = new Texture("chess/images/chess_board.png");
@@ -55,6 +56,8 @@ public class ChessImage {
 
         spotSize = scaledBoardWidth / 8;
         pieceSize = bBishop.getHeight();
+
+        circleRadius = spotSize / 5;
     }
 
     public Texture getChessBoard() {
@@ -123,6 +126,10 @@ public class ChessImage {
 
     public float getScaledBoardHeight() {
         return scaledBoardHeight;
+    }
+
+    public float getCircleRadius() {
+        return circleRadius;
     }
 
     public void dispose() {

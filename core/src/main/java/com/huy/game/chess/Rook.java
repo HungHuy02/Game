@@ -15,10 +15,9 @@ public class Rook extends Piece {
     }
 
     private int[][] rookMoves() {
-        int[][] rookMoves = {
+        return new int[][]{
             {1, 0}, {-1, 0}, {0, 1}, {0, -1}
         };
-        return rookMoves;
     }
 
     public Rook(boolean isWhite, Texture texture) {
@@ -44,6 +43,9 @@ public class Rook extends Piece {
                 currentX += directionX;
                 currentY += directionY;
             }
+            if(end.getPiece() != null) {
+                end.setCanBeCaptured(true);
+            }
             return true;
         }else {
             return false;
@@ -54,8 +56,8 @@ public class Rook extends Piece {
     public boolean calculateMove(Board board, Spot checkSpot) {
         for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                     if(calculateOneMove(board, checkSpot, x, y)) {
                         return true;
@@ -72,8 +74,8 @@ public class Rook extends Piece {
     public void calculateForPoint(Board board, Spot checkSpot) {
         for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
                     calculateForOnePoint(board, checkSpot, x, y);
                 }else {

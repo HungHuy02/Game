@@ -6,6 +6,7 @@ public class Pawn extends Piece{
 
     private int turn;
     private boolean isMoveTwo = false;
+    private boolean isCalculate = false;
 
     public Pawn(boolean isWhite, Texture texture) {
         super(isWhite, texture);
@@ -57,17 +58,21 @@ public class Pawn extends Piece{
         if(x > 2 || y >= 2) {
             return false;
         } else if(x > 1 && y == 0){
-            if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
-                isMoveTwo = true;
-                return true;
-            }
-            if(!this.isWhite() && start.getX() == 6 && end.getPiece() == null) {
-                isMoveTwo = true;
-                return true;
+            if(board.getSpot(Integer.signum(end.getX() - start.getX()) + start.getX(), start.getY()).getPiece() == null) {
+                if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
+                    isMoveTwo = true;
+                    return true;
+                }
+                if(!this.isWhite() && start.getX() == 6 && end.getPiece() == null) {
+                    isMoveTwo = true;
+                    return true;
+                }
             }
             return false;
         }else if(x == 1 && y == 1){
             if(end.getPiece() != null) {
+                isMoveTwo = false;
+                end.setCanBeCaptured(true);
                 return true;
             }else {
                 Piece checkPiece = board.getSpot(start.getX(), start.getY() + (end.getY() - start.getY())).getPiece();
@@ -76,12 +81,16 @@ public class Pawn extends Piece{
                     if(pawn.isMoveTwo) {
                         if(pawn.isWhite()) {
                             if(pawn.turn == this.turn) {
-                                board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                if(!isCalculate) {
+                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                }
                                 return true;
                             }
                         }else {
                             if(this.turn - pawn.turn == 1) {
-                                board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                if(!isCalculate) {
+                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                }
                                 return true;
                             }
                         }
@@ -94,26 +103,35 @@ public class Pawn extends Piece{
         }else if(y == 1) {
             return false;
         }else {
-            return end.getPiece() == null;
+            if(end.getPiece() == null) {
+                isMoveTwo = false;
+                return true;
+            }else {
+                return false;
+            }
         }
     }
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
+        isCalculate = true;
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
                 if(calculateOneMove(board, checkSpot, x, y)) {
+                    isCalculate = false;
                     return true;
                 }
             }
         }
+        isCalculate = false;
         return false;
     }
 
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
+        isCalculate = true;
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
@@ -121,5 +139,6 @@ public class Pawn extends Piece{
                 calculateForOnePoint(board, checkSpot, x, y);
             }
         }
+        isCalculate = false;
     }
 }
