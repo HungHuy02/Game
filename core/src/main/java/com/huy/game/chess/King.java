@@ -29,6 +29,13 @@ public class King extends Piece{
         super(isWhite, texture);
     }
 
+    public King(King king) {
+        super(king.isWhite());
+        hasMove = king.hasMove;
+        isSafe = king.isSafe;
+        isCastling = king.isCastling;
+    }
+
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {

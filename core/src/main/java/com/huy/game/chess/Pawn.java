@@ -8,6 +8,12 @@ public class Pawn extends Piece{
     private boolean isMoveTwo = false;
     private boolean isCalculate = false;
 
+    public Pawn(Pawn pawn) {
+        super(pawn.isWhite());
+        turn = pawn.turn;
+        isMoveTwo = pawn.isMoveTwo;
+    }
+
     public Pawn(boolean isWhite, Texture texture) {
         super(isWhite, texture);
     }

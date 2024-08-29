@@ -9,6 +9,10 @@ public class Knight extends Piece{
         super(isWhite, texture);
     }
 
+    public Knight(boolean isWhite) {
+        super(isWhite);
+    }
+
     private int[][] knightMoves() {
         return new int[][]{
             {2, 1}, {2, -1}, {-2, 1}, {-2, -1},

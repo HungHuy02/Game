@@ -1,17 +1,19 @@
 package com.huy.game.chess;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
 public abstract class Piece {
 
-    private boolean killed = false;
     private boolean isWhite;
     private Texture texture;
 
     public Piece(boolean isWhite, Texture texture) {
         this.isWhite = isWhite;
         this.texture = texture;
+    }
+
+    public Piece(boolean isWhite) {
+        this.isWhite = isWhite;
     }
 
     public boolean isWhite() {
@@ -22,14 +24,6 @@ public abstract class Piece {
         isWhite = white;
     }
 
-    public boolean isKilled() {
-        return killed;
-    }
-
-    public void setKilled(boolean killed) {
-        this.killed = killed;
-    }
-
     public Texture getTexture() {
         return texture;
     }
@@ -37,9 +31,7 @@ public abstract class Piece {
     public boolean calculateOneMove(Board board, Spot checkSpot,int x, int y) {
         Spot testSpot = board.getSpot(x, y);
         if(canMove(board, checkSpot, testSpot)) {
-            if(board.isKingSafe(checkSpot.getPiece().isWhite())) {
-                return true;
-            }
+            return board.isKingSafe(checkSpot.getPiece().isWhite());
         }
         return false;
     }
@@ -47,6 +39,7 @@ public abstract class Piece {
     public void calculateForOnePoint(Board board, Spot checkSpot, int x, int y) {
         Spot testSpot = board.getSpot(x, y);
         if(canMove(board, checkSpot, testSpot)) {
+            board.makeTempMove(checkSpot, testSpot);
             if(board.isKingSafe(checkSpot.getPiece().isWhite())) {
                 testSpot.setShowMovePoint(true);
             }

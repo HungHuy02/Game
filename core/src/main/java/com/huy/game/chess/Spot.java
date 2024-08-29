@@ -12,6 +12,29 @@ public class Spot {
     private boolean canBeCaptured = false;
     private boolean showMovePoint = false;
 
+    public Spot(Spot spot) {
+        Piece p = spot.getPiece();
+        if(p != null) {
+            if(p instanceof Pawn) {
+                piece = new Pawn((Pawn) p);
+            }else if(p instanceof Bishop) {
+                piece = new Bishop(p.isWhite());
+            }else if(p instanceof Rook) {
+                piece = new Rook((Rook) p);
+            }else if(p instanceof Queen) {
+                piece = new Queen(p.isWhite());
+            }else if(p instanceof Knight) {
+                piece = new Knight(p.isWhite());
+            }else if(p instanceof King){
+                piece = new King((King) p);
+            }
+        }else {
+            piece = null;
+        }
+        x = spot.getX();
+        y = spot.getY();
+    }
+
     public Spot(Piece piece, int x, int y) {
         this.piece = piece;
         this.x = x;

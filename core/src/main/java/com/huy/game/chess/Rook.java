@@ -20,6 +20,11 @@ public class Rook extends Piece {
         };
     }
 
+    public Rook(Rook rook) {
+        super(rook.isWhite());
+        hasMove = rook.hasMove;
+    }
+
     public Rook(boolean isWhite, Texture texture) {
         super(isWhite, texture);
     }

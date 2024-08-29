@@ -9,6 +9,10 @@ public class Queen extends Piece{
         super(isWhite, texture);
     }
 
+    public Queen(boolean isWhite) {
+        super(isWhite);
+    }
+
     private int[][] queenMoves() {
         return new int[][]{
             {1, -1}, {1, 0}, {1, 1},{0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}

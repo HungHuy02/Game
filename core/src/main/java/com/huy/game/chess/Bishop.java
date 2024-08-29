@@ -14,6 +14,10 @@ public class Bishop extends Piece{
         super(isWhite, texture);
     }
 
+    public Bishop(boolean isWhite) {
+        super(isWhite);
+    }
+
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
