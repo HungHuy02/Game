@@ -29,7 +29,7 @@ public class Knight extends Piece{
         int y = Math.abs(start.getY() - end.getY());
         if(x * y == 2) {
             if(end.getPiece() != null) {
-                end.setCanBeCaptured(true);
+                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
             }
             return true;
         }else {

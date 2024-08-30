@@ -39,7 +39,7 @@ public class Queen extends Piece{
                 currentY += directionY;
             }
             if(end.getPiece() != null) {
-                end.setCanBeCaptured(true);
+                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
             }
             return true;
         }else {

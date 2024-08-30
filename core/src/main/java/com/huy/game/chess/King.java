@@ -69,11 +69,11 @@ public class King extends Piece{
                     if(!isCalculate) {
                         this.setHasMove();
                         if(directionY > 0) {
-                            board.setSpot(start.getX(), 7, new Spot(null, start.getX(), 7));
-                            board.setSpot(start.getX(), start.getY() + 1, new Spot(rookPiece, start.getX(), start.getY() + 1));
+                            board.setSpot(start.getX(), 7, null);
+                            board.setSpot(start.getX(), start.getY() + 1, rookPiece);
                         }else {
-                            board.setSpot(start.getX(), 0, new Spot(null, start.getX(), 0));
-                            board.setSpot(start.getX(), start.getY() - 1, new Spot(rookPiece, start.getX(), start.getY() - 1));
+                            board.setSpot(start.getX(), 0, null);
+                            board.setSpot(start.getX(), start.getY() - 1, rookPiece);
                         }
                         isCastling = true;
                     }
@@ -136,7 +136,7 @@ public class King extends Piece{
 
     @Override
     public boolean calculateOneMove(Board board, Spot checkSpot, int x, int y) {
-        Spot testSpot = board.getSpot(x, y);
+        Spot testSpot = board.getTempSpot(x, y);
         if(canMove(board, checkSpot, testSpot)) {
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 return true;
@@ -147,10 +147,10 @@ public class King extends Piece{
 
     @Override
     public void calculateForOnePoint(Board board, Spot checkSpot, int x, int y) {
-        Spot testSpot = board.getSpot(x, y);
+        Spot testSpot = board.getTempSpot(x, y);
         if(canMove(board, checkSpot, testSpot)) {
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
-                testSpot.setShowMovePoint(true);
+                board.getSpot(x, y).setShowMovePoint(true);
             }
         }
     }

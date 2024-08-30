@@ -10,6 +10,8 @@ public class Board {
     private Spot[][] tempSpots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
+    private Spot tempWKingSpot;
+    private Spot tempBKingSpot;
     private Spot promotingSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
@@ -24,6 +26,8 @@ public class Board {
                 tempSpots[i][j] = new Spot(spots[i][j]);
             }
         }
+        tempWKingSpot = tempSpots[wKingSpot.getX()][wKingSpot.getY()];
+        tempBKingSpot = tempSpots[bKingSpot.getX()][bKingSpot.getY()];
     }
 
     public void setPromoting(boolean isPromoting) {
@@ -58,10 +62,10 @@ public class Board {
         return isEnd;
     }
 
-    public void setSpot(int x, int y, Spot spot) {
-        spots[x][y] = spot;
-        if(spot.getPiece() instanceof King) {
-            if(spot.getPiece().isWhite()) {
+    public void setSpot(int x, int y, Piece piece) {
+        spots[x][y].setPiece(piece);
+        if(piece instanceof King) {
+            if(piece.isWhite()) {
                 wKingSpot = spots[x][y];
             }else {
                 bKingSpot = spots[x][y];
@@ -69,8 +73,19 @@ public class Board {
         }
     }
 
+    public void setTempSpot(int x, int y, Piece piece) {
+        tempSpots[x][y].setPiece(piece);
+        if(piece instanceof King) {
+            if(piece.isWhite()) {
+                tempWKingSpot = tempSpots[x][y];
+            }else {
+                tempBKingSpot = tempSpots[x][y];
+            }
+        }
+    }
+
     public Spot getKingSpot(boolean isWhite) {
-        return isWhite ? wKingSpot : bKingSpot;
+        return isWhite ? tempWKingSpot : tempBKingSpot;
     }
 
     public void resetBoard(ChessImage chessImage ) {
@@ -107,6 +122,8 @@ public class Board {
                 spots[i][j] = new Spot(null,i, j);
             }
         }
+
+        setTempSpots();
     }
 
     public void renderBoard(SpriteBatch batch, float spotSize, float pieceSide, float centerX, float centerY) {
@@ -168,16 +185,24 @@ public class Board {
         }
     }
 
+    public void clearGuidePoint() {
+        for (int i = 0; i <= 7; i++) {
+            for(int j = 0; j <= 7; j++) {
+                spots[i][j].setShowMovePoint(false);
+                spots[i][j].setCanBeCaptured(false);
+            }
+        }
+    }
+
     public void makeTempMove(Spot start, Spot end) {
         setTempSpots();
-        tempSpots[start.getX()][start.getY()].setPiece(null);
-        tempSpots[end.getX()][end.getY()].setPiece(tempSpots[start.getX()][start.getY()].getPiece());
+        setTempSpot(end.getX(), end.getY(), start.getPiece());
+        setTempSpot(start.getX(), start.getY(), null);
     }
 
     public void makeMove(Spot start, Spot end) {
-        spots[end.getX()][end.getY()].setPiece(spots[start.getX()][start.getY()].getPiece());
-        spots[start.getX()][start.getY()].setPiece(null);
-
+        setSpot(end.getX(), end.getY(), start.getPiece());
+        setSpot(start.getX(), start.getY(), null);
     }
 
     public boolean isWithinBoard(int x, int y) {
@@ -185,13 +210,14 @@ public class Board {
     }
 
     public boolean isCheckmate(boolean isWhite) {
+        setTempSpots();
         if(!isKingSafe(isWhite)) {
             if(canKingMove(isWhite)) {
                 return false;
             }else {
                 for(int i = 0; i <= 7; i++) {
                     for(int j = 0; j <= 7; j++) {
-                        Spot checkSpot = getSpot(i, j);
+                        Spot checkSpot = getTempSpot(i, j);
                         Piece checkPiece = checkSpot.getPiece();
                         if(checkPiece != null) {
                             if(checkPiece.isWhite() == isWhite) {
@@ -252,7 +278,7 @@ public class Board {
                         int coordinatesX = x + i;
                         int coordinatesY = y + j;
                         while(isWithinBoard(coordinatesX, coordinatesY)) {
-                            Piece testPiece = tempSpots[x][y].getPiece();
+                            Piece testPiece = tempSpots[coordinatesX][coordinatesY].getPiece();
                             if(testPiece != null) {
                                 if(testPiece.isWhite() == isWhite) {
                                     break;

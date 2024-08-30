@@ -78,7 +78,7 @@ public class Pawn extends Piece{
         }else if(x == 1 && y == 1){
             if(end.getPiece() != null) {
                 isMoveTwo = false;
-                end.setCanBeCaptured(true);
+                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 return true;
             }else {
                 Piece checkPiece = board.getSpot(start.getX(), start.getY() + (end.getY() - start.getY())).getPiece();
@@ -88,14 +88,14 @@ public class Pawn extends Piece{
                         if(pawn.isWhite()) {
                             if(pawn.turn == this.turn) {
                                 if(!isCalculate) {
-                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), null);
                                 }
                                 return true;
                             }
                         }else {
                             if(this.turn - pawn.turn == 1) {
                                 if(!isCalculate) {
-                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), new Spot(null, start.getX(), start.getY() + (end.getY() - start.getY())));
+                                    board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), null);
                                 }
                                 return true;
                             }

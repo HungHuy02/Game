@@ -85,22 +85,22 @@ public class ChessScreen extends InputAdapter implements Screen {
                     board.setPromotingSpot(null);
                 }else {
                     board.setPromoting(false);
-                    Spot newSpot = new Spot(null, board.getPromotingSpot().getX(), board.getPromotingSpot().getY());
+                    Piece piece = null;
                     switch (boardY) {
                         case 7:
-                            newSpot.setPiece(new Queen(true, chessImage.getwQueen()));
+                            piece = new Queen(true, chessImage.getwQueen());
                             break;
                         case 6:
-                            newSpot.setPiece(new Knight(true, chessImage.getwKnight()));
+                            piece = new Knight(true, chessImage.getwKnight());
                             break;
                         case 5:
-                            newSpot.setPiece(new Bishop(true, chessImage.getwBishop()));
+                            piece = new Bishop(true, chessImage.getwBishop());
                             break;
                         case 4:
-                            newSpot.setPiece(new Rook(true, chessImage.getwRock()));
+                            piece = new Rook(true, chessImage.getwRock());
                             break;
                     }
-                    board.setSpot(newSpot.getX(), newSpot.getY(), newSpot);
+                    board.setSpot(board.getPromotingSpot().getX(), board.getPromotingSpot().getY(), piece);
                     chessSound.playPromoteSound();
                 }
             }else {
@@ -116,7 +116,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         }
                         selectedSpot = null;
                     }else {
-                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+                        selectedSpot.getPiece().calculateForPoint(board, board.getTempSpot(selectedSpot.getX(), selectedSpot.getY()));
                     }
                 } else {
                     Spot secondSpot = board.getSpot(boardY, boardX);
@@ -129,7 +129,6 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         board.makeTempMove(selectedSpot, secondSpot);
                         if(board.isKingSafe(currentPlayer.isWhite())) {
-                            board.makeMove(selectedSpot, secondSpot);
                             if(selectedSpot.getPiece() instanceof Pawn) {
                                 if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
                                     ((Pawn) selectedSpot.getPiece()).setTurn(turn);
@@ -149,6 +148,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                             }else {
                                 chessSound.playMoveSound();
                             }
+                            board.makeMove(selectedSpot, secondSpot);
                             selectedSpot = null;
                             if(currentPlayer == player1) {
                                 currentPlayer = player2;
@@ -163,14 +163,13 @@ public class ChessScreen extends InputAdapter implements Screen {
                         }else {
                             board.warnIllegalMove(selectedSpot.getPiece().isWhite());
                             selectedSpot.setShowColor(true);
-                            board.setSpot(selectedSpot.getX(), selectedSpot.getY(), selectedSpot);
-                            board.setSpot(boardY, boardX, secondSpot);
                             chessSound.playIllegalSound();
                         }
                     }else {
                         if(secondSpot.getPiece() != null) {
                             selectedSpot.setShowColor(false);
                             selectedSpot = secondSpot;
+                            board.clearGuidePoint();
                             selectedSpot.setShowColor(true);
                             selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
                         }else {
