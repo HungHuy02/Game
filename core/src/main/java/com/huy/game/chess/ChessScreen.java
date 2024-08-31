@@ -78,27 +78,56 @@ public class ChessScreen extends InputAdapter implements Screen {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / chessImage.getSpotSize());
 
-        if (boardX >= 0 && boardX < 8 && boardY >= 0 && boardY < 8) {
+        if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                if(boardX != board.getPromotingSpot().getY() || boardY <= 3) {
+                if(boardX != board.getPromotingSpot().getY()) {
                     board.setPromoting(false);
                     board.setPromotingSpot(null);
                 }else {
                     board.setPromoting(false);
                     Piece piece = null;
-                    switch (boardY) {
-                        case 7:
-                            piece = new Queen(true, chessImage.getwQueen());
-                            break;
-                        case 6:
-                            piece = new Knight(true, chessImage.getwKnight());
-                            break;
-                        case 5:
-                            piece = new Bishop(true, chessImage.getwBishop());
-                            break;
-                        case 4:
-                            piece = new Rook(true, chessImage.getwRock());
-                            break;
+                    if(board.getPromotingSpot().getPiece().isWhite()) {
+                        switch (boardY) {
+                            case 4:
+                                piece = new Rook(true, chessImage.getwRock());
+                                break;
+                            case 5:
+                                piece = new Bishop(true, chessImage.getwBishop());
+                                break;
+                            case 6:
+                                piece = new Knight(true, chessImage.getwKnight());
+                                break;
+                            case 7:
+                                piece = new Queen(true, chessImage.getwQueen());
+                                break;
+                        }
+                    }else {
+                        switch (boardY) {
+                            case 0:
+                                piece = new Queen(false, chessImage.getbQueen());
+                                break;
+                            case 1:
+                                piece = new Knight(false, chessImage.getbKnight());
+                                break;
+                            case 2:
+                                piece = new Bishop(false, chessImage.getbBishop());
+                                break;
+                            case 3:
+                                piece = new Rook(false, chessImage.getbRock());
+                                break;
+                            case 4:
+                                piece = new Rook(true, chessImage.getwRock());
+                                break;
+                            case 5:
+                                piece = new Bishop(true, chessImage.getwBishop());
+                                break;
+                            case 6:
+                                piece = new Knight(true, chessImage.getwKnight());
+                                break;
+                            case 7:
+                                piece = new Queen(true, chessImage.getwQueen());
+                                break;
+                        }
                     }
                     board.setSpot(board.getPromotingSpot().getX(), board.getPromotingSpot().getY(), piece);
                     chessSound.playPromoteSound();
@@ -116,15 +145,17 @@ public class ChessScreen extends InputAdapter implements Screen {
                         }
                         selectedSpot = null;
                     }else {
-                        selectedSpot.getPiece().calculateForPoint(board, board.getTempSpot(selectedSpot.getX(), selectedSpot.getY()));
+                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
                     }
                 } else {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
                     if(canMove && selectedSpot.getPiece().isWhite() == currentPlayer.isWhite()) {
-                        if(selectedSpot.getPiece() instanceof Pawn && selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) {
-                            board.setPromoting(true);
-                            board.setPromotingSpot(secondSpot);
+                        if(selectedSpot.getPiece() instanceof Pawn ) {
+                            if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
+                                board.setPromoting(true);
+                                board.setPromotingSpot(secondSpot);
+                            }
                         }
                         board.clearColorAndPoint();
                         board.makeTempMove(selectedSpot, secondSpot);

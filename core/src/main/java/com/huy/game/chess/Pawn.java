@@ -64,7 +64,7 @@ public class Pawn extends Piece{
         if(x > 2 || y >= 2) {
             return false;
         } else if(x > 1 && y == 0){
-            if(board.getSpot(Integer.signum(end.getX() - start.getX()) + start.getX(), start.getY()).getPiece() == null) {
+            if(board.getTempSpot(Integer.signum(end.getX() - start.getX()) + start.getX(), start.getY()).getPiece() == null) {
                 if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
                     isMoveTwo = true;
                     return true;
@@ -81,8 +81,8 @@ public class Pawn extends Piece{
                 board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 return true;
             }else {
-                Piece checkPiece = board.getSpot(start.getX(), start.getY() + (end.getY() - start.getY())).getPiece();
-                if(checkPiece instanceof Pawn) {
+                Piece checkPiece = board.getTempSpot(start.getX(), start.getY() + (end.getY() - start.getY())).getPiece();
+                if(checkPiece instanceof Pawn && checkPiece.isWhite() != this.isWhite()) {
                     Pawn pawn = (Pawn) checkPiece;
                     if(pawn.isMoveTwo) {
                         if(pawn.isWhite()) {

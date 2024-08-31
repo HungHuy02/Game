@@ -32,7 +32,7 @@ public class Queen extends Piece{
             int currentX = start.getX() + directionX;
             int currentY = start.getY() + directionY;
             while(currentX != end.getX() || currentY != end.getY()) {
-                if(board.getSpot(currentX, currentY).getPiece() != null) {
+                if(board.getTempSpot(currentX, currentY).getPiece() != null) {
                     return false;
                 }
                 currentX += directionX;

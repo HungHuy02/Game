@@ -29,18 +29,22 @@ public abstract class Piece {
     }
 
     public boolean calculateOneMove(Board board, Spot checkSpot,int x, int y) {
-        Spot testSpot = board.getTempSpot(x, y);
-        if(canMove(board, checkSpot, testSpot)) {
-            board.makeTempMove(checkSpot, testSpot);
+        board.setTempSpots();
+        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
+        Spot end = board.getTempSpot(x, y);
+        if(canMove(board, start, end)) {
+            board.makeTempMove(start, end);
             return board.isKingSafe(checkSpot.getPiece().isWhite());
         }
         return false;
     }
 
     public void calculateForOnePoint(Board board, Spot checkSpot, int x, int y) {
-        Spot testSpot = board.getTempSpot(x, y);
-        if(canMove(board, checkSpot, testSpot)) {
-            board.makeTempMove(checkSpot, testSpot);
+        board.setTempSpots();
+        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
+        Spot end = board.getTempSpot(x, y);
+        if(canMove(board, start, end)) {
+            board.makeTempMove(start, end);
             if(board.isKingSafe(checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
             }

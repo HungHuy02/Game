@@ -57,7 +57,7 @@ public class King extends Piece{
                         return false;
                     }
                     for(int i = 1; i <= 2; i++) {
-                        Piece checkPiece = board.getSpot(start.getX(), start.getY() + directionY * i).getPiece();
+                        Piece checkPiece = board.getTempSpot(start.getX(), start.getY() + directionY * i).getPiece();
                         if(checkPiece != null) {
                             return false;
                         }else {
@@ -129,15 +129,22 @@ public class King extends Piece{
             }
         }
         isCalculate = true;
-        calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
-        calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
+        if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
+            calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
+        }
+        if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() - 2)){
+            calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
+        }
         isCalculate = false;
     }
 
     @Override
     public boolean calculateOneMove(Board board, Spot checkSpot, int x, int y) {
-        Spot testSpot = board.getTempSpot(x, y);
-        if(canMove(board, checkSpot, testSpot)) {
+        board.setTempSpots();
+        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
+        Spot end = board.getTempSpot(x, y);
+        if(canMove(board, start, end)) {
+            board.makeTempMove(start, end);
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 return true;
             }
@@ -147,8 +154,11 @@ public class King extends Piece{
 
     @Override
     public void calculateForOnePoint(Board board, Spot checkSpot, int x, int y) {
-        Spot testSpot = board.getTempSpot(x, y);
-        if(canMove(board, checkSpot, testSpot)) {
+        board.setTempSpots();
+        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
+        Spot end = board.getTempSpot(x, y);
+        if(canMove(board, start, end)) {
+            board.makeTempMove(start, end);
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
             }

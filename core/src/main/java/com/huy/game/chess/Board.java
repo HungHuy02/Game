@@ -122,7 +122,6 @@ public class Board {
                 spots[i][j] = new Spot(null,i, j);
             }
         }
-
         setTempSpots();
     }
 
@@ -195,7 +194,6 @@ public class Board {
     }
 
     public void makeTempMove(Spot start, Spot end) {
-        setTempSpots();
         setTempSpot(end.getX(), end.getY(), start.getPiece());
         setTempSpot(start.getX(), start.getY(), null);
     }
@@ -368,7 +366,7 @@ public class Board {
             batch.end();
         }else {
             float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
-            float y = centerY + chessImage.getSpotSize() * promotingSpot.getX() + 3 * chessImage.getSpotSize();
+            float y = centerY;
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.WHITE);
