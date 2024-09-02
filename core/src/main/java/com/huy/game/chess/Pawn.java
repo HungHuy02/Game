@@ -2,6 +2,9 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Pawn extends Piece{
 
     private int turn;
@@ -146,5 +149,22 @@ public class Pawn extends Piece{
             }
         }
         isCalculate = false;
+    }
+
+    @Override
+    public List<Move> getValidMoves(Board board, Spot checkSpot) {
+        List<Move> list = new ArrayList<>();
+        isCalculate = true;
+        for (int[] move: pawnMoves(checkSpot)) {
+            int x = move[0] + checkSpot.getX();
+            int y = move[1] + checkSpot.getY();
+            if(board.isWithinBoard(x, y)) {
+                if(isValidMove(board, checkSpot, x, y)) {
+                    list.add(new Move(checkSpot.getX(), checkSpot.getY(), x, y));
+                }
+            }
+        }
+        isCalculate = false;
+        return list;
     }
 }

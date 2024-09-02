@@ -30,6 +30,16 @@ public class Board {
         tempBKingSpot = tempSpots[bKingSpot.getX()][bKingSpot.getY()];
     }
 
+    public Spot[][] cloneSpots() {
+        Spot[][] testSpots = new Spot[7][7];
+        for (int i = 0; i <= 7; i++) {
+            for (int j = 0; j <= 7; j++) {
+                testSpots[i][j] = new Spot(spots[i][j]);
+            }
+        }
+        return testSpots;
+    }
+
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
     }
