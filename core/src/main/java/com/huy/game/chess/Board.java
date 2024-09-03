@@ -30,8 +30,8 @@ public class Board {
         tempBKingSpot = tempSpots[bKingSpot.getX()][bKingSpot.getY()];
     }
 
-    public Spot[][] cloneSpots() {
-        Spot[][] testSpots = new Spot[7][7];
+    public Spot[][] cloneSpots(Spot[][] spots) {
+        Spot[][] testSpots = new Spot[8][8];
         for (int i = 0; i <= 7; i++) {
             for (int j = 0; j <= 7; j++) {
                 testSpots[i][j] = new Spot(spots[i][j]);

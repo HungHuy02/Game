@@ -149,7 +149,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                     }
                 } else {
                     Spot secondSpot = board.getSpot(boardY, boardX);
-                    boolean canMove = selectedSpot.getPiece().canMove(board, selectedSpot, secondSpot);
+                    boolean canMove = selectedSpot.getPiece().canMove(board, board.cloneSpots(board.getSpots()),selectedSpot, secondSpot);
                     if(canMove && selectedSpot.getPiece().isWhite() == currentPlayer.isWhite()) {
                         if(selectedSpot.getPiece() instanceof Pawn ) {
                             if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {

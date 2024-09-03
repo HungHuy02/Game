@@ -39,10 +39,10 @@ public class ChessAI {
             for(int i = 0; i <= 6; i++) {
                 for(int j = 0; j <=6 ; j++) {
                     if(spots[i][j].getPiece().isWhite()) {
-                        List<Move> list = spots[i][j].getPiece().getValidMoves(board.cloneSpots(), spots[i][j]);
+                        List<Move> list = spots[i][j].getPiece().getValidMoves(board, board.cloneSpots(spots), spots[i][j]);
                         for (Move move: list) {
                             move.makeMove(spots);
-                            int value = minimax(board, board.cloneSpots(), depth - 1, alpha, beta, false);
+                            int value = minimax(board, board.cloneSpots(spots), depth - 1, alpha, beta, false);
                             move.unMove(spots);
                             bestValue = Math.max(value, bestValue);
                             alpha = Math.max(value, alpha);
@@ -58,10 +58,10 @@ public class ChessAI {
             for(int i = 0; i <= 6; i++) {
                 for(int j = 0; j <=6 ; j++) {
                     if(!spots[i][j].getPiece().isWhite()) {
-                        List<Move> list = spots[i][j].getPiece().getValidMoves(board.cloneSpots(), spots[i][j]);
+                        List<Move> list = spots[i][j].getPiece().getValidMoves(board ,board.cloneSpots(spots), spots[i][j]);
                         for (Move move: list) {
                             move.makeMove(spots);
-                            int value = minimax(board, board.cloneSpots(), depth - 1, alpha, beta, true);
+                            int value = minimax(board, board.cloneSpots(spots), depth - 1, alpha, beta, true);
                             move.unMove(spots);
                             bestValue = Math.max(value, bestValue);
                             beta = Math.min(value, beta);
@@ -78,14 +78,14 @@ public class ChessAI {
     public Move findBestMove(Board board, boolean isWhite) {
         int bestValue = Integer.MIN_VALUE;
         Move bestMove = null;
-        Spot[][] spots = board.cloneSpots();
+        Spot[][] spots = board.cloneSpots(board.getSpots());
         for(int i = 0; i <= 6; i++) {
             for(int j = 0; j <=6 ; j++) {
                 if(spots[i][j].getPiece().isWhite() == isWhite) {
-                    List<Move> list = spots[i][j].getPiece().getValidMoves(board.cloneSpots(), spots[i][j]);
+                    List<Move> list = spots[i][j].getPiece().getValidMoves(board, board.cloneSpots(spots), spots[i][j]);
                     for (Move move: list) {
                         move.makeMove(spots);
-                        int value = minimax(board, board.cloneSpots(), 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+                        int value = minimax(board, board.cloneSpots(spots), 3, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
                         move.unMove(spots);
                         if(value > bestValue) {
                             bestMove = move;

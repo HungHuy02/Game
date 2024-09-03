@@ -48,7 +48,7 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public boolean canMove(Board board, Spot start, Spot end) {
+    public boolean canMove(Board board, Spot[][] spots,Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }
@@ -67,7 +67,7 @@ public class Pawn extends Piece{
         if(x > 2 || y >= 2) {
             return false;
         } else if(x > 1 && y == 0){
-            if(board.getTempSpot(Integer.signum(end.getX() - start.getX()) + start.getX(), start.getY()).getPiece() == null) {
+            if(spots[Integer.signum(end.getX() - start.getX()) + start.getX()][start.getY()].getPiece() == null) {
                 if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
                     isMoveTwo = true;
                     return true;
@@ -81,10 +81,12 @@ public class Pawn extends Piece{
         }else if(x == 1 && y == 1){
             if(end.getPiece() != null) {
                 isMoveTwo = false;
-                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                if(!isAICalculate()) {
+                    board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                }
                 return true;
             }else {
-                Piece checkPiece = board.getTempSpot(start.getX(), start.getY() + (end.getY() - start.getY())).getPiece();
+                Piece checkPiece = spots[start.getX()][start.getY() + (end.getY() - start.getY())].getPiece();
                 if(checkPiece instanceof Pawn && checkPiece.isWhite() != this.isWhite()) {
                     Pawn pawn = (Pawn) checkPiece;
                     if(pawn.isMoveTwo) {
@@ -124,11 +126,12 @@ public class Pawn extends Piece{
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
         isCalculate = true;
+        Spot[][] spots = board.cloneSpots(board.getSpots());
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                if(calculateOneMove(board, checkSpot, x, y)) {
+                if(calculateOneMove(board, spots,checkSpot, x, y)) {
                     isCalculate = false;
                     return true;
                 }
@@ -141,30 +144,33 @@ public class Pawn extends Piece{
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
         isCalculate = true;
+        Spot[][] spots = board.cloneSpots(board.getSpots());
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                calculateForOnePoint(board, checkSpot, x, y);
+                calculateForOnePoint(board, spots,checkSpot, x, y);
             }
         }
         isCalculate = false;
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Spot checkSpot) {
+    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
         isCalculate = true;
+        setAICalculate(true);
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                if(isValidMove(board, checkSpot, x, y)) {
+                if(isValidMove(board, spots,checkSpot, x, y)) {
                     list.add(new Move(checkSpot.getX(), checkSpot.getY(), x, y));
                 }
             }
         }
         isCalculate = false;
+        setAICalculate(false);
         return list;
     }
 }

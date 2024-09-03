@@ -2,6 +2,8 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.List;
+
 public class King extends Piece{
 
     private boolean hasMove = false;
@@ -37,7 +39,7 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean canMove(Board board, Spot start, Spot end) {
+    public boolean canMove(Board board, Spot[][] spots,Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }
@@ -97,6 +99,7 @@ public class King extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
+        Spot[][] spots = board.cloneSpots(board.getSpots());
         for(int i = -1; i <= 1; i++) {
             int x = checkSpot.getX() + i;
             for(int j = -1; j <= 1; j++) {
@@ -105,7 +108,7 @@ public class King extends Piece{
                 }
                 int y = checkSpot.getY() + j;
                 if(board.isWithinBoard(x, y)) {
-                    if(calculateOneMove(board, checkSpot, x, y)) {
+                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
                         return true;
                     }
                 }
@@ -116,6 +119,7 @@ public class King extends Piece{
 
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
+        Spot[][] spots = board.cloneSpots(board.getSpots());
         for(int i = -1; i <= 1; i++) {
             int x = checkSpot.getX() + i;
             for(int j = -1; j <= 1; j++) {
@@ -124,44 +128,52 @@ public class King extends Piece{
                 }
                 int y = checkSpot.getY() + j;
                 if(board.isWithinBoard(x, y)) {
-                    calculateForOnePoint(board, checkSpot, x, y);
+                    calculateForOnePoint(board, spots,checkSpot, x, y);
                 }
             }
         }
         isCalculate = true;
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
-            calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
+            calculateForOnePoint(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
         }
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() - 2)){
-            calculateForOnePoint(board, checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
+            calculateForOnePoint(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
         }
         isCalculate = false;
     }
 
     @Override
-    public boolean calculateOneMove(Board board, Spot checkSpot, int x, int y) {
-        board.setTempSpots();
-        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
-        Spot end = board.getTempSpot(x, y);
-        if(canMove(board, start, end)) {
-            board.makeTempMove(start, end);
+    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
+        return List.of();
+    }
+
+    @Override
+    public boolean calculateOneMove(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
+        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
+        Spot end = spots[x][y];
+        Move move = new Move(start.getX(), start.getY(), x, y);
+        if(canMove(board, spots,start, end)) {
+            move.makeMove(spots);
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
+                move.unMove(spots);
                 return true;
             }
         }
+        move.unMove(spots);
         return false;
     }
 
     @Override
-    public void calculateForOnePoint(Board board, Spot checkSpot, int x, int y) {
-        board.setTempSpots();
-        Spot start = board.getTempSpot(checkSpot.getX(), checkSpot.getY());
-        Spot end = board.getTempSpot(x, y);
-        if(canMove(board, start, end)) {
-            board.makeTempMove(start, end);
+    public void calculateForOnePoint(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
+        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
+        Spot end = spots[x][y];
+        Move move = new Move(start.getX(), start.getY(), x, y);
+        if(canMove(board, spots,start, end)) {
+            move.makeMove(spots);
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
             }
+            move.unMove(spots);
         }
     }
 }
