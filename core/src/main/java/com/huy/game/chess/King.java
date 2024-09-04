@@ -99,7 +99,8 @@ public class King extends Piece{
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for(int i = -1; i <= 1; i++) {
             int x = checkSpot.getX() + i;
             for(int j = -1; j <= 1; j++) {
@@ -108,7 +109,7 @@ public class King extends Piece{
                 }
                 int y = checkSpot.getY() + j;
                 if(board.isWithinBoard(x, y)) {
-                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                    if(calculateOneMove(testBoard, spots,checkSpot, x, y)) {
                         return true;
                     }
                 }
@@ -119,7 +120,8 @@ public class King extends Piece{
 
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for(int i = -1; i <= 1; i++) {
             int x = checkSpot.getX() + i;
             for(int j = -1; j <= 1; j++) {
@@ -128,16 +130,16 @@ public class King extends Piece{
                 }
                 int y = checkSpot.getY() + j;
                 if(board.isWithinBoard(x, y)) {
-                    calculateForOnePoint(board, spots,checkSpot, x, y);
+                    calculateForOnePoint(board,testBoard,spots,checkSpot, x, y);
                 }
             }
         }
         isCalculate = true;
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
-            calculateForOnePoint(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
+            calculateForOnePoint(board, testBoard,spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
         }
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() - 2)){
-            calculateForOnePoint(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
+            calculateForOnePoint(board, testBoard,spots,checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
         }
         isCalculate = false;
     }
@@ -151,29 +153,29 @@ public class King extends Piece{
     public boolean calculateOneMove(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
-        Move move = new Move(start.getX(), start.getY(), x, y);
+        Move move = new Move(start, end);
         if(canMove(board, spots,start, end)) {
-            move.makeMove(spots);
+            move.makeMove(board);
             if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
-                move.unMove(spots);
+                move.unMove(board);
                 return true;
             }
         }
-        move.unMove(spots);
+        move.unMove(board);
         return false;
     }
 
     @Override
-    public void calculateForOnePoint(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
+    public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots, Spot checkSpot, int x, int y) {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
-        Move move = new Move(start.getX(), start.getY(), x, y);
+        Move move = new Move(start, end);
         if(canMove(board, spots,start, end)) {
-            move.makeMove(spots);
-            if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
+            move.makeMove(testBoard);
+            if(testBoard.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
             }
-            move.unMove(spots);
+            move.unMove(testBoard);
         }
     }
 }

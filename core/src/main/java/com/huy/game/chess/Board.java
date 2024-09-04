@@ -16,18 +16,12 @@ public class Board {
     private boolean isPromoting = false;
     private boolean isEnd = false;
 
-    public Spot[][] getSpots() {
-        return spots;
+    public void setSpots(Spot[][] spots) {
+        this.spots = spots;
     }
 
-    public void setTempSpots() {
-        for (int i = 0; i <= 7; i++) {
-            for (int j = 0; j <= 7; j++) {
-                tempSpots[i][j] = new Spot(spots[i][j]);
-            }
-        }
-        tempWKingSpot = tempSpots[wKingSpot.getX()][wKingSpot.getY()];
-        tempBKingSpot = tempSpots[bKingSpot.getX()][bKingSpot.getY()];
+    public Spot[][] getSpots() {
+        return spots;
     }
 
     public Spot[][] cloneSpots(Spot[][] spots) {
@@ -38,6 +32,22 @@ public class Board {
             }
         }
         return testSpots;
+    }
+
+    public void setwKingSpot(Spot wKingSpot) {
+        this.wKingSpot = wKingSpot;
+    }
+
+    public void setbKingSpot(Spot bKingSpot) {
+        this.bKingSpot = bKingSpot;
+    }
+
+    public Board cloneBoard() {
+        Board testBoard = new Board();
+        testBoard.setSpots(cloneSpots(spots));
+        testBoard.setwKingSpot(testBoard.getSpots()[wKingSpot.getX()][wKingSpot.getY()]);
+        testBoard.setbKingSpot(testBoard.getSpots()[bKingSpot.getX()][bKingSpot.getY()]);
+        return testBoard;
     }
 
     public void setPromoting(boolean isPromoting) {
@@ -132,7 +142,6 @@ public class Board {
                 spots[i][j] = new Spot(null,i, j);
             }
         }
-        setTempSpots();
     }
 
     public void renderBoard(SpriteBatch batch, float spotSize, float pieceSide, float centerX, float centerY) {
@@ -218,14 +227,13 @@ public class Board {
     }
 
     public boolean isCheckmate(boolean isWhite) {
-        setTempSpots();
         if(!isKingSafe(isWhite)) {
             if(canKingMove(isWhite)) {
                 return false;
             }else {
                 for(int i = 0; i <= 7; i++) {
                     for(int j = 0; j <= 7; j++) {
-                        Spot checkSpot = getTempSpot(i, j);
+                        Spot checkSpot = spots[i][j];
                         Piece checkPiece = checkSpot.getPiece();
                         if(checkPiece != null) {
                             if(checkPiece.isWhite() == isWhite) {
@@ -269,7 +277,7 @@ public class Board {
                 }
                 int y = positionY + j;
                 if(isWithinBoard(x, y)) {
-                    Piece checkPiece = tempSpots[x][y].getPiece();
+                    Piece checkPiece = spots[x][y].getPiece();
                     if(checkPiece != null) {
                         if(checkPiece.isWhite() != isWhite) {
                             if(i != 0 && j != 0) {
@@ -286,7 +294,7 @@ public class Board {
                         int coordinatesX = x + i;
                         int coordinatesY = y + j;
                         while(isWithinBoard(coordinatesX, coordinatesY)) {
-                            Piece testPiece = tempSpots[coordinatesX][coordinatesY].getPiece();
+                            Piece testPiece = spots[coordinatesX][coordinatesY].getPiece();
                             if(testPiece != null) {
                                 if(testPiece.isWhite() == isWhite) {
                                     break;
@@ -326,7 +334,7 @@ public class Board {
             int x = positionX + move[0];
             int y = positionY + move[1];
             if(isWithinBoard(x, y)) {
-                Piece checkPiece = tempSpots[x][y].getPiece();
+                Piece checkPiece = spots[x][y].getPiece();
                 if(checkPiece instanceof Knight && checkPiece.isWhite() != isWhite) {
                     return true;
                 }

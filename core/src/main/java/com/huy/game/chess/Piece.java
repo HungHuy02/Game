@@ -42,15 +42,15 @@ public abstract class Piece {
     public boolean calculateOneMove(Board board, Spot[][] spots, Spot checkSpot, int x, int y) {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
-        Move move = new Move(start.getX(), start.getY(), x, y);
+        Move move = new Move(start, end);
         if(canMove(board, spots,start, end)) {
-            move.makeMove(spots);
+            move.makeMove(board);
             if(board.isKingSafe(checkSpot.getPiece().isWhite)) {
-                move.unMove(spots);
+                move.unMove(board);
                 return true;
             }
         }
-        move.unMove(spots);
+        move.unMove(board);
         return false;
     }
 
@@ -64,6 +64,19 @@ public abstract class Piece {
                 board.getSpot(x, y).setShowMovePoint(true);
             }
             move.unMove(spots);
+        }
+    }
+
+    public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots,Spot checkSpot, int x, int y) {
+        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
+        Spot end = spots[x][y];
+        Move move = new Move(start, end);
+        if(canMove(testBoard, spots, start, end)) {
+            move.makeMove(testBoard);
+            if(testBoard.isKingSafe(checkSpot.getPiece().isWhite())) {
+                board.getSpot(x, y).setShowMovePoint(true);
+            }
+            move.unMove(testBoard);
         }
     }
 

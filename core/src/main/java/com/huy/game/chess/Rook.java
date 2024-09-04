@@ -66,13 +66,14 @@ public class Rook extends Piece {
 
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
-                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                    if(calculateOneMove(testBoard, spots,checkSpot, x, y)) {
                         return true;
                     }
                 }else {
@@ -85,13 +86,14 @@ public class Rook extends Piece {
 
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
-                    calculateForOnePoint(board, spots,checkSpot, x, y);
+                    calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
                 }else {
                     break;
                 }

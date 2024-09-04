@@ -126,12 +126,13 @@ public class Pawn extends Piece{
     @Override
     public boolean calculateMove(Board board, Spot checkSpot) {
         isCalculate = true;
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                if(calculateOneMove(testBoard, spots,checkSpot, x, y)) {
                     isCalculate = false;
                     return true;
                 }
@@ -144,12 +145,13 @@ public class Pawn extends Piece{
     @Override
     public void calculateForPoint(Board board, Spot checkSpot) {
         isCalculate = true;
-        Spot[][] spots = board.cloneSpots(board.getSpots());
+        Board testBoard = board.cloneBoard();
+        Spot[][] spots = testBoard.getSpots();
         for (int[] move: pawnMoves(checkSpot)) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                calculateForOnePoint(board, spots,checkSpot, x, y);
+                calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
             }
         }
         isCalculate = false;
