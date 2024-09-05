@@ -7,11 +7,8 @@ import com.badlogic.gdx.utils.Timer;
 
 public class Board {
     private Spot[][] spots = new Spot[8][8];
-    private Spot[][] tempSpots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
-    private Spot tempWKingSpot;
-    private Spot tempBKingSpot;
     private Spot promotingSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
@@ -62,10 +59,6 @@ public class Board {
         return spots[x][y];
     }
 
-    public Spot getTempSpot(int x, int y) {
-        return tempSpots[x][y];
-    }
-
     public Spot getPromotingSpot() {
         return promotingSpot;
     }
@@ -93,19 +86,8 @@ public class Board {
         }
     }
 
-    public void setTempSpot(int x, int y, Piece piece) {
-        tempSpots[x][y].setPiece(piece);
-        if(piece instanceof King) {
-            if(piece.isWhite()) {
-                tempWKingSpot = tempSpots[x][y];
-            }else {
-                tempBKingSpot = tempSpots[x][y];
-            }
-        }
-    }
-
     public Spot getKingSpot(boolean isWhite) {
-        return isWhite ? tempWKingSpot : tempBKingSpot;
+        return isWhite ? wKingSpot : bKingSpot;
     }
 
     public void resetBoard(ChessImage chessImage ) {
@@ -210,16 +192,6 @@ public class Board {
                 spots[i][j].setCanBeCaptured(false);
             }
         }
-    }
-
-    public void makeTempMove(Spot start, Spot end) {
-        setTempSpot(end.getX(), end.getY(), start.getPiece());
-        setTempSpot(start.getX(), start.getY(), null);
-    }
-
-    public void makeMove(Spot start, Spot end) {
-        setSpot(end.getX(), end.getY(), start.getPiece());
-        setSpot(start.getX(), start.getY(), null);
     }
 
     public boolean isWithinBoard(int x, int y) {
@@ -384,18 +356,17 @@ public class Board {
             batch.end();
         }else {
             float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
-            float y = centerY;
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
+            shapeRenderer.rect(x, centerY, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
             shapeRenderer.end();
 
             batch.begin();
-            batch.draw(chessImage.getbRock(), x + padding, y + padding , scaledSide, scaledSide);
-            batch.draw(chessImage.getbBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
-            batch.draw(chessImage.getbKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
-            batch.draw(chessImage.getbQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
+            batch.draw(chessImage.getbRock(), x + padding, centerY + padding , scaledSide, scaledSide);
+            batch.draw(chessImage.getbBishop(), x + padding, centerY + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
+            batch.draw(chessImage.getbKnight(), x + padding, centerY + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
+            batch.draw(chessImage.getbQueen(), x + padding, centerY + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
             batch.end();
         }
     }

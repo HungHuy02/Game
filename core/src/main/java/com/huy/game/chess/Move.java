@@ -1,34 +1,21 @@
 package com.huy.game.chess;
 
 public class Move {
-    private int startX;
-    private int startY;
-    private int endX;
-    private int endY;
     private Spot start;
     private Spot end;
-
-    public Move(int startX, int startY,int endX, int endY) {
-        this.startX = startX;
-        this.startY = startY;
-        this.endX = endX;
-        this.endY = endY;
-    }
+    private Piece startPiece;
+    private Piece endPiece;
 
     public Move(Spot start, Spot end) {
         this.start = start;
         this.end = end;
+        startPiece = start.getPiece();
+        endPiece = end.getPiece();
     }
 
-    public void makeMove(Spot[][] spots) {
-        spots[endX][endY].setPiece(spots[startX][startY].getPiece());
-        spots[startX][startX].setPiece(null);
-    }
-
-    public void unMove(Spot[][] spots) {
-        spots[startX][startX].setPiece(spots[endX][endY].getPiece());
-        spots[endX][endY].setPiece(null);
-
+    public void makeRealMove(Board board) {
+        board.setSpot(end.getX(), end.getY(), start.getPiece());
+        board.setSpot(start.getX(), start.getY(), null);
     }
 
     public void makeMove(Board board) {
@@ -36,8 +23,13 @@ public class Move {
         board.setSpot(start.getX(), start.getY(), null);
     }
 
+    public void makeAIMove(Board board) {
+        board.setSpot(end.getX(), end.getY(), board.getSpot(start.getX(), start.getY()).getPiece());
+        board.setSpot(start.getX(), start.getY(), null);
+    }
+
     public void unMove(Board board) {
-        board.setSpot(start.getX(), start.getY(), start.getPiece());
+        board.setSpot(start.getX(), start.getY(), startPiece);
         board.setSpot(end.getX(), end.getY(), null);
     }
 }

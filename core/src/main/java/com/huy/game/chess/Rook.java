@@ -8,7 +8,6 @@ import java.util.List;
 public class Rook extends Piece {
 
     private boolean hasMove = false;
-    private boolean isAICalculate = false;
 
     public boolean isHasMove() {
         return hasMove;
@@ -102,15 +101,19 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
+    public List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot) {
         List<Move> list = new ArrayList<>();
         setAICalculate(true);
         for (int[] move: rookMoves()) {
-            int x = move[0] + checkSpot.getX();
-            int y = move[1] + checkSpot.getY();
-            if(board.isWithinBoard(x, y)) {
-                if(isValidMove(board, spots,checkSpot, x, y)) {
-                    list.add(new Move(checkSpot.getX(), checkSpot.getY(), x, y));
+            for(int i = 1; i <= 7; i++) {
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
+                if(board.isWithinBoard(x, y)) {
+                    if(calculateOneMove(board, spots, checkSpot, x, y)) {
+                        list.add(new Move(checkSpot, spots[x][y]));
+                    }
+                }else {
+                    break;
                 }
             }
         }

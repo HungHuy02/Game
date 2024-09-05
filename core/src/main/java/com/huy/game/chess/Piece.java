@@ -45,26 +45,13 @@ public abstract class Piece {
         Move move = new Move(start, end);
         if(canMove(board, spots,start, end)) {
             move.makeMove(board);
-            if(board.isKingSafe(checkSpot.getPiece().isWhite)) {
+            if(board.isKingSafe(end.getPiece().isWhite)) {
                 move.unMove(board);
                 return true;
             }
         }
         move.unMove(board);
         return false;
-    }
-
-    public void calculateForOnePoint(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
-        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
-        Spot end = spots[x][y];
-        Move move = new Move(start.getX(), start.getY(), x, y);
-        if(canMove(board, spots, start, end)) {
-            move.makeMove(spots);
-            if(board.isKingSafe(checkSpot.getPiece().isWhite())) {
-                board.getSpot(x, y).setShowMovePoint(true);
-            }
-            move.unMove(spots);
-        }
     }
 
     public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots,Spot checkSpot, int x, int y) {
@@ -80,25 +67,11 @@ public abstract class Piece {
         }
     }
 
-    public boolean isValidMove(Board board,Spot[][] spots, Spot checkSpot, int x, int y) {
-        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
-        Spot end = spots[x][y];
-        Move move = new Move(start.getX(), start.getY(), end.getX(),end.getY());
-        if(canMove(board, spots,start, end)) {
-            move.makeMove(spots);
-            if(board.isKingSafe(checkSpot.getPiece().isWhite())) {
-                board.makeTempMove(start, end);
-                return board.isKingSafe(checkSpot.getPiece().isWhite());
-            }
-        }
-        return false;
-    }
-
     public abstract boolean canMove(Board board, Spot[][] spots,Spot start, Spot end);
 
     public abstract boolean calculateMove(Board board, Spot checkSpot);
 
     public abstract void calculateForPoint(Board board, Spot checkSpot);
 
-    public abstract List<Move> getValidMoves(Board board ,Spot[][] spots, Spot checkSpot);
+    public abstract List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot);
 }

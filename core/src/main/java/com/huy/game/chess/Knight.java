@@ -7,8 +7,6 @@ import java.util.List;
 
 public class Knight extends Piece{
 
-    private boolean isAICalculate = false;
-
     public Knight(boolean isWhite, Texture texture) {
         super(isWhite, texture);
     }
@@ -80,8 +78,8 @@ public class Knight extends Piece{
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                if(isValidMove(board, spots,checkSpot, x, y)) {
-                    list.add(new Move(checkSpot.getX(), checkSpot.getY(), x, y));
+                if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                    list.add(new Move(checkSpot, spots[x][y]));
                 }
             }
         }

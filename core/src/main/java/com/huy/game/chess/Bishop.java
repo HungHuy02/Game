@@ -2,6 +2,7 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bishop extends Piece{
@@ -88,7 +89,23 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
-        return List.of();
+    public List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot) {
+        List<Move> list = new ArrayList<>();
+        setAICalculate(true);
+        for (int[] move: bishopMoves()) {
+            for(int i = 1; i <= 7; i++) {
+                int x = move[0] * i + checkSpot.getX();
+                int y = move[1] * i + checkSpot.getY();
+                if(board.isWithinBoard(x, y)) {
+                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                        list.add(new Move(checkSpot, spots[x][y]));
+                    }
+                }else {
+                    break;
+                }
+            }
+        }
+        setAICalculate(false);
+        return list;
     }
 }

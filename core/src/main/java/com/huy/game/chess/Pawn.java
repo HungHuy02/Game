@@ -166,8 +166,8 @@ public class Pawn extends Piece{
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                if(isValidMove(board, spots,checkSpot, x, y)) {
-                    list.add(new Move(checkSpot.getX(), checkSpot.getY(), x, y));
+                if(calculateOneMove(board, spots, checkSpot, x, y)) {
+                    list.add(new Move(checkSpot, spots[x][y]));
                 }
             }
         }

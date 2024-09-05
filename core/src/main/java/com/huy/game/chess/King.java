@@ -2,6 +2,7 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class King extends Piece{
@@ -59,7 +60,7 @@ public class King extends Piece{
                         return false;
                     }
                     for(int i = 1; i <= 2; i++) {
-                        Piece checkPiece = board.getTempSpot(start.getX(), start.getY() + directionY * i).getPiece();
+                        Piece checkPiece = spots[start.getX()][start.getY() + directionY * i].getPiece();
                         if(checkPiece != null) {
                             return false;
                         }else {
@@ -145,11 +146,6 @@ public class King extends Piece{
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
-        return List.of();
-    }
-
-    @Override
     public boolean calculateOneMove(Board board, Spot[][] spots,Spot checkSpot, int x, int y) {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
@@ -177,5 +173,39 @@ public class King extends Piece{
             }
             move.unMove(testBoard);
         }
+    }
+
+    @Override
+    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
+        List<Move> list = new ArrayList<>();
+        setAICalculate(true);
+        for(int i = -1; i <= 1; i++) {
+            int x = checkSpot.getX() + i;
+            for(int j = -1; j <= 1; j++) {
+                if(i == 0 && j == 0) {
+                    continue;
+                }
+                int y = checkSpot.getY() + j;
+                if(board.isWithinBoard(x, y)) {
+                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                        list.add(new Move(checkSpot, spots[x][y]));
+                    }
+                }
+            }
+        }
+        isCalculate = true;
+        if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
+            if(calculateOneMove(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2)) {
+                list.add(new Move(checkSpot, spots[checkSpot.getX()][checkSpot.getY() + 2]));
+            }
+        }
+        if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() - 2)){
+            if(calculateOneMove(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() - 2)) {
+                list.add(new Move(checkSpot, spots[checkSpot.getX()][checkSpot.getY() - 2]));
+            }
+        }
+        isCalculate = false;
+        setAICalculate(false);
+        return list;
     }
 }
