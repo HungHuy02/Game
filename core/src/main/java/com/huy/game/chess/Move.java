@@ -30,6 +30,6 @@ public class Move {
 
     public void unMove(Board board) {
         board.setSpot(start.getX(), start.getY(), startPiece);
-        board.setSpot(end.getX(), end.getY(), null);
+        board.setSpot(end.getX(), end.getY(), endPiece);
     }
 }

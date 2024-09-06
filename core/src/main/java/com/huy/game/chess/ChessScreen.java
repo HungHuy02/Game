@@ -79,7 +79,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(currentPlayer.isWhite()) {
             int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
-            int boardY = (int) Math.floor((Gdx.graphics.getHeight() - (screenY - centerY)) / chessImage.getSpotSize());
+            int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
 
             if (board.isWithinBoard(boardX, boardY)) {
                 if(board.isPromoting()) {

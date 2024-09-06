@@ -58,7 +58,7 @@ public abstract class Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(testBoard, spots, start, end)) {
+        if(canMove(board, spots, start, end)) {
             move.makeMove(testBoard);
             if(testBoard.isKingSafe(checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);

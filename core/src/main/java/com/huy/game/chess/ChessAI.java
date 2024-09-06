@@ -93,7 +93,7 @@ public class ChessAI {
                             move.makeMove(testBoard);
                             int value = minimax(testBoard, spots, isWhite,3, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
                             move.unMove(testBoard);
-                            if(Math.abs(value) > bestValue) {
+                            if(value > bestValue) {
                                 bestMove = move;
                                 bestValue = value;
                             }
