@@ -3,15 +3,15 @@ package com.huy.game.chess;
 import java.util.List;
 
 public class ChessAI {
-    int evaluateScore(Spot[][] spots) {
+    int evaluateScore(Spot[][] spots, boolean isWhite) {
         int score = 0;
         for(int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
                 Piece piece = spots[i][j].getPiece();
                 if(piece != null) {
-                    int k = piece.isWhite() ? 1 : -1;
+                    int k = piece.isWhite() == isWhite ? 1 : -1;
                     if(piece instanceof Pawn) {
-                        score += 1 * k;
+                        score += k;
                     }else if(piece instanceof Rook) {
                         score += 5 * k;
                     }else if(piece instanceof Bishop) {
@@ -31,13 +31,13 @@ public class ChessAI {
 
     public int minimax(Board board ,Spot[][] spots, boolean isWhite,int depth, int alpha, int beta,boolean maximizingPlayer) {
         if(depth == 0) {
-            return evaluateScore(spots);
+            return evaluateScore(spots, isWhite);
         }
 
         if(maximizingPlayer) {
-            int bestValue = Integer.MIN_VALUE;
-            for(int i = 0; i <= 6; i++) {
-                for(int j = 0; j <=6 ; j++) {
+            int maxValue = Integer.MIN_VALUE;
+            for(int i = 0; i <= 7; i++) {
+                for(int j = 0; j <= 7 ; j++) {
                     if(spots[i][j].getPiece() != null) {
                         if(spots[i][j].getPiece().isWhite() == isWhite) {
                             List<Move> list = spots[i][j].getPiece().getValidMoves(board, spots, spots[i][j]);
@@ -45,7 +45,7 @@ public class ChessAI {
                                 move.makeMove(board);
                                 int value = minimax(board, spots, isWhite,depth - 1, alpha, beta, false);
                                 move.unMove(board);
-                                bestValue = Math.max(value, bestValue);
+                                maxValue = Math.max(value, maxValue);
                                 alpha = Math.max(value, alpha);
                                 if(beta <= alpha)
                                     break;
@@ -54,11 +54,11 @@ public class ChessAI {
                     }
                 }
             }
-            return bestValue;
+            return maxValue;
         }else {
-            int bestValue = Integer.MAX_VALUE;
-            for(int i = 0; i <= 6; i++) {
-                for(int j = 0; j <=6 ; j++) {
+            int minValue = Integer.MAX_VALUE;
+            for(int i = 0; i <= 7; i++) {
+                for(int j = 0; j <= 7 ; j++) {
                     if(spots[i][j].getPiece() != null) {
                         if(spots[i][j].getPiece().isWhite() != isWhite) {
                             List<Move> list = spots[i][j].getPiece().getValidMoves(board, spots, spots[i][j]);
@@ -66,7 +66,7 @@ public class ChessAI {
                                 move.makeMove(board);
                                 int value = minimax(board, spots, isWhite,depth - 1, alpha, beta, true);
                                 move.unMove(board);
-                                bestValue = Math.max(value, bestValue);
+                                minValue = Math.min(value, minValue);
                                 beta = Math.min(value, beta);
                                 if(beta <= alpha)
                                     break;
@@ -75,7 +75,7 @@ public class ChessAI {
                     }
                 }
             }
-            return bestValue;
+            return minValue;
         }
     }
 
@@ -84,8 +84,8 @@ public class ChessAI {
         Move bestMove = null;
         Board testBoard = board.cloneBoard();
         Spot[][] spots = testBoard.getSpots();
-        for(int i = 0; i <= 6; i++) {
-            for(int j = 0; j <=6 ; j++) {
+        for(int i = 0; i <= 7; i++) {
+            for(int j = 0; j <= 7 ; j++) {
                 if(spots[i][j].getPiece() != null) {
                     if(spots[i][j].getPiece().isWhite() == isWhite) {
                         List<Move> moves = spots[i][j].getPiece().getValidMoves(testBoard, spots, spots[i][j]);

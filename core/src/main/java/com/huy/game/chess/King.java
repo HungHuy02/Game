@@ -152,7 +152,7 @@ public class King extends Piece{
         Move move = new Move(start, end);
         if(canMove(board, spots,start, end)) {
             move.makeMove(board);
-            if(board.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
+            if(board.isPositionSafe(x, y, end.getPiece().isWhite())) {
                 move.unMove(board);
                 return true;
             }
