@@ -3,13 +3,13 @@ package com.huy.game.chess;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ChessScreen extends InputAdapter implements Screen {
+    private TopAppBar appBar;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -38,7 +38,9 @@ public class ChessScreen extends InputAdapter implements Screen {
         shapeRenderer = new ShapeRenderer();
         board = new Board();
         chessImage = new ChessImage();
+        appBar = new TopAppBar(chessImage);
         selectedSpot = null;
+
 
         centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
@@ -49,7 +51,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.BLACK);
+        ScreenUtils.clear(Colors.GREY_900_94);
         batch.begin();
         batch.draw(chessImage.getChessBoard(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
         batch.end();
@@ -73,6 +75,8 @@ public class ChessScreen extends InputAdapter implements Screen {
             batch.draw(chessImage.getChessBoard(), 0, 0);
             batch.end();
         }
+        appBar.getStage().act(Gdx.graphics.getDeltaTime());
+        appBar.getStage().draw();
     }
 
     @Override

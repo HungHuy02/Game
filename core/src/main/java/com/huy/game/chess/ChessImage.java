@@ -2,6 +2,9 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Scaling;
+
 
 public class ChessImage {
 
@@ -26,6 +29,9 @@ public class ChessImage {
     private float scaledBoardHeight;
     private float circleRadius;
 
+    private Texture backArrow;
+    private Texture appbarBackground;
+
     public ChessImage() {
         chessBoard = new Texture("chess/images/chess_board.png");
         wBishop = new Texture("chess/images/wbishop.png");
@@ -41,6 +47,9 @@ public class ChessImage {
         bPawn = new Texture("chess/images/bpawn.png");
         bQueen = new Texture("chess/images/bqueen.png");
         bRock = new Texture("chess/images/brook.png");
+
+        backArrow = new Texture("chess/images/icons8-left-100.png");
+        appbarBackground = new Texture("chess/images/appbar_background.png");
 
         float boardWidth = chessBoard.getWidth();
         float boardHeight = chessBoard.getHeight();
@@ -112,6 +121,14 @@ public class ChessImage {
         return bRock;
     }
 
+    public Image getBackArrow() {
+        return new Image(backArrow);
+    }
+
+    public Image getAppbarBackground() {
+        return new Image(appbarBackground);
+    }
+
     public float getSpotSize() {
         return spotSize;
     }
@@ -132,6 +149,7 @@ public class ChessImage {
         return circleRadius;
     }
 
+
     public void dispose() {
         chessBoard.dispose();
         wBishop.dispose();
@@ -147,5 +165,8 @@ public class ChessImage {
         bPawn.dispose();
         bQueen.dispose();
         bRock.dispose();
+
+        backArrow.dispose();
+        appbarBackground.dispose();
     }
 }
