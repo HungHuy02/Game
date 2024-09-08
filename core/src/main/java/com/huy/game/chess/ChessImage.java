@@ -25,9 +25,11 @@ public class ChessImage {
 
     private float spotSize;
     private float pieceSize;
+    private float scaledPieceSize;
     private float scaledBoardWidth;
     private float scaledBoardHeight;
     private float circleRadius;
+    private float capturedPieceSize;
 
     private Texture backArrow;
     private Texture appbarBackground;
@@ -66,7 +68,12 @@ public class ChessImage {
         spotSize = scaledBoardWidth / 8;
         pieceSize = bBishop.getHeight();
 
+        float padding = spotSize / 10f;
+        float pieceScale = (spotSize - (2 * padding)) / pieceSize;
+        scaledPieceSize = pieceScale * pieceSize;
+
         circleRadius = spotSize / 5;
+        capturedPieceSize = scaledPieceSize / 3;
     }
 
     public Texture getChessBoard() {
@@ -149,6 +156,13 @@ public class ChessImage {
         return circleRadius;
     }
 
+    public float getCapturedPieceSize() {
+        return capturedPieceSize;
+    }
+
+    public float getScaledPieceSize() {
+        return scaledPieceSize;
+    }
 
     public void dispose() {
         chessBoard.dispose();

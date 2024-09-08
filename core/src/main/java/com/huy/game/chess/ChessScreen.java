@@ -2,14 +2,17 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ChessScreen extends InputAdapter implements Screen {
-    private TopAppBar appBar;
+    private Stage stage;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -29,24 +32,32 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public void show() {
-        player1 = new ChessPlayer(true);
-        player2 = new ChessPlayer(false);
+        chessImage = new ChessImage();
+        stage = new Stage();
+        player1 = new ChessPlayer(chessImage,true);
+        PlayerInfo player1Info = new PlayerInfo("1", player1.getMap(), chessImage, new Image(chessImage.getbKing()), true, true);
+        player2 = new ChessPlayer(chessImage,false);
+        PlayerInfo player2Info = new PlayerInfo("2", player2.getMap(), chessImage, new Image(chessImage.getbKing()), false, false);
         chessAI = new ChessAI();
         currentPlayer = player1;
         chessSound = new ChessSound();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         board = new Board();
-        chessImage = new ChessImage();
-        appBar = new TopAppBar(chessImage);
+        TopAppBar appBar = new TopAppBar(chessImage);
         selectedSpot = null;
-
+        stage.addActor(appBar.getStack());
+        stage.addActor(player1Info.getInfo());
+        stage.addActor(player2Info.getInfo());
 
         centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
 
         board.resetBoard(chessImage);
-        Gdx.input.setInputProcessor(this);
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(this);
+        inputMultiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -63,7 +74,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
         batch.begin();
-        board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getPieceSize(), centerX, centerY);
+        board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY);
         batch.end();
 
         if(board.isPromoting()) {
@@ -75,12 +86,13 @@ public class ChessScreen extends InputAdapter implements Screen {
             batch.draw(chessImage.getChessBoard(), 0, 0);
             batch.end();
         }
-        appBar.getStage().act(Gdx.graphics.getDeltaTime());
-        appBar.getStage().draw();
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
         if(currentPlayer.isWhite()) {
             int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
             int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());

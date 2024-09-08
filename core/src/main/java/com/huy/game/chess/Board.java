@@ -126,18 +126,16 @@ public class Board {
         }
     }
 
-    public void renderBoard(SpriteBatch batch, float spotSize, float pieceSide, float centerX, float centerY) {
+    public void renderBoard(SpriteBatch batch, float spotSize, float pieceSize, float centerX, float centerY) {
         float padding = spotSize / 10f;
-        float scale = (spotSize - (2 * padding)) / pieceSide;
         float x = centerX + padding;
         float y = centerY + padding;
-        float scaledSide = scale * pieceSide;
         for(int i = 0; i <= 7; i++) {
             float distanceY = spotSize * i + y;
             for (int j = 0;j <= 7; j++) {
                 float distance = spotSize * j;
                 if(spots[i][j].getPiece() != null) {
-                    batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, scaledSide, scaledSide);
+                    batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize);
                 }
             }
         }
