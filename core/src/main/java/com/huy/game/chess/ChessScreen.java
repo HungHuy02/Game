@@ -5,17 +5,20 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.awt.Font;
 
 public class ChessScreen extends InputAdapter implements Screen {
     private Stage stage;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
+    private BitmapFont bitmapFont;
     private ChessImage chessImage;
     private ChessAI chessAI;
 
@@ -33,16 +36,17 @@ public class ChessScreen extends InputAdapter implements Screen {
     @Override
     public void show() {
         chessImage = new ChessImage();
+        batch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
+        bitmapFont = new BitmapFont(Gdx.files.internal("ui/montserrat.fnt"));
         stage = new Stage();
-        player1 = new ChessPlayer(chessImage,true);
-        PlayerInfo player1Info = new PlayerInfo("1", player1.getMap(), chessImage, new Image(chessImage.getbKing()), true, true);
-        player2 = new ChessPlayer(chessImage,false);
-        PlayerInfo player2Info = new PlayerInfo("2", player2.getMap(), chessImage, new Image(chessImage.getbKing()), false, false);
+        player1 = new ChessPlayer(true);
+        PlayerInfo player1Info = new PlayerInfo("1", player1.getMap(), chessImage, chessImage.getbBishop(), true, true, bitmapFont);
+        player2 = new ChessPlayer(false);
+        PlayerInfo player2Info = new PlayerInfo("2", player2.getMap(), chessImage, chessImage.getbQueen(), false, false, bitmapFont);
         chessAI = new ChessAI();
         currentPlayer = player1;
         chessSound = new ChessSound();
-        batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage);
         selectedSpot = null;
@@ -197,6 +201,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                                     }
                                 }else if(secondSpot.getPiece() != null) {
                                     chessSound.playCaptureSound();
+                                    currentPlayer.putValue(secondSpot.getPiece());
                                 }else {
                                     chessSound.playMoveSound();
                                 }

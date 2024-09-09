@@ -73,7 +73,7 @@ public class ChessImage {
         scaledPieceSize = pieceScale * pieceSize;
 
         circleRadius = spotSize / 5;
-        capturedPieceSize = scaledPieceSize / 3;
+        capturedPieceSize = scaledPieceSize / 2;
     }
 
     public Texture getChessBoard() {
