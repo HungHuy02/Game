@@ -13,7 +13,16 @@ public class Move {
         endPiece = end.getPiece();
     }
 
+    public Spot getStart() {
+        return start;
+    }
+
+    public Spot getEnd() {
+        return end;
+    }
+
     public void makeRealMove(Board board) {
+        board.addMove(this);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
     }

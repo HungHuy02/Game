@@ -10,7 +10,6 @@ public class CapturedPiecesActor extends Actor {
     private Map<String, Integer> map;
     private ChessImage chessImage;
     private boolean isWhite;
-    private int value = 0;
     private BitmapFont font;
 
     public CapturedPiecesActor(Map<String, Integer> map,ChessImage chessImage, boolean isWhite, BitmapFont font) {
@@ -128,7 +127,10 @@ public class CapturedPiecesActor extends Actor {
                 batch.draw(chessImage.getwQueen(), position , 10, size, size);
             }
         }
-        position += pieceSize * 3;
-        font.draw(batch, "+"+ value, position, 45);
+        int value = map.get("value");
+        if(value != 0) {
+            position += pieceSize * 3;
+            font.draw(batch, "+"+ value, position, 45);
+        }
     }
 }

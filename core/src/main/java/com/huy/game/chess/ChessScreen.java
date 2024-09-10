@@ -202,6 +202,12 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 }else if(secondSpot.getPiece() != null) {
                                     chessSound.playCaptureSound();
                                     currentPlayer.putValue(secondSpot.getPiece());
+                                    int value = player1.getValue() - player2.getValue();
+                                    if(value > 0) {
+                                        player1.putValue(value);
+                                    }else {
+                                        player2.putValue(Math.abs(value));
+                                    }
                                 }else {
                                     chessSound.playMoveSound();
                                 }

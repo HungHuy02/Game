@@ -18,6 +18,7 @@ public class ChessPlayer {
         map.put("b", 0);
         map.put("r", 0);
         map.put("q", 0);
+        map.put("value", 0);
     }
 
     public Map<String, Integer> getMap() {
@@ -30,6 +31,10 @@ public class ChessPlayer {
 
     public void setWhite(boolean isWhite) {
         isWhite = isWhite;
+    }
+
+    public int getValue() {
+        return value;
     }
 
     public void putValue(Piece piece) {
@@ -49,5 +54,9 @@ public class ChessPlayer {
             map.put("k", map.get("k") + 1);
             value += 3;
         }
+    }
+
+    public void putValue(int value) {
+        map.put("value", value);
     }
 }

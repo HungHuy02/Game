@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
     private Spot[][] spots = new Spot[8][8];
     private Spot wKingSpot;
@@ -12,6 +15,7 @@ public class Board {
     private Spot promotingSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
+    private final List<String> movedList = new ArrayList<>();
 
     public void setSpots(Spot[][] spots) {
         this.spots = spots;
@@ -88,6 +92,37 @@ public class Board {
 
     public Spot getKingSpot(boolean isWhite) {
         return isWhite ? wKingSpot : bKingSpot;
+    }
+
+    public void addMove(Move move) {
+        Spot start = move.getStart();
+        Spot end = move.getEnd();
+        String beforeMove = changeToFullAlgebraicNotation(start, null);
+        String afterMove = changeToFullAlgebraicNotation(end, end.getPiece());
+        movedList.add(beforeMove + " " + afterMove);
+    }
+
+    public String changeToFullAlgebraicNotation(Spot start, Piece endPiece) {
+        Piece startPiece = start.getPiece();
+        String firstMove = endPiece != null ? "x" + changePositionToAlgebraicNotation(start) : changePositionToAlgebraicNotation(start);
+        if(startPiece instanceof Knight) {
+            firstMove = "N" + firstMove;
+        }else if(startPiece instanceof Bishop) {
+            firstMove = "B" + firstMove;
+        }else if(startPiece instanceof Queen) {
+            firstMove = "Q" + firstMove;
+        }else if(startPiece instanceof Rook) {
+            firstMove = "R" + firstMove;
+        }else if(startPiece instanceof King) {
+            firstMove = "K" + firstMove;
+        }
+        return firstMove;
+    }
+
+    public String changePositionToAlgebraicNotation(Spot spot) {
+        char col = (char) ('a' + spot.getY());
+        int row = spot.getX() + 1;
+        return "" + col + row;
     }
 
     public void resetBoard(ChessImage chessImage ) {
@@ -337,8 +372,8 @@ public class Board {
         float padding = chessImage.getSpotSize() / 10f;
         float scale = (chessImage.getSpotSize() - (2 * padding)) / chessImage.getPieceSize();
         float scaledSide = scale * chessImage.getPieceSize();
+        float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
         if(promotingSpot.getX() == 7) {
-            float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
             float y = centerY + chessImage.getSpotSize() * promotingSpot.getX() - 3 * chessImage.getSpotSize();
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -351,10 +386,7 @@ public class Board {
             batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
             batch.draw(chessImage.getwQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
-            batch.end();
         }else {
-            float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
-
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.WHITE);
             shapeRenderer.rect(x, centerY, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
@@ -365,7 +397,7 @@ public class Board {
             batch.draw(chessImage.getbBishop(), x + padding, centerY + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getbKnight(), x + padding, centerY + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
             batch.draw(chessImage.getbQueen(), x + padding, centerY + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
-            batch.end();
         }
+        batch.end();
     }
 }
