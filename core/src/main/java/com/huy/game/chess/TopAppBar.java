@@ -2,7 +2,6 @@ package com.huy.game.chess;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -31,11 +30,10 @@ public class TopAppBar {
         stack.add(appbar);
     }
 
-    private HorizontalGroup setAppbar(ChessImage chessImage) {
+    private void setAppbar(ChessImage chessImage) {
         appbar = new HorizontalGroup();
         appbar.setSize(Gdx.graphics.getWidth(), 100f);
         appbar.addActor(backArrow(chessImage));
-        return appbar;
     }
 
     private Container<Image> backgroundContainer(ChessImage chessImage) {
@@ -53,7 +51,8 @@ public class TopAppBar {
                 super.clicked(event, x, y);
             }
         });
-
         return backArrow;
     }
+
+
 }

@@ -94,34 +94,34 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public void addMove(Move move) {
+    public String addMove(Move move) {
         Spot start = move.getStart();
         Spot end = move.getEnd();
-        String beforeMove = changeToFullAlgebraicNotation(start, null);
-        String afterMove = changeToFullAlgebraicNotation(end, end.getPiece());
+        String beforeMove = changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null);
+        String afterMove = changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece());
         movedList.add(beforeMove + " " + afterMove);
+        return afterMove;
     }
 
-    public String changeToFullAlgebraicNotation(Spot start, Piece endPiece) {
-        Piece startPiece = start.getPiece();
-        String firstMove = endPiece != null ? "x" + changePositionToAlgebraicNotation(start) : changePositionToAlgebraicNotation(start);
+    public String changeToFullAlgebraicNotation(int x, int y, Piece startPiece,Piece endPiece) {
+        String move = endPiece != null ? "x" + changePositionToAlgebraicNotation(x, y) : changePositionToAlgebraicNotation(x, y);
         if(startPiece instanceof Knight) {
-            firstMove = "N" + firstMove;
+            move = "N" + move;
         }else if(startPiece instanceof Bishop) {
-            firstMove = "B" + firstMove;
+            move = "B" + move;
         }else if(startPiece instanceof Queen) {
-            firstMove = "Q" + firstMove;
+            move = "Q" + move;
         }else if(startPiece instanceof Rook) {
-            firstMove = "R" + firstMove;
+            move = "R" + move;
         }else if(startPiece instanceof King) {
-            firstMove = "K" + firstMove;
+            move = "K" + move;
         }
-        return firstMove;
+        return move;
     }
 
-    public String changePositionToAlgebraicNotation(Spot spot) {
-        char col = (char) ('a' + spot.getY());
-        int row = spot.getX() + 1;
+    public String changePositionToAlgebraicNotation(int x, int y) {
+        char col = (char) ('a' + y);
+        int row = x + 1;
         return "" + col + row;
     }
 

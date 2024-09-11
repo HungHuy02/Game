@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.awt.Font;
-
 public class ChessScreen extends InputAdapter implements Screen {
     private Stage stage;
 
@@ -29,6 +27,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     private ChessPlayer player1;
     private ChessPlayer player2;
     private ChessPlayer currentPlayer;
+    private NotationHistoryScrollPane scrollPane;
 
     private ChessSound chessSound;
     private int turn;
@@ -49,8 +48,10 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessSound = new ChessSound();
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage);
+        scrollPane = new NotationHistoryScrollPane();
         selectedSpot = null;
         stage.addActor(appBar.getStack());
+        stage.addActor(scrollPane.getScrollPane());
         stage.addActor(player1Info.getInfo());
         stage.addActor(player2Info.getInfo());
 
@@ -211,7 +212,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 }else {
                                     chessSound.playMoveSound();
                                 }
-                                move.makeRealMove(board);
+                                scrollPane.addValue(move.makeRealMove(board), bitmapFont);
                                 selectedSpot = null;
                                 if(currentPlayer == player1) {
                                     currentPlayer = player2;

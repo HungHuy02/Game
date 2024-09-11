@@ -21,10 +21,11 @@ public class Move {
         return end;
     }
 
-    public void makeRealMove(Board board) {
-        board.addMove(this);
+    public String makeRealMove(Board board) {
+        String text = board.addMove(this);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
+        return text;
     }
 
     public void makeMove(Board board) {
