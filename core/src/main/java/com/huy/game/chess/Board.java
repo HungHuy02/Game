@@ -15,6 +15,7 @@ public class Board {
     private Spot promotingSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
+    private int turn = 0;
     private final List<String> movedList = new ArrayList<>();
 
     public void setSpots(Spot[][] spots) {
@@ -50,6 +51,8 @@ public class Board {
         testBoard.setbKingSpot(testBoard.getSpots()[bKingSpot.getX()][bKingSpot.getY()]);
         return testBoard;
     }
+
+
 
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
@@ -94,9 +97,7 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public String addMove(Move move) {
-        Spot start = move.getStart();
-        Spot end = move.getEnd();
+    public String addMove(Spot start, Spot end) {
         String beforeMove = changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null);
         String afterMove = changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece());
         movedList.add(beforeMove + " " + afterMove);
@@ -123,6 +124,45 @@ public class Board {
         char col = (char) ('a' + y);
         int row = x + 1;
         return "" + col + row;
+    }
+
+    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, ChessSound chessSound,ChessPlayer currentPlayer, ChessPlayer player1, ChessPlayer player2, int turn) {
+        if(selectedSpot.getPiece() instanceof Pawn) {
+            if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
+                ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+            }
+        }
+        if(!isKingSafe(!currentPlayer.isWhite())) {
+            chessSound.playCheckSound();
+        }else if(selectedSpot.getPiece() instanceof King) {
+            if(((King) selectedSpot.getPiece()).isCastling()) {
+                ((King) selectedSpot.getPiece()).setCastling(false);
+                chessSound.playCastleSound();
+            }else {
+                chessSound.playMoveSound();
+            }
+        }else if(secondSpot.getPiece() != null) {
+            chessSound.playCaptureSound();
+            currentPlayer.putValue(secondSpot.getPiece());
+            int value = player1.getValue() - player2.getValue();
+            if(value > 0) {
+                player1.putValue(value);
+            }else {
+                player2.putValue(Math.abs(value));
+            }
+        }else {
+            chessSound.playMoveSound();
+        }
+        if(currentPlayer == player1) {
+            currentPlayer = player2;
+        }else {
+            currentPlayer = player1;
+            turn++;
+        }
+        if(isCheckmate(currentPlayer.isWhite())) {
+            chessSound.playGameEndSound();
+            setEnd();
+        }
     }
 
     public void resetBoard(ChessImage chessImage ) {

@@ -22,7 +22,7 @@ public class Move {
     }
 
     public String makeRealMove(Board board) {
-        String text = board.addMove(this);
+        String text = board.addMove(start, end);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
         return text;
@@ -33,9 +33,12 @@ public class Move {
         board.setSpot(start.getX(), start.getY(), null);
     }
 
-    public void makeAIMove(Board board) {
-        board.setSpot(end.getX(), end.getY(), board.getSpot(start.getX(), start.getY()).getPiece());
+    public String makeAIMove(Board board) {
+        Spot startSpot = board.getSpot(start.getX(), start.getY());
+        String text = board.addMove(startSpot, board.getSpot(end.getX(), end.getY()));
+        board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
+        return text;
     }
 
     public void unMove(Board board) {

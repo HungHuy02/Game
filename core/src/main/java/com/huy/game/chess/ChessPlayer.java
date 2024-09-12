@@ -9,6 +9,7 @@ public class ChessPlayer {
     private boolean isWhite;
     private Map<String, Integer> map;
     private int value = 0;
+    private int turn = 1;
 
     public ChessPlayer(boolean isWhite) {
         this.isWhite = isWhite;
@@ -35,6 +36,14 @@ public class ChessPlayer {
 
     public int getValue() {
         return value;
+    }
+
+    public void increaseTurn() {
+        turn++;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 
     public void putValue(Piece piece) {
