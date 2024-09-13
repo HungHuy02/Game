@@ -1,11 +1,11 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pawn extends Piece{
+public class Pawn extends Piece {
 
     private int turn;
     private boolean isMoveTwo = false;
@@ -48,7 +48,7 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public boolean canMove(Board board, Spot[][] spots,Spot start, Spot end) {
+    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }

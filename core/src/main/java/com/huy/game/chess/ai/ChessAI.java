@@ -1,4 +1,14 @@
-package com.huy.game.chess;
+package com.huy.game.chess.ai;
+
+import com.huy.game.chess.core.Bishop;
+import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.Knight;
+import com.huy.game.chess.core.Move;
+import com.huy.game.chess.core.Pawn;
+import com.huy.game.chess.core.Piece;
+import com.huy.game.chess.core.Queen;
+import com.huy.game.chess.core.Rook;
+import com.huy.game.chess.core.Spot;
 
 import java.util.List;
 
@@ -29,7 +39,7 @@ public class ChessAI {
         return score;
     }
 
-    public int minimax(Board board ,Spot[][] spots, boolean isWhite,int depth, int alpha, int beta,boolean maximizingPlayer) {
+    public int minimax(Board board , Spot[][] spots, boolean isWhite, int depth, int alpha, int beta, boolean maximizingPlayer) {
         if(depth == 0) {
             return evaluateScore(spots, isWhite);
         }

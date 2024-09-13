@@ -1,4 +1,4 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
 

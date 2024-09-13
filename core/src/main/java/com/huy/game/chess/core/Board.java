@@ -1,9 +1,13 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
+import com.huy.game.chess.manager.ChessGameManager;
+import com.huy.game.chess.ui.ChessImage;
+import com.huy.game.chess.ui.ChessSound;
+import com.huy.game.chess.ui.Colors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +19,6 @@ public class Board {
     private Spot promotingSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
-    private int turn = 0;
     private final List<String> movedList = new ArrayList<>();
 
     public void setSpots(Spot[][] spots) {
@@ -51,8 +54,6 @@ public class Board {
         testBoard.setbKingSpot(testBoard.getSpots()[bKingSpot.getX()][bKingSpot.getY()]);
         return testBoard;
     }
-
-
 
     public void setPromoting(boolean isPromoting) {
         this.isPromoting = isPromoting;
@@ -126,13 +127,13 @@ public class Board {
         return "" + col + row;
     }
 
-    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, ChessSound chessSound,ChessPlayer currentPlayer, ChessPlayer player1, ChessPlayer player2, int turn) {
+    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, ChessSound chessSound, ChessGameManager chessGameManager) {
         if(selectedSpot.getPiece() instanceof Pawn) {
             if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
-                ((Pawn) selectedSpot.getPiece()).setTurn(turn);
+                ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
             }
         }
-        if(!isKingSafe(!currentPlayer.isWhite())) {
+        if(!isKingSafe(!chessGameManager.getCurrentPlayer().isWhite())) {
             chessSound.playCheckSound();
         }else if(selectedSpot.getPiece() instanceof King) {
             if(((King) selectedSpot.getPiece()).isCastling()) {
@@ -143,25 +144,9 @@ public class Board {
             }
         }else if(secondSpot.getPiece() != null) {
             chessSound.playCaptureSound();
-            currentPlayer.putValue(secondSpot.getPiece());
-            int value = player1.getValue() - player2.getValue();
-            if(value > 0) {
-                player1.putValue(value);
-            }else {
-                player2.putValue(Math.abs(value));
-            }
+            chessGameManager.putValue(secondSpot.getPiece());
         }else {
             chessSound.playMoveSound();
-        }
-        if(currentPlayer == player1) {
-            currentPlayer = player2;
-        }else {
-            currentPlayer = player1;
-            turn++;
-        }
-        if(isCheckmate(currentPlayer.isWhite())) {
-            chessSound.playGameEndSound();
-            setEnd();
         }
     }
 
@@ -243,6 +228,15 @@ public class Board {
 
                 }
 
+            }
+        }
+    }
+
+    public void clearColor() {
+        for (int i = 0; i <= 7; i++) {
+            for(int j = 0; j <= 7; j++) {
+                spots[i][j].setShowColor(false);
+                spots[i][j].setIdentificationColor(false);
             }
         }
     }
@@ -406,6 +400,62 @@ public class Board {
                 }
             }
         }, 0, 0.5f);
+    }
+
+    public void handlePawnPromotion(int boardX, int boardY,  ChessImage chessImage, ChessSound chessSound, ChessGameManager chessGameManager) {
+        isPromoting = false;
+        if(boardX != getPromotingSpot().getY()) {
+            isPromoting = false;
+            promotingSpot = null;
+        }else {
+            Piece piece = null;
+            if (promotingSpot.getPiece().isWhite()) {
+                switch (boardY) {
+                    case 4:
+                        piece = new Rook(true, chessImage.getwRock());
+                        break;
+                    case 5:
+                        piece = new Bishop(true, chessImage.getwBishop());
+                        break;
+                    case 6:
+                        piece = new Knight(true, chessImage.getwKnight());
+                        break;
+                    case 7:
+                        piece = new Queen(true, chessImage.getwQueen());
+                        break;
+                }
+            } else {
+                switch (boardY) {
+                    case 0:
+                        piece = new Queen(false, chessImage.getbQueen());
+                        break;
+                    case 1:
+                        piece = new Knight(false, chessImage.getbKnight());
+                        break;
+                    case 2:
+                        piece = new Bishop(false, chessImage.getbBishop());
+                        break;
+                    case 3:
+                        piece = new Rook(false, chessImage.getbRock());
+                        break;
+                    case 4:
+                        piece = new Rook(true, chessImage.getwRock());
+                        break;
+                    case 5:
+                        piece = new Bishop(true, chessImage.getwBishop());
+                        break;
+                    case 6:
+                        piece = new Knight(true, chessImage.getwKnight());
+                        break;
+                    case 7:
+                        piece = new Queen(true, chessImage.getwQueen());
+                        break;
+                }
+            }
+            setSpot(promotingSpot.getX(), promotingSpot.getY(), piece);
+            chessSound.playPromoteSound();
+            chessGameManager.switchPlayer(this);
+        }
     }
 
     public void showPromoteSelection(SpriteBatch batch,ShapeRenderer shapeRenderer,float centerX, float centerY, ChessImage chessImage) {

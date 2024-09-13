@@ -1,11 +1,11 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class King extends Piece{
+public class King extends Piece {
 
     private boolean hasMove = false;
     private boolean isSafe = true;
@@ -40,7 +40,7 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean canMove(Board board, Spot[][] spots,Spot start, Spot end) {
+    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }
@@ -90,7 +90,11 @@ public class King extends Piece{
             }
         }else {
             if (x <= 1 && y <= 1) {
-                end.setShowMovePoint(true);
+                if(!isAICalculate()) {
+                    if(end.getPiece()!= null) {
+                        board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                    }
+                }
                 return true;
             }else {
                 return false;

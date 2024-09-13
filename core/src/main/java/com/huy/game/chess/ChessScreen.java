@@ -10,6 +10,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.Move;
+import com.huy.game.chess.core.Pawn;
+import com.huy.game.chess.core.Spot;
+import com.huy.game.chess.manager.ChessGameManager;
+import com.huy.game.chess.ai.ChessAI;
+import com.huy.game.chess.ui.ChessImage;
+import com.huy.game.chess.ui.ChessSound;
+import com.huy.game.chess.ui.Colors;
+import com.huy.game.chess.ui.NotationHistoryScrollPane;
+import com.huy.game.chess.ui.PlayerInfo;
+import com.huy.game.chess.ui.TopAppBar;
 
 public class ChessScreen extends InputAdapter implements Screen {
     private Stage stage;
@@ -99,58 +111,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
             if (board.isWithinBoard(boardX, boardY)) {
                 if(board.isPromoting()) {
-                    if(boardX != board.getPromotingSpot().getY()) {
-                        board.setPromoting(false);
-                        board.setPromotingSpot(null);
-                    }else {
-                        board.setPromoting(false);
-                        Piece piece = null;
-                        if(board.getPromotingSpot().getPiece().isWhite()) {
-                            switch (boardY) {
-                                case 4:
-                                    piece = new Rook(true, chessImage.getwRock());
-                                    break;
-                                case 5:
-                                    piece = new Bishop(true, chessImage.getwBishop());
-                                    break;
-                                case 6:
-                                    piece = new Knight(true, chessImage.getwKnight());
-                                    break;
-                                case 7:
-                                    piece = new Queen(true, chessImage.getwQueen());
-                                    break;
-                            }
-                        }else {
-                            switch (boardY) {
-                                case 0:
-                                    piece = new Queen(false, chessImage.getbQueen());
-                                    break;
-                                case 1:
-                                    piece = new Knight(false, chessImage.getbKnight());
-                                    break;
-                                case 2:
-                                    piece = new Bishop(false, chessImage.getbBishop());
-                                    break;
-                                case 3:
-                                    piece = new Rook(false, chessImage.getbRock());
-                                    break;
-                                case 4:
-                                    piece = new Rook(true, chessImage.getwRock());
-                                    break;
-                                case 5:
-                                    piece = new Bishop(true, chessImage.getwBishop());
-                                    break;
-                                case 6:
-                                    piece = new Knight(true, chessImage.getwKnight());
-                                    break;
-                                case 7:
-                                    piece = new Queen(true, chessImage.getwQueen());
-                                    break;
-                            }
-                        }
-                        board.setSpot(board.getPromotingSpot().getX(), board.getPromotingSpot().getY(), piece);
-                        chessSound.playPromoteSound();
-                    }
+                    board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager);
                 }else {
                     if (selectedSpot == null) {
                         selectedSpot = board.getSpot(boardY, boardX);
@@ -181,29 +142,10 @@ public class ChessScreen extends InputAdapter implements Screen {
                             board.clearColorAndPoint();
                             move.makeMove(testBoard);
                             if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                                if(selectedSpot.getPiece() instanceof Pawn) {
-                                    if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
-                                        ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
-                                    }
-                                }
-                                if(!board.isKingSafe(!chessGameManager.getCurrentPlayer().isWhite())) {
-                                    chessSound.playCheckSound();
-                                }else if(selectedSpot.getPiece() instanceof King) {
-                                    if(((King) selectedSpot.getPiece()).isCastling()) {
-                                        ((King) selectedSpot.getPiece()).setCastling(false);
-                                        chessSound.playCastleSound();
-                                    }else {
-                                        chessSound.playMoveSound();
-                                    }
-                                }else if(secondSpot.getPiece() != null) {
-                                    chessSound.playCaptureSound();
-                                    chessGameManager.putValue(secondSpot.getPiece());
-                                }else {
-                                    chessSound.playMoveSound();
-                                }
+                                board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
                                 scrollPane.addValue(move.makeRealMove(board), bitmapFont);
                                 selectedSpot = null;
-                                chessGameManager.switchPlayer();
+                                chessGameManager.switchPlayer(board);
                                 if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
                                     chessSound.playGameEndSound();
                                     board.setEnd();
@@ -222,6 +164,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
                             }else {
                                 selectedSpot = null;
+                                board.clearGuidePoint();
                             }
                         }
                     }
@@ -229,10 +172,12 @@ public class ChessScreen extends InputAdapter implements Screen {
             }
         }else {
             Thread thread = new Thread(() -> {
+                board.clearColor();
                 Move move = chessAI.findBestMove(board, false);
+                board.handleMoveColorAndSound(board.getSpot(move.getStart().getX(), move.getStart().getY()), board.getSpot(move.getEnd().getX(), move.getEnd().getY()), chessSound, chessGameManager);
                 String text = move.makeAIMove(board);
                 Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont));
-                chessGameManager.switchPlayer();
+                chessGameManager.switchPlayer(board);
             });
             thread.start();
         }

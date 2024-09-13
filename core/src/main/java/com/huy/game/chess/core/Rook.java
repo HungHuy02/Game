@@ -1,34 +1,45 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bishop extends Piece{
+public class Rook extends Piece {
 
-    private int[][] bishopMoves() {
+    private boolean hasMove = false;
+
+    public boolean isHasMove() {
+        return hasMove;
+    }
+
+    public void setHasMove() {
+        this.hasMove = true;
+    }
+
+    private int[][] rookMoves() {
         return new int[][]{
-            {1, -1}, {1, 1}, {-1, 1}, {-1, -1}
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1}
         };
     }
 
-    public Bishop(boolean isWhite, Texture texture) {
+    public Rook(Rook rook) {
+        super(rook.isWhite());
+        hasMove = rook.hasMove;
+    }
+
+    public Rook(boolean isWhite, Texture texture) {
         super(isWhite, texture);
     }
 
-    public Bishop(boolean isWhite) {
-        super(isWhite);
-    }
-
     @Override
-    public boolean canMove(Board board, Spot[][] spots,Spot start, Spot end) {
+    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
             return false;
         }
         int x = Math.abs(end.getX() - start.getX());
         int y = Math.abs(end.getY() - start.getY());
-        if(x == y) {
+        if(x == 0 || y == 0) {
             int directionX = Integer.signum(end.getX() - start.getX());
             int directionY = Integer.signum(end.getY() - start.getY());
             int currentX = start.getX() + directionX;
@@ -45,6 +56,7 @@ public class Bishop extends Piece{
                     board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 }
             }
+
             return true;
         }else {
             return false;
@@ -55,7 +67,7 @@ public class Bishop extends Piece{
     public boolean calculateMove(Board board, Spot checkSpot) {
         Board testBoard = board.cloneBoard();
         Spot[][] spots = testBoard.getSpots();
-        for (int[] move: bishopMoves()) {
+        for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
@@ -75,12 +87,12 @@ public class Bishop extends Piece{
     public void calculateForPoint(Board board, Spot checkSpot) {
         Board testBoard = board.cloneBoard();
         Spot[][] spots = testBoard.getSpots();
-        for (int[] move: bishopMoves()) {
+        for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
-                   calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
+                    calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
                 }else {
                     break;
                 }
@@ -89,15 +101,15 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot) {
+    public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
         setAICalculate(true);
-        for (int[] move: bishopMoves()) {
+        for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
-                    if(calculateOneMove(board, spots,checkSpot, x, y)) {
+                    if(calculateOneMove(board, spots, checkSpot, x, y)) {
                         list.add(new Move(checkSpot, spots[x][y]));
                     }
                 }else {

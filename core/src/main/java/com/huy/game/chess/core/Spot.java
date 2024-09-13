@@ -1,6 +1,7 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Color;
+import com.huy.game.chess.ui.Colors;
 
 public class Spot {
     private Piece piece;

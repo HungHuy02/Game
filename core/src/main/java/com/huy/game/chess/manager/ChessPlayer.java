@@ -1,6 +1,10 @@
-package com.huy.game.chess;
+package com.huy.game.chess.manager;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.huy.game.chess.core.Bishop;
+import com.huy.game.chess.core.Pawn;
+import com.huy.game.chess.core.Piece;
+import com.huy.game.chess.core.Queen;
+import com.huy.game.chess.core.Rook;
 
 import java.util.HashMap;
 import java.util.Map;

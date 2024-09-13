@@ -1,4 +1,4 @@
-package com.huy.game.chess;
+package com.huy.game.chess.core;
 
 public class Move {
     private Spot start;
@@ -25,6 +25,8 @@ public class Move {
         String text = board.addMove(start, end);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
+        start.setShowColor(true);
+        end.setShowColor(true);
         return text;
     }
 
@@ -37,6 +39,7 @@ public class Move {
         Spot startSpot = board.getSpot(start.getX(), start.getY());
         String text = board.addMove(startSpot, board.getSpot(end.getX(), end.getY()));
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
+        startSpot.setShowColor(true);
         board.setSpot(start.getX(), start.getY(), null);
         return text;
     }

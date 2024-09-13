@@ -1,9 +1,8 @@
-package com.huy.game.chess;
+package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Scaling;
 
 
 public class ChessImage {

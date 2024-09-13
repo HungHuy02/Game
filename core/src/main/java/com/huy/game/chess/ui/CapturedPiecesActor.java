@@ -1,4 +1,4 @@
-package com.huy.game.chess;
+package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

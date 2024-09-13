@@ -1,4 +1,7 @@
-package com.huy.game.chess;
+package com.huy.game.chess.manager;
+
+import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.Piece;
 
 public class ChessGameManager {
 
@@ -12,13 +15,15 @@ public class ChessGameManager {
         currentPlayer = player1;
     }
 
-    public void switchPlayer() {
-        if(currentPlayer == player1) {
-            currentPlayer = player2;
-        }else {
-            currentPlayer = player1;
+    public void switchPlayer(Board board) {
+        if(!board.isPromoting()) {
+            if(currentPlayer == player1) {
+                currentPlayer = player2;
+            }else {
+                currentPlayer = player1;
+            }
+            currentPlayer.increaseTurn();
         }
-        currentPlayer.increaseTurn();
     }
 
     public void putValue(Piece piece) {

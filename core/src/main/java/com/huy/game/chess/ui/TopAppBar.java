@@ -1,4 +1,4 @@
-package com.huy.game.chess;
+package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
