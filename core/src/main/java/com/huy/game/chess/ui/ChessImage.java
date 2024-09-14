@@ -31,6 +31,10 @@ public class ChessImage {
     private float capturedPieceSize;
 
     private Texture backArrow;
+    private Texture options;
+    private Texture plus;
+    private Texture back;
+    private Texture forwards;
     private Texture appbarBackground;
 
     public ChessImage() {
@@ -50,6 +54,10 @@ public class ChessImage {
         bRock = new Texture("chess/images/brook.png");
 
         backArrow = new Texture("chess/images/icons8-left-100.png");
+        options = new Texture("chess/images/icons8-bulleted-list-100.png");
+        plus = new Texture("chess/images/icons8-plus-100.png");
+        back = new Texture("chess/images/icons8-back-100.png");
+        forwards = new Texture("chess/images/icons8-forward-100.png");
         appbarBackground = new Texture("chess/images/appbar_background.png");
 
         float boardWidth = chessBoard.getWidth();
@@ -131,6 +139,22 @@ public class ChessImage {
         return new Image(backArrow);
     }
 
+    public Image getOptions() {
+        return new Image(options);
+    }
+
+    public Image getPlus() {
+        return new Image(plus);
+    }
+
+    public Image getBack() {
+        return new Image(back);
+    }
+
+    public Image getForwards() {
+        return new Image(forwards);
+    }
+
     public Image getAppbarBackground() {
         return new Image(appbarBackground);
     }
@@ -180,6 +204,10 @@ public class ChessImage {
         bRock.dispose();
 
         backArrow.dispose();
+        options.dispose();
+        plus.dispose();
+        back.dispose();
+        forwards.dispose();
         appbarBackground.dispose();
     }
 }

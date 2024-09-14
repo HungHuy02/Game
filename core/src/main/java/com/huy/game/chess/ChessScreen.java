@@ -16,6 +16,7 @@ import com.huy.game.chess.core.Pawn;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.ai.ChessAI;
+import com.huy.game.chess.ui.BottomAppBar;
 import com.huy.game.chess.ui.ChessImage;
 import com.huy.game.chess.ui.ChessSound;
 import com.huy.game.chess.ui.Colors;
@@ -56,11 +57,13 @@ public class ChessScreen extends InputAdapter implements Screen {
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage);
         scrollPane = new NotationHistoryScrollPane();
+        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont);
         selectedSpot = null;
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
         stage.addActor(player1Info.getInfo());
         stage.addActor(player2Info.getInfo());
+        stage.addActor(bottomAppBar.getStack());
 
         centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
