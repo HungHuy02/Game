@@ -29,7 +29,7 @@ public class LoginWayActivity extends AppCompatActivity {
         });
 
         binding.guestBtn.setOnClickListener((v) -> {
-            Intent intent = new Intent(this, AndroidLauncher.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
     }

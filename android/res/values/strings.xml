@@ -11,4 +11,11 @@
     <string name="create_account">Tạo một tài khoản</string>
     <string name="display_name">Tên hiển thị*</string>
     <string name="continue_text">Tiếp tục</string>
+    <string name="text">Causual Game</string>
+    <string name="text2">Trò chơi thông thường</string>
+    <string name="play_text">Chơi</string>
+    <string name="rank_text">Xếp hạng</string>
+    <string name="new_chess_play_text">Bắt đầu ván cờ mới</string>
+    <string name="play_with_ai_text">Đấu với máy</string>
+    <string name="play_2_people_1_device_text">2 người 1 máy</string>
 </resources>

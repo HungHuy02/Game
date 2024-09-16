@@ -6,4 +6,8 @@
     <color name="gray_50">#FAFAFA</color>
     <color name="light_blue_a400">#039BE6</color>
     <color name="turquoise_green">#67D1BD</color>
+    <color name="grey_900_98">#252422</color>
+    <color name="grey_900_94">#312D2A</color>
+    <color name="grey_800">#464241</color>
+    <color name="light_green_700">#86A94B</color>
 </resources>

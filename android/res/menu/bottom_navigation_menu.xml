@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_1"
+        android:enabled="true"
+        android:icon="@drawable/sports_esports_24px"
+        android:iconTint="@color/black"
+        android:title="@string/play_text"/>
+    <item
+        android:id="@+id/item_2"
+        android:enabled="true"
+        android:icon="@drawable/trophy_24px"
+        android:iconTint="@color/black"
+        android:title="@string/rank_text"/>
+</menu>
