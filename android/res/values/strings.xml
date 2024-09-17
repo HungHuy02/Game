@@ -18,4 +18,17 @@
     <string name="new_chess_play_text">Bắt đầu ván cờ mới</string>
     <string name="play_with_ai_text">Đấu với máy</string>
     <string name="play_2_people_1_device_text">2 người 1 máy</string>
+    <string name="time_text">Thời gian</string>
+    <string name="super_flash_text">Siêu chớp</string>
+    <string name="one_minute_text">1 phút</string>
+    <string name="one_minute_plus_one_text">1 | 1</string>
+    <string name="two_minute_plus_one_text">2 | 1</string>
+    <string name="flash_text">Chớp</string>
+    <string name="three_minute_text">3 phút</string>
+    <string name="three_minute_plus_two_text">3 | 2</string>
+    <string name="five_minute_text">5 phút</string>
+    <string name="fast_text">Nhanh</string>
+    <string name="ten_minute_text">10 phút</string>
+    <string name="fifteen_minute_plus_ten">15 | 10</string>
+    <string name="thirty_minute">30 phút</string>
 </resources>

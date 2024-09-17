@@ -1,5 +1,6 @@
 package com.huy.game.android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.huy.game.R;
+import com.huy.game.databinding.FragmentRankBinding;
 
 public class RankFragment extends Fragment {
 
@@ -17,9 +18,12 @@ public class RankFragment extends Fragment {
 
     }
 
+    private FragmentRankBinding fragmentRankBinding;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_rank, container, false);
+        fragmentRankBinding = FragmentRankBinding.inflate(inflater, container, false);
+        return fragmentRankBinding.getRoot();
     }
 }

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/grey_900_94">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_text"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/super_flash_text"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_1m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/one_minute_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_1mp1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/one_minute_plus_one_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_2mp1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/two_minute_plus_one_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/flash_text"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_3m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/three_minute_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_3mp2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/three_minute_plus_two_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_5m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/five_minute_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fast_text"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_10m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ten_minute_text"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_15mp10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fifteen_minute_plus_ten"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_30m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/thirty_minute"
+            android:backgroundTint="@color/grey_800"
+            android:layout_weight="1"
+            app:cornerRadius="4dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
