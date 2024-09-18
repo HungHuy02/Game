@@ -1,57 +1,113 @@
 package com.huy.game.android;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.huy.game.R;
+import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.databinding.ActivityChangeTimeBinding;
 
-public class ChangeTimeActivity extends AppCompatActivity {
-
-    private ActivityChangeTimeBinding binding;
+public class ChangeTimeActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityChangeTimeBinding.inflate(getLayoutInflater());
+        com.huy.game.databinding.ActivityChangeTimeBinding binding = ActivityChangeTimeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.backBtn.setOnClickListener((v) -> getOnBackPressedDispatcher().onBackPressed());
+        int position = getIntent().getIntExtra("position", 7);
+        switch (position) {
+            case 1:
+                updateButton(binding.btn1m);
+                break;
+            case 2:
+                updateButton(binding.btn1mp1);
+                break;
+            case 3:
+                updateButton(binding.btn2mp1);
+                break;
+            case 4:
+                updateButton(binding.btn3m);
+                break;
+            case 5:
+                updateButton(binding.btn3mp2);
+                break;
+            case 6:
+                updateButton(binding.btn5m);
+                break;
+            case 7:
+                updateButton(binding.btn10m);
+                break;
+            case 8:
+                updateButton(binding.btn15mp10);
+                break;
+            case 9:
+                updateButton(binding.btn30m);
+                break;
+        }
+        binding.btn1m.setOnClickListener(this);
+        binding.btn1mp1.setOnClickListener(this);
+        binding.btn2mp1.setOnClickListener(this);
+        binding.btn3m.setOnClickListener(this);
+        binding.btn3mp2.setOnClickListener(this);
+        binding.btn5m.setOnClickListener(this);
+        binding.btn10m.setOnClickListener(this);
+        binding.btn15mp10.setOnClickListener(this);
+        binding.btn30m.setOnClickListener(this);
+    }
 
-        binding.btn1m.setOnClickListener((v) -> {
+    @Override
+    public void onClick(View view) {
+        StorageUtils storageUtils = StorageUtils.getInstance(view.getContext());
+        Intent resultIntent = new Intent();
+        int id = view.getId();
+        if(id == R.id.btn_1m) {
+            handleResult(resultIntent, storageUtils, getString(R.string.one_minute_text), "1", 1);
+        }else if(id == R.id.btn_1mp1) {
+            handleResult(resultIntent, storageUtils, getString(R.string.one_minute_plus_one_text), "1", 2);
+        }else if(id == R.id.btn_2mp1) {
+            handleResult(resultIntent, storageUtils, getString(R.string.two_minute_plus_one_text), "1", 3);
+        }else if(id == R.id.btn_3m){
+            handleResult(resultIntent, storageUtils, getString(R.string.three_minute_text), "2", 4);
+        }else if(id == R.id.btn_3mp2) {
+            handleResult(resultIntent, storageUtils, getString(R.string.three_minute_plus_two_text), "2", 5);
+        }else if(id == R.id.btn_5m) {
+            handleResult(resultIntent, storageUtils, getString(R.string.five_minute_text), "2", 6);
+        }else if(id == R.id.btn_10m) {
+            handleResult(resultIntent, storageUtils, getString(R.string.ten_minute_text), "3", 7);
+        }else if(id == R.id.btn_15mp10) {
+            handleResult(resultIntent, storageUtils, getString(R.string.fifteen_minute_plus_ten), "3", 8);
+        }else if(id == R.id.btn_30m) {
+            handleResult(resultIntent, storageUtils, getString(R.string.thirty_minute), "3", 9);
+        }
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
+    }
 
-        });
+    private void updateButton(MaterialButton button) {
+        int strokeWidth = 3;
+        ColorStateList strokeColor = getResources().getColorStateList(R.color.light_green_700, getTheme());
+        ColorStateList buttonColor = getResources().getColorStateList(R.color.grey_700, getTheme());
+        button.setStrokeWidth(strokeWidth);
+        button.setStrokeColor(strokeColor);
+        button.setBackgroundTintList(buttonColor);
+    }
 
-        binding.btn1mp1.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn2mp1.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn3m.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn3mp2.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn5m.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn10m.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn15mp10.setOnClickListener((v) -> {
-
-        });
-
-        binding.btn30m.setOnClickListener((v) -> {
-
-        });
+    private void handleResult(Intent resultIntent, StorageUtils storageUtils ,String text, String value, int position) {
+        resultIntent.putExtra("time", text);
+        resultIntent.putExtra("icon", value);
+        storageUtils.setStringValue("time", text);
+        storageUtils.setStringValue("icon", value);
+        storageUtils.setIntValue("position", position);
     }
 }
+
+

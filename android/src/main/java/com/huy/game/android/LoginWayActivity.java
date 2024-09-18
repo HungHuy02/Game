@@ -9,13 +9,11 @@ import com.huy.game.databinding.ActivityLoginWayBinding;
 
 public class LoginWayActivity extends AppCompatActivity {
 
-    private ActivityLoginWayBinding binding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityLoginWayBinding.inflate(getLayoutInflater());
+        com.huy.game.databinding.ActivityLoginWayBinding binding = ActivityLoginWayBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         binding.loginBtn.setOnClickListener((v) -> {

@@ -9,5 +9,10 @@
     <color name="grey_900_98">#252422</color>
     <color name="grey_900_94">#312D2A</color>
     <color name="grey_800">#464241</color>
+    <color name="grey_700">#585755</color>
+    <color name="grey_300">#DEDEDE</color>
+    <color name="grey_400">#B2B2B0</color>
     <color name="light_green_700">#86A94B</color>
+    <color name="flash_color">#F6BF46</color>
+    <color name="timer_color">#6C9C42</color>
 </resources>

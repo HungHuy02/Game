@@ -14,10 +14,6 @@ import com.huy.game.databinding.FragmentRankBinding;
 
 public class RankFragment extends Fragment {
 
-    public RankFragment() {
-
-    }
-
     private FragmentRankBinding fragmentRankBinding;
 
     @Nullable
