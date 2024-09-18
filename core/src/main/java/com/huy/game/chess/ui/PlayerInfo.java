@@ -15,6 +15,7 @@ import java.util.Map;
 public class PlayerInfo {
 
     private HorizontalGroup info;
+    private Label timer;
 
     public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font) {
         horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font);
@@ -35,6 +36,7 @@ public class PlayerInfo {
         }
         info.addActor(image(image, chessImage));
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
+        info.addActor(timer(50));
         return info;
     }
 
@@ -63,5 +65,18 @@ public class PlayerInfo {
 
     private CapturedPiecesActor capturedPiecesActor(Map<String, Integer> map , ChessImage chessImage, boolean isWhite, BitmapFont font) {
         return new CapturedPiecesActor(map, chessImage, isWhite, font);
+    }
+
+    private Label timer(int time) {
+        int minutes = time / 60;
+        int remainSeconds = time % 60;
+        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        timer = new Label(String.format(String.format("%d:%02d", minutes, remainSeconds)), skin);
+        timer.setFontScale(5);
+        return timer;
+    }
+
+    public Label getTimer() {
+        return timer;
     }
 }

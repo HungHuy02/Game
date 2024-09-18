@@ -13,7 +13,7 @@ import com.huy.game.chess.core.Spot;
 import java.util.List;
 
 public class ChessAI {
-    int evaluateScore(Spot[][] spots, boolean isWhite) {
+    int evaluateScore(Spot[][] spots, boolean isWhite, Board board) {
         int score = 0;
         for(int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
@@ -31,7 +31,11 @@ public class ChessAI {
                     }else if (piece instanceof Queen) {
                         score += 9 * k;
                     }else {
-                        score += 900 * k;
+                        if(board.isKingSafe(piece.isWhite())) {
+                            score += 900 * k;
+                        }else {
+                            score -= 900 * k;
+                        }
                     }
                 }
             }
@@ -40,8 +44,8 @@ public class ChessAI {
     }
 
     public int minimax(Board board , Spot[][] spots, boolean isWhite, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        if(depth == 0) {
-            return evaluateScore(spots, isWhite);
+        if(depth == 0 || board.isEnd()) {
+            return evaluateScore(spots, isWhite, board);
         }
 
         if(maximizingPlayer) {
@@ -114,6 +118,5 @@ public class ChessAI {
         }
         return bestMove;
     }
-
 }
 

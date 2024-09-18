@@ -1,6 +1,8 @@
 package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -49,6 +51,16 @@ public class TopAppBar {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                Gdx.input.setInputProcessor(new InputAdapter() {
+                    @Override
+                    public boolean keyDown(int keycode) {
+                        if (keycode == Input.Keys.BACK) {
+
+                            return true;
+                        }
+                        return false;
+                    }
+                });
             }
         });
         return backArrow;

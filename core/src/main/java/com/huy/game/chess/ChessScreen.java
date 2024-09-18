@@ -52,6 +52,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameManager = new ChessGameManager();
         PlayerInfo player1Info = new PlayerInfo("1", chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), true, true, bitmapFont);
         PlayerInfo player2Info = new PlayerInfo("2", chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), false, false, bitmapFont);
+        chessGameManager.setLabel(player1Info.getTimer(), player2Info.getTimer());
         chessAI = new ChessAI();
         chessSound = new ChessSound();
         board = new Board();

@@ -14,6 +14,7 @@ public class ChessPlayer {
     private Map<String, Integer> map;
     private int value = 0;
     private int turn = 1;
+    private int timeRemain = 500;
 
     public ChessPlayer(boolean isWhite) {
         this.isWhite = isWhite;
@@ -71,5 +72,13 @@ public class ChessPlayer {
 
     public void putValue(int value) {
         map.put("value", value);
+    }
+
+    public void setTimeRemain(int timeRemain) {
+        this.timeRemain = timeRemain;
+    }
+
+    public int getTimeRemain() {
+        return timeRemain;
     }
 }

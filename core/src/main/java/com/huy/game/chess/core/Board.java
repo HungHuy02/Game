@@ -196,6 +196,7 @@ public class Board {
                 float distance = spotSize * j;
                 if(spots[i][j].getPiece() != null) {
                     batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize);
+//                    batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize, 0, 0, spots[i][j].getPiece().getTexture().getWidth(), spots[i][j].getPiece().getTexture().getHeight(), false, true);
                 }
             }
         }
