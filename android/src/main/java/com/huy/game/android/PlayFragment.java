@@ -41,31 +41,27 @@ public class PlayFragment extends Fragment {
         Drawable flashDrawable = AppCompatResources.getDrawable(view.getContext(), R.drawable.flash_on_24px);
         Drawable timerDrawable = AppCompatResources.getDrawable(view.getContext(), R.drawable.timer_24px);
 
-        ColorStateList flashColor = getResources().getColorStateList(R.color.flash_color, getActivity().getTheme());
-        ColorStateList timerColor = getResources().getColorStateList(R.color.timer_color, getActivity().getTheme());
+        ColorStateList flashColor = getResources().getColorStateList(R.color.flash_color, requireActivity().getTheme());
+        ColorStateList timerColor = getResources().getColorStateList(R.color.timer_color, requireActivity().getTheme());
 
-        viewModel.getSelectedTime().observe(getViewLifecycleOwner(), timeSelected -> {
-            fragmentPlayBinding.btnTime.setText(timeSelected);
-        });
+        viewModel.getSelectedTime().observe(getViewLifecycleOwner(), timeSelected -> fragmentPlayBinding.btnTime.setText(timeSelected));
 
         viewModel.getSelectedIcon().observe(getViewLifecycleOwner(), iconSelected -> {
             Drawable drawable;
-            ColorStateList tintColor;
-
-            switch (iconSelected) {
-                case "1":
+            ColorStateList tintColor = switch (iconSelected) {
+                case "1" -> {
                     drawable = bulletDrawable;
-                    tintColor = flashColor;
-                    break;
-                case "2":
+                    yield flashColor;
+                }
+                case "2" -> {
                     drawable = flashDrawable;
-                    tintColor = flashColor;
-                    break;
-                default:
+                    yield flashColor;
+                }
+                default -> {
                     drawable = timerDrawable;
-                    tintColor = timerColor;
-                    break;
-            }
+                    yield timerColor;
+                }
+            };
 
             fragmentPlayBinding.btnTime.setIcon(drawable);
             fragmentPlayBinding.btnTime.setIconTint(tintColor);
@@ -103,7 +99,8 @@ public class PlayFragment extends Fragment {
         });
 
         fragmentPlayBinding.btnPlayAi.setOnClickListener((v) -> {
-
+            Intent intent = new Intent(this.getContext(), AndroidLauncher.class);
+            startActivity(intent);
         });
 
         fragmentPlayBinding.btnNew.setOnClickListener((v) -> {

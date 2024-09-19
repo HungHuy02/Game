@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -40,19 +39,20 @@ public class BottomAppBar {
     }
 
      private HorizontalGroup horizontalGroup(ChessImage chessImage, BitmapFont font) {
-         Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+         Label.LabelStyle labelStyle = new Label.LabelStyle();
+         labelStyle.font = font;
          HorizontalGroup horizontalGroup = new HorizontalGroup();
-         horizontalGroup.addActor(verticalGroup(chessImage.getOptions(), "Tùy chọn", skin, font));
-         horizontalGroup.addActor(verticalGroup(chessImage.getPlus(), "Mới", skin, font));
-         horizontalGroup.addActor(verticalGroup(chessImage.getBack(), "Quay lại", skin, font));
-         horizontalGroup.addActor(verticalGroup(chessImage.getForwards(), "Tiếp", skin, font));
+         horizontalGroup.addActor(verticalGroup(chessImage.getOptions(), "Tùy chọn", labelStyle));
+         horizontalGroup.addActor(verticalGroup(chessImage.getPlus(), "Mới", labelStyle));
+         horizontalGroup.addActor(verticalGroup(chessImage.getBack(), "Quay lại", labelStyle));
+         horizontalGroup.addActor(verticalGroup(chessImage.getForwards(), "Tiếp", labelStyle));
          return horizontalGroup;
      }
 
-     private VerticalGroup verticalGroup(Image image, String name, Skin skin, BitmapFont font) {
+     private VerticalGroup verticalGroup(Image image, String name, Label.LabelStyle labelStyle) {
          VerticalGroup verticalGroup = new VerticalGroup();
          verticalGroup.addActor(image(image));
-         verticalGroup.addActor(name(name, skin, font));
+         verticalGroup.addActor(name(name, labelStyle));
          return verticalGroup;
      }
 
@@ -69,9 +69,8 @@ public class BottomAppBar {
          return  container;
      }
 
-     private Label name(String name, Skin skin, BitmapFont font) {
-         Label label = new Label(name, skin);
-         label.getStyle().font = font;
+     private Label name(String name, Label.LabelStyle labelStyle) {
+         Label label = new Label(name, labelStyle);
          return label;
      }
 

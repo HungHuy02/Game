@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 
@@ -15,17 +14,16 @@ import java.util.Map;
 public class PlayerInfo {
 
     private HorizontalGroup info;
-    private Label timer;
 
-    public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font) {
-        horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font);
+    public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList) {
+        horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, timeList);
     }
 
     public HorizontalGroup getInfo() {
         return info;
     }
 
-    private HorizontalGroup horizontalGroup(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font) {
+    private void horizontalGroup(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList) {
         info = new HorizontalGroup();
         info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
         info.padRight(16);
@@ -36,8 +34,7 @@ public class PlayerInfo {
         }
         info.addActor(image(image, chessImage));
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
-        info.addActor(timer(50));
-        return info;
+        info.addActor(new Timer(timeList, font, isPlayer1, chessImage));
     }
 
     private Image image(Texture image, ChessImage chessImage) {
@@ -51,32 +48,20 @@ public class PlayerInfo {
     private VerticalGroup verticalGroup(String name, Map<String, Integer> map, ChessImage chessImage,boolean isWhite, BitmapFont font) {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.space(50f);
-        verticalGroup.addActor(name(name));
+        verticalGroup.addActor(name(name, font));
         verticalGroup.addActor(capturedPiecesActor(map, chessImage, isWhite, font));
         return verticalGroup;
     }
 
-    private Label name(String name) {
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
-        Label label = new Label(name, skin);
-        label.setFontScale(5);
+    private Label name(String name, BitmapFont font) {
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = font;
+        Label label = new Label(name, labelStyle);
+        label.getStyle().font = font;
         return label;
     }
 
     private CapturedPiecesActor capturedPiecesActor(Map<String, Integer> map , ChessImage chessImage, boolean isWhite, BitmapFont font) {
         return new CapturedPiecesActor(map, chessImage, isWhite, font);
-    }
-
-    private Label timer(int time) {
-        int minutes = time / 60;
-        int remainSeconds = time % 60;
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
-        timer = new Label(String.format(String.format("%d:%02d", minutes, remainSeconds)), skin);
-        timer.setFontScale(5);
-        return timer;
-    }
-
-    public Label getTimer() {
-        return timer;
     }
 }

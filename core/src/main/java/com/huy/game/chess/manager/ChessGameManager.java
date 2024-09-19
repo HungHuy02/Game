@@ -1,11 +1,8 @@
 package com.huy.game.chess.manager;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.Piece;
-import com.huy.game.chess.core.Spot;
-import com.huy.game.chess.ui.Colors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,19 +13,19 @@ public class ChessGameManager {
     private ChessPlayer player2;
     private ChessPlayer currentPlayer;
     private Timer timer;
-    private Label player1Timer;
-    private Label player2Timer;
+    private Map<String, Integer> timeList;
 
     public ChessGameManager() {
         player1 = new ChessPlayer(true);
         player2 = new ChessPlayer(false);
         currentPlayer = player1;
         timer = new Timer();
-    }
-
-    public void setLabel(Label player1Timer, Label player2Timer) {
-        this.player1Timer = player1Timer;
-        this.player2Timer = player2Timer;
+        timeList = new HashMap<>();
+        timeList.put("play1", 0);
+        timeList.put("play2", 0);
+        timeList.put("1", 500);
+        timeList.put("2", 500);
+        handleTimer("1");
     }
 
 
@@ -37,10 +34,10 @@ public class ChessGameManager {
             cancelTimer();
             if(currentPlayer == player1) {
                 currentPlayer = player2;
-                handleTimer(player2Timer);
+                handleTimer("2");
             }else {
                 currentPlayer = player1;
-                handleTimer(player1Timer);
+                handleTimer("1");
             }
             currentPlayer.increaseTurn();
         }
@@ -56,28 +53,33 @@ public class ChessGameManager {
         }
     }
 
-    public void handleTimer(Label label) {
+    public void handleTimer(String key) {
+        timeList.put("play"+ key, 1);
         Timer.Task task = new Timer.Task() {
             int remainingTime = currentPlayer.getTimeRemain();
 
             @Override
             public void run() {
                 if (remainingTime > 0) {
-                    int minutes = remainingTime / 60;
-                    int remainSeconds = remainingTime % 60;
-                    label.setText(String.format("%d:%02d", minutes, remainSeconds));
                     remainingTime--;
                     currentPlayer.setTimeRemain(remainingTime);
+                    timeList.put(key, remainingTime);
                 } else {
                     this.cancel();
-                    label.setText("0:00");
+                    timeList.put(key, 0);
                 }
             }
         };
         timer.scheduleTask(task, 0, 1);
     }
 
+    public Map<String, Integer> getTimeList() {
+        return timeList;
+    }
+
     public void cancelTimer() {
+        timeList.put("play1", 0);
+        timeList.put("play2", 0);
         timer.clear();
     }
 

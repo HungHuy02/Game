@@ -31,7 +31,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbPawn(), position , 10, size, size);
+                batch.draw(chessImage.getbPawn(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -42,7 +42,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbKnight(), position , 10, size, size);
+                batch.draw(chessImage.getbKnight(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -53,7 +53,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbBishop(), position , 10, size, size);
+                batch.draw(chessImage.getbBishop(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -64,7 +64,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbRock(), position , 10, size, size);
+                batch.draw(chessImage.getbRock(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -74,14 +74,14 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbQueen(), position , 10, size, size);
+                batch.draw(chessImage.getbQueen(), position , 0, size, size);
             }
         }else {
             for (int j = 0; j < map.get("p"); j++) {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getwPawn(), position , 10, size, size);
+                batch.draw(chessImage.getwPawn(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -92,7 +92,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getwKnight(), position , 10, size, size);
+                batch.draw(chessImage.getwKnight(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -103,7 +103,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getwBishop(), position , 10, size, size);
+                batch.draw(chessImage.getwBishop(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -114,7 +114,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getwRock(), position , 10, size, size);
+                batch.draw(chessImage.getwRock(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
@@ -124,13 +124,13 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getwQueen(), position , 10, size, size);
+                batch.draw(chessImage.getwQueen(), position , 0, size, size);
             }
         }
         int value = map.get("value");
         if(value != 0) {
             position += pieceSize * 3;
-            font.draw(batch, "+"+ value, position, 45);
+            font.draw(batch, "+"+ value, position, 35);
         }
     }
 }

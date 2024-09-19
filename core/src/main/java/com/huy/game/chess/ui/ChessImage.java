@@ -36,6 +36,7 @@ public class ChessImage {
     private Texture back;
     private Texture forwards;
     private Texture appbarBackground;
+    private Texture timer;
 
     public ChessImage() {
         chessBoard = new Texture("chess/images/chess_board.png");
@@ -59,6 +60,7 @@ public class ChessImage {
         back = new Texture("chess/images/icons8-back-100.png");
         forwards = new Texture("chess/images/icons8-forward-100.png");
         appbarBackground = new Texture("chess/images/appbar_background.png");
+        timer = new Texture("chess/images/timer_20dp.png");
 
         float boardWidth = chessBoard.getWidth();
         float boardHeight = chessBoard.getHeight();
@@ -157,6 +159,10 @@ public class ChessImage {
 
     public Image getAppbarBackground() {
         return new Image(appbarBackground);
+    }
+
+    public Texture getTimer() {
+        return timer;
     }
 
     public float getSpotSize() {
