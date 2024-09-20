@@ -27,8 +27,16 @@
     <string name="three_minute_text">3 phút</string>
     <string name="three_minute_plus_two_text">3 | 2</string>
     <string name="five_minute_text">5 phút</string>
+    <string name="five_minute_plus_five_text">5 | 5</string>
     <string name="fast_text">Nhanh</string>
     <string name="ten_minute_text">10 phút</string>
     <string name="fifteen_minute_plus_ten">15 | 10</string>
     <string name="thirty_minute">30 phút</string>
+    <string name="play_with_friend_offline_text">Chơi với bạn offline</string>
+    <string name="white_piece_text">Quân trắng</string>
+    <string name="black_piece_text">Quân đen</string>
+    <string name="player_text">Đấu thủ</string>
+    <string name="control_time_text">Điều khiển thời gian</string>
+    <string name="rotate_board_text">Xoay bàn cờ</string>
+    <string name="none_text">Không có</string>
 </resources>

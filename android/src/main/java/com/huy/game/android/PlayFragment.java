@@ -95,7 +95,8 @@ public class PlayFragment extends Fragment {
         });
 
         fragmentPlayBinding.btnPlayTwo.setOnClickListener((v) -> {
-
+            Intent intent = new Intent(this.getContext(), TwoPersonsPlaySetupActivity.class);
+            startActivity(intent);
         });
 
         fragmentPlayBinding.btnPlayAi.setOnClickListener((v) -> {

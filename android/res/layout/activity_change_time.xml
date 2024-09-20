@@ -74,7 +74,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_1m"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"
@@ -83,7 +83,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_1mp1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
@@ -93,7 +93,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_2mp1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"
@@ -132,7 +132,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_3m"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"
@@ -141,7 +141,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_3mp2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
@@ -151,7 +151,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_5m"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"
@@ -189,7 +189,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_10m"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"
@@ -198,7 +198,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_15mp10"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
@@ -208,7 +208,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_30m"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/grey_800"

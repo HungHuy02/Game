@@ -15,4 +15,5 @@
     <color name="light_green_700">#86A94B</color>
     <color name="flash_color">#F6BF46</color>
     <color name="timer_color">#6C9C42</color>
+    <color name="transparent">#00000000</color>
 </resources>

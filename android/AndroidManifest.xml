@@ -54,5 +54,10 @@
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
+        <activity
+            android:name="com.huy.game.android.TwoPersonsPlaySetupActivity"
+            android:exported="false"
+            android:theme="@style/GdxThemeApp"/>
+
     </application>
 </manifest>
