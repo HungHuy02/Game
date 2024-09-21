@@ -100,7 +100,7 @@ public class PlayFragment extends Fragment {
         });
 
         fragmentPlayBinding.btnPlayAi.setOnClickListener((v) -> {
-            Intent intent = new Intent(this.getContext(), AndroidLauncher.class);
+            Intent intent = new Intent(this.getContext(), PlayWithAISetupActivity.class);
             startActivity(intent);
         });
 

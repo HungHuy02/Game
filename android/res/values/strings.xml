@@ -39,4 +39,5 @@
     <string name="control_time_text">Điều khiển thời gian</string>
     <string name="rotate_board_text">Xoay bàn cờ</string>
     <string name="none_text">Không có</string>
+    <string name="play_with_piece_text">CHƠI VỚI QUÂN</string>
 </resources>
