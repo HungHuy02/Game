@@ -1,5 +1,6 @@
 package com.huy.game.android;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
@@ -7,13 +8,21 @@ import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
+import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayWithAISetupViewModel;
+import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.PieceColor;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.databinding.ActivityPlayWithAiSetUpBinding;
+
+import java.util.Optional;
+import java.util.Random;
 
 public class PlayWithAISetupActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -32,13 +41,13 @@ public class PlayWithAISetupActivity extends AppCompatActivity implements View.O
             clearButtonsBorder(binding);
             switch (position) {
                 case 1:
-                    binding.btnWhite.setBackground(getDrawable(R.drawable.button_stroke));
+                    binding.btnWhite.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
                     break;
                 case 2:
-                    binding.btnWhiteBlack.setBackground(getDrawable(R.drawable.button_stroke));
+                    binding.btnWhiteBlack.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
                     break;
                 case 3:
-                    binding.btnBlack.setBackground(getDrawable(R.drawable.button_stroke));
+                    binding.btnBlack.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
                     break;
             }
         });
@@ -90,7 +99,7 @@ public class PlayWithAISetupActivity extends AppCompatActivity implements View.O
         });
 
         StorageUtils storageUtils = StorageUtils.getInstance(this);
-        int position = storageUtils.getIntValue("position-ai");
+        int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION_AI);
         viewModel.setPosition(position);
 
         binding.btnNone.setOnClickListener(this);
@@ -113,6 +122,43 @@ public class PlayWithAISetupActivity extends AppCompatActivity implements View.O
 
         binding.btnControlTime.setOnClickListener((v) -> viewModel.setShowButtons(Boolean.FALSE.equals(viewModel.showButtons().getValue())));
 
+        binding.btnPlay.setOnClickListener((v) -> {
+            Intent intent = new Intent(this, AndroidLauncher.class);
+            intent.putExtra(Constants.BUNDLE_MODE, ChessMode.AI.toString());
+            int positionTime = Optional.ofNullable(viewModel.getPosition().getValue()).orElse(0);
+            TimeType type = switch (positionTime) {
+                case 1 -> TimeType.ONE_MINUTE;
+                case 2 -> TimeType.THREE_MINUTE;
+                case 3 -> TimeType.FIVE_MINUTE;
+                case 4 -> TimeType.TWO_MINUTE_PLUS_ONE;
+                case 5 -> TimeType.THREE_MINUTE_PLUS_TWO;
+                case 6 -> TimeType.FIVE_MINUTE_PLUS_FIVE;
+                case 7 -> TimeType.TEN_MINUTE;
+                case 8 -> TimeType.FIFTEEN_MINUTE_PLUS_TEN;
+                case 9 -> TimeType.THIRTY_MINUTE;
+                default -> TimeType.NO_TIME;
+            };
+            intent.putExtra(Constants.BUNDLE_TIME, type.toString());
+            int positionColor = Optional.ofNullable(viewModel.getPositionColor().getValue()).orElse(1);
+            PieceColor pieceColor = switch (positionColor) {
+                case 1 -> PieceColor.WHITE;
+                case 2 -> {
+                    Random random = new Random();
+                    int color = random.nextInt(2) + 1;
+                    if(color == 1) {
+                        yield PieceColor.WHITE;
+                    }else {
+                        yield PieceColor.BLACK;
+                    }
+                }
+                default -> PieceColor.BLACK;
+            };
+            intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, pieceColor.toString());
+            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, "test");
+            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Constants.AI_NAME);
+            startActivity(intent);
+            finish();
+        });
     }
 
     @Override
@@ -144,7 +190,7 @@ public class PlayWithAISetupActivity extends AppCompatActivity implements View.O
     }
 
     private void handleData(StorageUtils utils ,int position) {
-        utils.setIntValue("position-ai", position);
+        utils.setIntValue(Constants.DATASTORE_POSITION_AI, position);
         viewModel.setPosition(position);
     }
 
@@ -164,7 +210,7 @@ public class PlayWithAISetupActivity extends AppCompatActivity implements View.O
     }
 
     private void clearButtonBorder(ImageButton button) {
-        button.setBackground(getDrawable(R.drawable.transparent_button));
+        button.setBackground(AppCompatResources.getDrawable(this ,R.drawable.transparent_button));
     }
 
     private void clearButtonsStroke(ActivityPlayWithAiSetUpBinding binding) {

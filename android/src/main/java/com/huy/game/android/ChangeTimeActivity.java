@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
+import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.databinding.ActivityChangeTimeBinding;
 
@@ -23,7 +24,7 @@ public class ChangeTimeActivity extends AppCompatActivity implements View.OnClic
         com.huy.game.databinding.ActivityChangeTimeBinding binding = ActivityChangeTimeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.backBtn.setOnClickListener((v) -> getOnBackPressedDispatcher().onBackPressed());
-        int position = getIntent().getIntExtra("position", 7);
+        int position = getIntent().getIntExtra(Constants.BUNDLE_POSITION, 7);
         switch (position) {
             case 1:
                 updateButton(binding.btn1m);
@@ -70,23 +71,23 @@ public class ChangeTimeActivity extends AppCompatActivity implements View.OnClic
         Intent resultIntent = new Intent();
         int id = view.getId();
         if(id == R.id.btn_1m) {
-            handleResult(resultIntent, storageUtils, getString(R.string.one_minute_text), "1", 1);
+            handleResult(resultIntent, storageUtils, 1);
         }else if(id == R.id.btn_1mp1) {
-            handleResult(resultIntent, storageUtils, getString(R.string.one_minute_plus_one_text), "1", 2);
+            handleResult(resultIntent, storageUtils, 2);
         }else if(id == R.id.btn_2mp1) {
-            handleResult(resultIntent, storageUtils, getString(R.string.two_minute_plus_one_text), "1", 3);
+            handleResult(resultIntent, storageUtils, 3);
         }else if(id == R.id.btn_3m){
-            handleResult(resultIntent, storageUtils, getString(R.string.three_minute_text), "2", 4);
+            handleResult(resultIntent, storageUtils, 4);
         }else if(id == R.id.btn_3mp2) {
-            handleResult(resultIntent, storageUtils, getString(R.string.three_minute_plus_two_text), "2", 5);
+            handleResult(resultIntent, storageUtils, 5);
         }else if(id == R.id.btn_5m) {
-            handleResult(resultIntent, storageUtils, getString(R.string.five_minute_text), "2", 6);
+            handleResult(resultIntent, storageUtils, 6);
         }else if(id == R.id.btn_10m) {
-            handleResult(resultIntent, storageUtils, getString(R.string.ten_minute_text), "3", 7);
+            handleResult(resultIntent, storageUtils, 7);
         }else if(id == R.id.btn_15mp10) {
-            handleResult(resultIntent, storageUtils, getString(R.string.fifteen_minute_plus_ten), "3", 8);
+            handleResult(resultIntent, storageUtils, 8);
         }else if(id == R.id.btn_30m) {
-            handleResult(resultIntent, storageUtils, getString(R.string.thirty_minute), "3", 9);
+            handleResult(resultIntent, storageUtils, 9);
         }
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
@@ -101,12 +102,9 @@ public class ChangeTimeActivity extends AppCompatActivity implements View.OnClic
         button.setBackgroundTintList(buttonColor);
     }
 
-    private void handleResult(Intent resultIntent, StorageUtils storageUtils ,String text, String value, int position) {
-        resultIntent.putExtra("time", text);
-        resultIntent.putExtra("icon", value);
-        storageUtils.setStringValue("time", text);
-        storageUtils.setStringValue("icon", value);
-        storageUtils.setIntValue("position", position);
+    private void handleResult(Intent resultIntent, StorageUtils storageUtils, int position) {
+        resultIntent.putExtra(Constants.BUNDLE_POSITION, position);
+        storageUtils.setIntValue(Constants.DATASTORE_POSITION, position);
     }
 }
 
