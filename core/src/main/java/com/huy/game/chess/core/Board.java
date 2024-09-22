@@ -186,17 +186,33 @@ public class Board {
         }
     }
 
-    public void renderBoard(SpriteBatch batch, float spotSize, float pieceSize, float centerX, float centerY) {
+    public void renderBoard(SpriteBatch batch, float spotSize, float pieceSize, float centerX, float centerY, ChessImage chessImage) {
         float padding = spotSize / 10f;
         float x = centerX + padding;
         float y = centerY + padding;
+        batch.draw(chessImage.getPosition(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
         for(int i = 0; i <= 7; i++) {
             float distanceY = spotSize * i + y;
             for (int j = 0;j <= 7; j++) {
                 float distance = spotSize * j;
                 if(spots[i][j].getPiece() != null) {
                     batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize);
-//                    batch.draw(spots[i][j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize, 0, 0, spots[i][j].getPiece().getTexture().getWidth(), spots[i][j].getPiece().getTexture().getHeight(), false, true);
+                }
+            }
+        }
+    }
+
+    public void renderRotateBoard(SpriteBatch batch, float spotSize, float pieceSize, float centerX, float centerY, ChessImage chessImage) {
+        float padding = spotSize / 10f;
+        float x = centerX + padding;
+        float y = centerY + padding;
+        batch.draw(chessImage.getRotate_position(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
+        for(int i = 0; i <= 7; i++) {
+            float distanceY = spotSize * i + y;
+            for (int j = 0;j <= 7; j++) {
+                float distance = spotSize * j;
+                if(spots[7- i][7- j].getPiece() != null) {
+                    batch.draw(spots[7 -i][7 - j].getPiece().getTexture(), x + distance, distanceY, pieceSize, pieceSize);
                 }
             }
         }

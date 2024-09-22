@@ -11,26 +11,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.huy.game.Main;
 
 public class TopAppBar {
 
     private Stack stack;
 
-    public TopAppBar(ChessImage chessImage, BitmapFont font) {
-        setStack(chessImage, font);
+    public TopAppBar(ChessImage chessImage, BitmapFont font, Main main) {
+        setStack(chessImage, font, main);
     }
 
     public Stack getStack() {
         return stack;
     }
 
-    private void setStack(ChessImage chessImage, BitmapFont font) {
+    private void setStack(ChessImage chessImage, BitmapFont font, Main main) {
         stack = new Stack();
         stack.setSize(Gdx.graphics.getWidth(), 100f);
         stack.setPosition(0, Gdx.graphics.getHeight() - 100f);
         stack.add(backgroundContainer(chessImage));
         stack.add(name(font));
-        stack.add(backArrow(chessImage));
+        stack.add(backArrow(chessImage, main));
     }
 
     private Container<Image> backgroundContainer(ChessImage chessImage) {
@@ -39,7 +40,7 @@ public class TopAppBar {
         return backgroundContainer;
     }
 
-    private Container<Image> backArrow(ChessImage chessImage) {
+    private Container<Image> backArrow(ChessImage chessImage, Main main) {
         Container<Image> backArrow = new Container<>(chessImage.getBackArrow());
         backArrow.padLeft(16);
         backArrow.setFillParent(true);
@@ -48,12 +49,7 @@ public class TopAppBar {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                Gdx.input.setInputProcessor(new InputAdapter() {
-                    @Override
-                    public boolean keyDown(int keycode) {
-                        return keycode == Input.Keys.BACK;
-                    }
-                });
+                main.disposeCurrentScreen();
             }
         });
         return backArrow;

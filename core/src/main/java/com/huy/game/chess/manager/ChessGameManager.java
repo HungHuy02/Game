@@ -3,6 +3,7 @@ package com.huy.game.chess.manager;
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.Piece;
+import com.huy.game.chess.enums.ChessMode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +16,22 @@ public class ChessGameManager {
     private Timer timer;
     private Map<String, Integer> timeList;
 
-    public ChessGameManager() {
-        player1 = new ChessPlayer(true);
-        player2 = new ChessPlayer(false);
+    public ChessGameManager(ChessMode mode) {
+        switch (mode) {
+            case TWO_PERSONS:
+                player1 = new ChessPlayer(true);
+                player2 = new ChessPlayer(false);
+                break;
+            case AI:
+                player1 = new ChessPlayer(true);
+                player2 = new ChessAIPlayer(false);
+                break;
+            case ONLINE:
+                player1 = new ChessPlayer(true);
+                player2 = new ChessOnlinePlayer(false);
+                break;
+        }
+
         currentPlayer = player1;
         timer = new Timer();
         timeList = new HashMap<>();

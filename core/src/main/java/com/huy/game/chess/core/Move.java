@@ -21,7 +21,18 @@ public class Move {
         return end;
     }
 
-    public String makeRealMove(Board board) {
+    public String makeRealMove(Board board, ZobristHashing hashing) {
+        hashing.makeAMove(start, end);
+        String text = board.addMove(start, end);
+        board.setSpot(end.getX(), end.getY(), start.getPiece());
+        board.setSpot(start.getX(), start.getY(), null);
+        start.setShowColor(true);
+        end.setShowColor(true);
+        return text;
+    }
+
+    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history) {
+        history.addStateHash(hashing.makeAMove(start, end));
         String text = board.addMove(start, end);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);

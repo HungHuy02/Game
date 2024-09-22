@@ -15,6 +15,7 @@ public class ChessPlayer {
     private int value = 0;
     private int turn = 1;
     private int timeRemain = 500;
+    private boolean isAIPlay = false;
 
     public ChessPlayer(boolean isWhite) {
         this.isWhite = isWhite;

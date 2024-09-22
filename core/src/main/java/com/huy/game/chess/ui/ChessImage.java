@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 public class ChessImage {
 
     private Texture chessBoard;
+    private Texture position;
+    private Texture rotate_position;
     private Texture wBishop;
     private Texture wKing;
     private Texture wKnight;
@@ -40,6 +42,8 @@ public class ChessImage {
 
     public ChessImage() {
         chessBoard = new Texture("chess/images/chess_board.png");
+        position = new Texture("chess/images/position.png");
+        rotate_position = new Texture("chess/images/position_rotate.png");
         wBishop = new Texture("chess/images/wbishop.png");
         wKing = new Texture("chess/images/wking.png");
         wKnight = new Texture("chess/images/wknight.png");
@@ -87,6 +91,14 @@ public class ChessImage {
 
     public Texture getChessBoard() {
         return chessBoard;
+    }
+
+    public Texture getPosition() {
+        return position;
+    }
+
+    public Texture getRotate_position() {
+        return rotate_position;
     }
 
     public Texture getwBishop() {
@@ -195,6 +207,8 @@ public class ChessImage {
 
     public void dispose() {
         chessBoard.dispose();
+        position.dispose();
+        rotate_position.dispose();
         wBishop.dispose();
         wKing.dispose();
         wKnight.dispose();
