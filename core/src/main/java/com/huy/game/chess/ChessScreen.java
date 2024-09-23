@@ -5,12 +5,11 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.huy.game.Main;
 import com.huy.game.chess.ai.ChessAI;
@@ -22,11 +21,12 @@ import com.huy.game.chess.core.Pawn;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
 import com.huy.game.chess.manager.ChessAIPlayer;
+import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameManager;
+import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessOnlinePlayer;
+import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.ui.BottomAppBar;
-import com.huy.game.chess.ui.ChessImage;
-import com.huy.game.chess.ui.ChessSound;
 import com.huy.game.chess.ui.Colors;
 import com.huy.game.chess.ui.NotationHistoryScrollPane;
 import com.huy.game.chess.ui.OptionsPopup;
@@ -55,6 +55,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     private ChessSound chessSound;
     private GameHistory gameHistory;
     private ZobristHashing hashing;
+    private ChessGameAssesManager manager;
 
     public ChessScreen(Main main) {
         this.main = main;
@@ -62,39 +63,32 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public void show() {
+        manager = new ChessGameAssesManager();
+        manager.loadAll();
+        I18NBundle bundle = manager.getBundle("vi");
         gameHistory = new GameHistory();
         setting = new BoardSetting();
-        chessImage = new ChessImage();
+        chessImage = new ChessImage(manager);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/Montserrat-SemiBold.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 32;
-        parameter.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,!?\"'()[]:;+-*/=%éèàùâêîôûçđăĩũơưÁÉÈÀÙÂÊÎÔÛÇĐĂĨŨƠƯ" +
-            "àáảãạăắằẵẳặâầấậẩẫđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ";
-        parameter.characters += "ăâêôươ";
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        bitmapFont = generator.generateFont(parameter);
-        generator.dispose();
+        bitmapFont = manager.getFont();
         stage = new Stage();
         chessGameManager = new ChessGameManager(main.getMode());
-        PlayerInfo player1Info = new PlayerInfo("Tùy chọn", chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), true, true, bitmapFont, chessGameManager.getTimeList());
-        PlayerInfo player2Info = new PlayerInfo("2", chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), false, false, bitmapFont, chessGameManager.getTimeList());
+        PlayerInfo player1Info = new PlayerInfo("ABCD", chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), true, true, bitmapFont, chessGameManager.getTimeList());
+        PlayerInfo player2Info = new PlayerInfo("abcd12345", chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), false, false, bitmapFont, chessGameManager.getTimeList());
         chessAI = new ChessAI();
-        chessSound = new ChessSound();
+        chessSound = new ChessSound(manager);
         board = new Board();
-        TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main);
+        TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
-        optionsPopup = new OptionsPopup(setting ,bitmapFont);
-        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup());
+        optionsPopup = new OptionsPopup(setting ,bitmapFont, bundle, manager);
+        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), stage, bundle);
         selectedSpot = null;
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
         stage.addActor(player1Info.getInfo());
         stage.addActor(player2Info.getInfo());
         stage.addActor(bottomAppBar.getStack());
-        stage.addActor(optionsPopup.getOptionsPopup());
 
         centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
@@ -208,7 +202,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
-                            scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont);
+                            scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont, manager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
@@ -275,7 +269,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
-                            scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont);
+                            scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont, manager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
@@ -287,7 +281,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 Move aiMove = chessAI.findBestMove(board, chessGameManager.getCurrentPlayer().isWhite());
                                 board.handleMoveColorAndSound(board.getSpot(aiMove.getStart().getX(), aiMove.getStart().getY()), board.getSpot(aiMove.getEnd().getX(), aiMove.getEnd().getY()), chessSound, chessGameManager);
                                 String text = aiMove.makeAIMove(board);
-                                Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont));
+                                Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager));
                                 chessGameManager.switchPlayer(board);
                             });
                             thread.start();
@@ -422,5 +416,6 @@ public class ChessScreen extends InputAdapter implements Screen {
         shapeRenderer.dispose();
         chessImage.dispose();
         chessSound.dispose();
+        manager.dispose();
     }
 }

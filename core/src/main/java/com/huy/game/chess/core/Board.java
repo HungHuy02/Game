@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.manager.ChessGameManager;
-import com.huy.game.chess.ui.ChessImage;
-import com.huy.game.chess.ui.ChessSound;
+import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.ui.Colors;
 
 import java.util.ArrayList;
@@ -165,7 +165,7 @@ public class Board {
             spots[1][i] = new Spot(new Pawn(true, chessImage.getwPawn()), 1, i);
         }
 
-        spots[7][0] = new Spot(new Rook(false, chessImage.getbRock()), 7, 0);
+        spots[7][0] = new Spot(new Rook(false, chessImage.getbRook()), 7, 0);
         spots[7][1] = new Spot(new Knight(false, chessImage.getbKnight()), 7, 1);
         spots[7][2] = new Spot(new Bishop(false, chessImage.getbBishop()), 7, 2);
         spots[7][3] = new Spot(new Queen(false, chessImage.getbQueen()), 7, 3);
@@ -173,7 +173,7 @@ public class Board {
         bKingSpot = spots[7][4];
         spots[7][5] = new Spot(new Bishop(false, chessImage.getbBishop()), 7, 5);
         spots[7][6] = new Spot(new Knight(false, chessImage.getbKnight()), 7, 6);
-        spots[7][7] = new Spot(new Rook(false, chessImage.getbRock()), 7, 7);
+        spots[7][7] = new Spot(new Rook(false, chessImage.getbRook()), 7, 7);
 
         for(int i = 0; i <= 7; i++) {
             spots[6][i] = new Spot(new Pawn(false, chessImage.getbPawn()), 6, i);
@@ -453,7 +453,7 @@ public class Board {
                         piece = new Bishop(false, chessImage.getbBishop());
                         break;
                     case 3:
-                        piece = new Rook(false, chessImage.getbRock());
+                        piece = new Rook(false, chessImage.getbRook());
                         break;
                     case 4:
                         piece = new Rook(true, chessImage.getwRock());
@@ -500,7 +500,7 @@ public class Board {
             shapeRenderer.end();
 
             batch.begin();
-            batch.draw(chessImage.getbRock(), x + padding, centerY + padding , scaledSide, scaledSide);
+            batch.draw(chessImage.getbRook(), x + padding, centerY + padding , scaledSide, scaledSide);
             batch.draw(chessImage.getbBishop(), x + padding, centerY + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getbKnight(), x + padding, centerY + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
             batch.draw(chessImage.getbQueen(), x + padding, centerY + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);

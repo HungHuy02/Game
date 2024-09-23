@@ -1,0 +1,15 @@
+package com.huy.game.chess.enums;
+
+public enum TimeType {
+    ONE_MINUTE,
+    ONE_MINUTE_PLUS_ONE,
+    TWO_MINUTE_PLUS_ONE,
+    THREE_MINUTE,
+    THREE_MINUTE_PLUS_TWO,
+    FIVE_MINUTE,
+    FIVE_MINUTE_PLUS_FIVE,
+    TEN_MINUTE,
+    FIFTEEN_MINUTE_PLUS_TEN,
+    THIRTY_MINUTE,
+    NO_TIME
+}

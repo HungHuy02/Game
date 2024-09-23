@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.huy.game.chess.manager.ChessGameAssesManager;
 
 public class NotationHistoryScrollPane {
 
@@ -32,7 +33,7 @@ public class NotationHistoryScrollPane {
         scrollPane.setPosition(0, Gdx.graphics.getHeight() - 150);
     }
 
-    public void addValue(String value, BitmapFont font) {
+    public void addValue(String value, BitmapFont font, ChessGameAssesManager manager) {
         if(index >= 0) {
             Actor child = horizontalGroup.getChild(index);
             if(child instanceof TextButton) {
@@ -40,7 +41,7 @@ public class NotationHistoryScrollPane {
             }
         }
         index++;
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        Skin skin = manager.getSkin();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
         style.up = skin.getDrawable("button-normal");

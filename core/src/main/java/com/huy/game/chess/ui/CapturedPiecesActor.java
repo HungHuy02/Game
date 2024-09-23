@@ -3,6 +3,7 @@ package com.huy.game.chess.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.huy.game.chess.manager.ChessImage;
 
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class CapturedPiecesActor extends Actor {
                 if(j != 0) {
                     position += pieceSize;
                 }
-                batch.draw(chessImage.getbRock(), position , 0, size, size);
+                batch.draw(chessImage.getbRook(), position , 0, size, size);
                 hasBefore = true;
             }
             if(hasBefore) {
