@@ -2,7 +2,9 @@ package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -20,6 +22,8 @@ public class PlayerInfo {
         horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, timeList);
     }
 
+    public PlayerInfo() {}
+
     public HorizontalGroup getInfo() {
         return info;
     }
@@ -36,6 +40,34 @@ public class PlayerInfo {
         info.addActor(image(image, chessImage));
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
         info.addActor(new Timer(timeList, font, isPlayer1, chessImage));
+    }
+
+    public void horizontalGroupForChessMatchScreen(String name,Container<Image> image, ChessImage chessImage, BitmapFont font) {
+        info = new HorizontalGroup();
+        info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
+        info.padRight(16);
+        info.setPosition(0, Gdx.graphics.getHeight() * 4 / 5);
+        info.addActor(image);
+        info.addActor(name(name, font));
+    }
+
+    public Animation<Texture> animation(ChessImage chessImage) {
+        Texture[] textures = new Texture[5];
+        textures[0] = chessImage.getbBishop();
+        textures[1] = chessImage.getbKnight();
+        textures[2] = chessImage.getbPawn();
+        textures[3] = chessImage.getwBishop();
+        textures[4] = chessImage.getwKing();
+        Animation<Texture> animation = new Animation<>(0.5f, textures);
+        return animation;
+    }
+
+    public Container<Image> imageForChessMatchScreen(Texture image, ChessImage chessImage) {
+        Container<Image> avatar = new Container<>(new Image(image));
+        float scale = chessImage.getScaledPieceSize() / image.getWidth();
+        avatar.setOrigin(Align.center);
+        avatar.setScale(scale);
+        return avatar;
     }
 
     private Image image(Texture image, ChessImage chessImage) {

@@ -1,6 +1,7 @@
 package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Scaling;
 import com.huy.game.chess.manager.ChessImage;
@@ -19,6 +21,8 @@ import com.huy.game.chess.manager.ChessImage;
 public class BottomAppBar {
 
     private Stack stack;
+
+    public BottomAppBar() {}
 
     public BottomAppBar(ChessImage chessImage, BitmapFont font, Window window, Stage stage, I18NBundle bundle) {
         setStack(chessImage, font, window, stage, bundle);
@@ -34,6 +38,31 @@ public class BottomAppBar {
         stack.setPosition(0, 0);
         stack.add(backgroundContainer(chessImage));
         stack.add(horizontalGroup(chessImage, font, window, stage, bundle));
+    }
+
+    public void setStack(ChessImage chessImage,BitmapFont font, I18NBundle bundle) {
+        stack = new Stack();
+        stack.setSize(Gdx.graphics.getWidth(), 150f);
+        stack.setPosition(0, 0);
+        stack.add(backgroundContainer(chessImage));
+        stack.add(horizontalGroupForChessMatchScreen(chessImage, font, bundle));
+    }
+
+    private HorizontalGroup horizontalGroupForChessMatchScreen(ChessImage chessImage, BitmapFont font, I18NBundle bundle) {
+        Image image = chessImage.getCancer();
+        Container<Image> container = new Container<>(image);
+        container.prefWidth(Gdx.graphics.getWidth() / 4);
+        image.setScaling(Scaling.fit);
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = font;
+        Label label = new Label(bundle.get("cancel"), labelStyle);
+        VerticalGroup verticalGroup = new VerticalGroup();
+        verticalGroup.addActor(container);
+        verticalGroup.addActor(label);
+        HorizontalGroup horizontalGroup = new HorizontalGroup();
+        horizontalGroup.addActor(verticalGroup);
+        horizontalGroup.align(Align.center);
+        return horizontalGroup;
     }
 
     private Container<Image> backgroundContainer(ChessImage chessImage) {

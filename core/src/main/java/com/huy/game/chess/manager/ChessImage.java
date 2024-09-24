@@ -139,6 +139,8 @@ public class ChessImage {
         return new Image(manager.getOverlay());
     }
 
+    public Image getCancer() { return new Image(manager.getClose());}
+
     public Texture getTimer() {
         return manager.getTimer();
     }

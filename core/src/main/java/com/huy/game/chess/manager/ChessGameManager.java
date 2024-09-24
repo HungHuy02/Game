@@ -62,7 +62,9 @@ public class ChessGameManager {
         int value = player1.getValue() - player2.getValue();
         if(value > 0) {
             player1.putValue(value);
+            player2.putValue(0);
         }else {
+            player1.putValue(0);
             player2.putValue(Math.abs(value));
         }
     }

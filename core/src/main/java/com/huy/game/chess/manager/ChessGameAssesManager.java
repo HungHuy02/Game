@@ -28,6 +28,20 @@ public class ChessGameAssesManager {
         manager.finishLoading();
     }
 
+    public void loadForChessMathScreen() {
+        manager.load("chess/images/opacity_board.png", Texture.class);
+        manager.load("chess/images/close_24dp.png", Texture.class);
+        manager.finishLoading();
+    }
+
+    public Texture getOpacityBoard() {
+        return manager.get("chess/images/opacity_board.png", Texture.class);
+    }
+
+    public Texture getClose() {
+        return manager.get("chess/images/close_24dp.png", Texture.class);
+    }
+
     public void loadImages() {
         manager.load("chess/images/chess_board.png", Texture.class);
         manager.load("chess/images/position.png", Texture.class);
