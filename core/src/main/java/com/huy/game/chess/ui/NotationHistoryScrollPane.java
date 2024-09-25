@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -29,19 +32,31 @@ public class NotationHistoryScrollPane {
         horizontalGroup = new HorizontalGroup();
         scrollPane = new ScrollPane(horizontalGroup);
         scrollPane.setScrollingDisabled(false, true);
+        scrollPane.setOverscroll(true, true);
         scrollPane.setSize(Gdx.graphics.getWidth(), 50);
         scrollPane.setPosition(0, Gdx.graphics.getHeight() - 150);
     }
 
     public void addValue(String value, BitmapFont font, ChessGameAssesManager manager) {
-        if(index >= 0) {
+        if(index >= 1) {
             Actor child = horizontalGroup.getChild(index);
             if(child instanceof TextButton) {
                 ((TextButton) child).getStyle().up = null;
             }
         }
-        index++;
+        if(index % 3 == 2 || index == -1) {
+            Label.LabelStyle style = new Label.LabelStyle();
+            style.font = font;
+            style.fontColor = Colors.GREY_600;
+            Label label = new Label((index / 2 + 1) + ".", style);
+            Container<Label> labelContainer = new Container<>(label);
+            labelContainer.padLeft(16);
+            labelContainer.padRight(16);
+            horizontalGroup.addActor(labelContainer);
+            index++;
+        }
         Skin skin = manager.getSkin();
+        index++;
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
         style.up = skin.getDrawable("button-normal");
@@ -68,7 +83,8 @@ public class NotationHistoryScrollPane {
             }
         });
         horizontalGroup.addActor(button);
-        scrollPane.setScrollX(horizontalGroup.getWidth() + 100);
+        scrollPane.layout();
+        scrollPane.setScrollX(horizontalGroup.getWidth());
     }
 
 
