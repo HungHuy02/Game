@@ -57,4 +57,13 @@ public class GameHistory {
         int row = x + 1;
         return "" + col + row;
     }
+
+    public String getMove(int index) {
+        if(index % 3 == 1) {
+            return movedList.get(index + index / 3);
+        }else {
+            return movedList.get(index + index / 3 + 1);
+        }
+
+    }
 }

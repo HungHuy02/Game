@@ -30,7 +30,6 @@ public class ChessGameAssesManager {
 
     public void loadForChessMathScreen() {
         manager.load("chess/images/opacity_board.png", Texture.class);
-        manager.load("chess/images/close_24dp.png", Texture.class);
         manager.finishLoading();
     }
 
@@ -68,6 +67,7 @@ public class ChessGameAssesManager {
         manager.load("chess/images/appbar_background.png", Texture.class);
         manager.load("chess/images/timer_20dp.png", Texture.class);
         manager.load("chess/images/overlay.png", Texture.class);
+        manager.load("chess/images/close_24dp.png", Texture.class);
     }
 
     public Texture getChessBoard() {
