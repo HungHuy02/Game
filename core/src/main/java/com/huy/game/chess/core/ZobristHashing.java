@@ -5,7 +5,6 @@ import java.util.Random;
 public class ZobristHashing {
 
     private long[][][] zobristArray = new long[8][8][12];
-    private long sideMove;
     private long hashValue = 0l;
 
     public ZobristHashing(Spot[][] spots) {
@@ -15,7 +14,6 @@ public class ZobristHashing {
 
     public void initialization() {
         Random random = new Random();
-        sideMove = random.nextLong();
         for(int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
                 for (int k = 0; k <= 11; k++) {

@@ -7,6 +7,7 @@ public class GameHistory {
 
     private final List<String> movedList = new ArrayList<>();
     private final List<Long> stateHashList = new ArrayList<>();
+    private final List<Board> boardList = new ArrayList<>();
 
     public GameHistory() {
 
@@ -64,6 +65,9 @@ public class GameHistory {
         }else {
             return movedList.get(index + index / 3 + 1);
         }
+    }
 
+    public void addBoard(Board board) {
+        boardList.add(board.cloneBoard());
     }
 }

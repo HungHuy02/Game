@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,12 @@ public class Rook extends Piece {
     public Rook(Rook rook) {
         super(rook.isWhite());
         hasMove = rook.hasMove;
+        setType(PieceType.ROOK);
     }
 
     public Rook(boolean isWhite, Texture texture) {
         super(isWhite, texture);
+        setType(PieceType.ROOK);
     }
 
     @Override

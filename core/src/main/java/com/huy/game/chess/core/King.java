@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class King extends Piece {
 
     public King(boolean isWhite, Texture texture) {
         super(isWhite, texture);
+        setType(PieceType.KING);
     }
 
     public King(King king) {
@@ -37,6 +39,7 @@ public class King extends Piece {
         hasMove = king.hasMove;
         isSafe = king.isSafe;
         isCastling = king.isCastling;
+        setType(PieceType.KING);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,12 @@ public class Bishop extends Piece {
 
     public Bishop(boolean isWhite, Texture texture) {
         super(isWhite, texture);
+        setType(PieceType.BISHOP);
     }
 
     public Bishop(boolean isWhite) {
         super(isWhite);
+        setType(PieceType.BISHOP);
     }
 
     @Override

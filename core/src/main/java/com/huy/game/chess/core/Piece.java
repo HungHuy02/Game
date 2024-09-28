@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ public abstract class Piece {
     private boolean isWhite;
     private Texture texture;
     private boolean isAICalculate;
+    private PieceType type;
 
     public Piece(boolean isWhite, Texture texture) {
         this.isWhite = isWhite;
@@ -37,6 +39,14 @@ public abstract class Piece {
 
     public void setAICalculate(boolean AICalculate) {
         isAICalculate = AICalculate;
+    }
+
+    public void setType(PieceType type) {
+        this.type = type;
+    }
+
+    public PieceType getType() {
+        return type;
     }
 
     public boolean calculateOneMove(Board board, Spot[][] spots, Spot checkSpot, int x, int y) {

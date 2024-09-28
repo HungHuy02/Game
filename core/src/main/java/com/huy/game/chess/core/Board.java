@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
+import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessSound;
@@ -107,16 +108,12 @@ public class Board {
 
     public String changeToFullAlgebraicNotation(int x, int y, Piece startPiece,Piece endPiece) {
         String move = endPiece != null ? "x" + changePositionToAlgebraicNotation(x, y) : changePositionToAlgebraicNotation(x, y);
-        if(startPiece instanceof Knight) {
-            move = "N" + move;
-        }else if(startPiece instanceof Bishop) {
-            move = "B" + move;
-        }else if(startPiece instanceof Queen) {
-            move = "Q" + move;
-        }else if(startPiece instanceof Rook) {
-            move = "R" + move;
-        }else if(startPiece instanceof King) {
-            move = "K" + move;
+        switch (startPiece.getType()) {
+            case PAWN -> move = "N" + move;
+            case BISHOP -> move = "B" + move;
+            case QUEEN -> move = "Q" + move;
+            case ROOK -> move = "R" + move;
+            case KING -> move = "K" + move;
         }
         return move;
     }
@@ -337,18 +334,23 @@ public class Board {
                     if(checkPiece != null) {
                         if(checkPiece.isWhite() != isWhite) {
                             if(i != 0 && j != 0) {
-                                if(checkPiece instanceof Bishop || checkPiece instanceof Queen || checkPiece instanceof Pawn || checkPiece instanceof King) {
-                                    return false;
+                                switch (checkPiece.getType()) {
+                                    case BISHOP, QUEEN, PAWN, KING -> {
+                                        return false;
+                                    }
                                 }
                             }else {
-                                if(checkPiece instanceof Rook || checkPiece instanceof Queen) {
-                                    return false;
+                                switch (checkPiece.getType()) {
+                                    case ROOK, QUEEN -> {
+                                        return false;
+                                    }
                                 }
                             }
                         }
                     }else {
                         int coordinatesX = x + i;
                         int coordinatesY = y + j;
+                        loop:
                         while(isWithinBoard(coordinatesX, coordinatesY)) {
                             Piece testPiece = spots[coordinatesX][coordinatesY].getPiece();
                             if(testPiece != null) {
@@ -356,16 +358,22 @@ public class Board {
                                     break;
                                 }else {
                                     if(i != 0 && j != 0) {
-                                        if(testPiece instanceof Bishop || testPiece instanceof Queen){
-                                            return false;
-                                        }else {
-                                            break;
+                                        switch (testPiece.getType()) {
+                                            case BISHOP, QUEEN -> {
+                                                return false;
+                                            }
+                                            default -> {
+                                                break loop;
+                                            }
                                         }
                                     }else {
-                                        if(testPiece instanceof Rook || testPiece instanceof Queen) {
-                                            return false;
-                                        }else {
-                                            break;
+                                        switch (testPiece.getType()) {
+                                            case ROOK, QUEEN -> {
+                                                return false;
+                                            }
+                                            default -> {
+                                                break loop;
+                                            }
                                         }
                                     }
                                 }
@@ -391,8 +399,10 @@ public class Board {
             int y = positionY + move[1];
             if(isWithinBoard(x, y)) {
                 Piece checkPiece = spots[x][y].getPiece();
-                if(checkPiece instanceof Knight && checkPiece.isWhite() != isWhite) {
-                    return true;
+                if(checkPiece != null) {
+                    if(checkPiece.getType() == PieceType.KNIGHT && checkPiece.isWhite() != isWhite) {
+                        return true;
+                    }
                 }
             }
         }
@@ -425,49 +435,27 @@ public class Board {
             isPromoting = false;
             promotingSpot = null;
         }else {
-            Piece piece = null;
+            Piece piece;
             if (promotingSpot.getPiece().isWhite()) {
-                switch (boardY) {
-                    case 4:
-                        piece = new Rook(true, chessImage.getwRock());
-                        break;
-                    case 5:
-                        piece = new Bishop(true, chessImage.getwBishop());
-                        break;
-                    case 6:
-                        piece = new Knight(true, chessImage.getwKnight());
-                        break;
-                    case 7:
-                        piece = new Queen(true, chessImage.getwQueen());
-                        break;
-                }
+                piece = switch (boardY) {
+                    case 4 -> new Rook(true, chessImage.getwRock());
+                    case 5 -> new Bishop(true, chessImage.getwBishop());
+                    case 6 -> new Knight(true, chessImage.getwKnight());
+                    case 7 -> new Queen(true, chessImage.getwQueen());
+                    default -> null;
+                };
             } else {
-                switch (boardY) {
-                    case 0:
-                        piece = new Queen(false, chessImage.getbQueen());
-                        break;
-                    case 1:
-                        piece = new Knight(false, chessImage.getbKnight());
-                        break;
-                    case 2:
-                        piece = new Bishop(false, chessImage.getbBishop());
-                        break;
-                    case 3:
-                        piece = new Rook(false, chessImage.getbRook());
-                        break;
-                    case 4:
-                        piece = new Rook(true, chessImage.getwRock());
-                        break;
-                    case 5:
-                        piece = new Bishop(true, chessImage.getwBishop());
-                        break;
-                    case 6:
-                        piece = new Knight(true, chessImage.getwKnight());
-                        break;
-                    case 7:
-                        piece = new Queen(true, chessImage.getwQueen());
-                        break;
-                }
+                piece = switch (boardY) {
+                    case 0 -> new Queen(false, chessImage.getbQueen());
+                    case 1 -> new Knight(false, chessImage.getbKnight());
+                    case 2 -> new Bishop(false, chessImage.getbBishop());
+                    case 3 -> new Rook(false, chessImage.getbRook());
+                    case 4 -> new Rook(true, chessImage.getwRock());
+                    case 5 -> new Bishop(true, chessImage.getwBishop());
+                    case 6 -> new Knight(true, chessImage.getwKnight());
+                    case 7 -> new Queen(true, chessImage.getwQueen());
+                    default -> null;
+                };
             }
             setSpot(promotingSpot.getX(), promotingSpot.getY(), piece);
             chessSound.playPromoteSound();

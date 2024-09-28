@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,12 @@ public class Queen extends Piece {
 
     public Queen(boolean isWhite, Texture texture) {
         super(isWhite, texture);
+        setType(PieceType.QUEEN);
     }
 
     public Queen(boolean isWhite) {
         super(isWhite);
+        setType(PieceType.QUEEN);
     }
 
     private int[][] queenMoves() {

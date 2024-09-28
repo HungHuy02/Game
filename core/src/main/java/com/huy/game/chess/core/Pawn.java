@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,12 @@ public class Pawn extends Piece {
         super(pawn.isWhite());
         turn = pawn.turn;
         isMoveTwo = pawn.isMoveTwo;
+        setType(PieceType.PAWN);
     }
 
     public Pawn(boolean isWhite, Texture texture) {
         super(isWhite, texture);
+        setType(PieceType.PAWN);
     }
 
     public int getTurn() {
