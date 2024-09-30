@@ -83,7 +83,7 @@ public class Bishop extends Piece {
                 int x = move[0] * i + checkSpot.getX();
                 int y = move[1] * i + checkSpot.getY();
                 if(board.isWithinBoard(x, y)) {
-                   calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
+                    calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
                 }else {
                     break;
                 }

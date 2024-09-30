@@ -246,6 +246,39 @@ public class Board {
         }
     }
 
+    public void renderRotateColorAndPoint(ShapeRenderer shapeRenderer, float circlePointRadius, float pieceSide, float spotSize, float centerX, float centerY) {
+        float padding = spotSize / 10f;
+        float scale = (spotSize - (2 * padding)) / pieceSide;
+        float scaledSide = scale * pieceSide;
+
+        for (int i = 7; i >= 0; i--) {
+            float distanceY = spotSize * (7 - i) + centerY;
+            for (int j = 7; j >= 0; j--) {
+                float distance = spotSize * (7 - j);
+
+                if (spots[i][j].isShowColor()) {
+                    shapeRenderer.setColor(spots[i][j].getSpotColor());
+                    shapeRenderer.rect(centerX + distance, distanceY, spotSize, spotSize);
+                }
+
+                if (spots[i][j].isShowMovePoint()) {
+                    if (spots[i][j].isCanBeCaptured()) {
+                        shapeRenderer.end();
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                        shapeRenderer.setColor(Color.WHITE);
+                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, scaledSide / 2);
+                        shapeRenderer.end();
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    } else {
+                        shapeRenderer.setColor(Color.WHITE);
+                        shapeRenderer.circle(centerX + distance + spotSize / 2, distanceY + spotSize / 2, circlePointRadius);
+                    }
+                }
+            }
+        }
+    }
+
+
     public void clearColor() {
         for (int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {

@@ -20,12 +20,15 @@ import com.huy.game.chess.core.Move;
 import com.huy.game.chess.core.Pawn;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
+import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.chess.manager.ChessAIPlayer;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessOnlinePlayer;
 import com.huy.game.chess.manager.ChessSound;
+import com.huy.game.chess.manager.Player;
 import com.huy.game.chess.ui.BottomAppBar;
 import com.huy.game.chess.ui.Colors;
 import com.huy.game.chess.ui.EndGamePopup;
@@ -37,7 +40,6 @@ import com.huy.game.chess.ui.TopAppBar;
 public class ChessScreen extends InputAdapter implements Screen {
     private final Main main;
     private Stage stage;
-    private BoardSetting setting;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -65,21 +67,20 @@ public class ChessScreen extends InputAdapter implements Screen {
     public void show() {
         I18NBundle bundle = main.manager.getBundle("vi");
         gameHistory = new GameHistory();
-        setting = new BoardSetting();
         chessImage = new ChessImage(main.manager);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = main.manager.getFont();
         stage = new Stage();
-        chessGameManager = new ChessGameManager(main.getMode());
-        PlayerInfo player1Info = new PlayerInfo("ABCD", chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), true, true, bitmapFont, chessGameManager.getTimeList());
-        PlayerInfo player2Info = new PlayerInfo("abcd12345", chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), false, false, bitmapFont, chessGameManager.getTimeList());
+        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite());
+        PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList());
+        PlayerInfo player2Info = new PlayerInfo("abcd12345", chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList());
         chessAI = new ChessAI();
         chessSound = new ChessSound(main.manager);
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
-        OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, main.manager);
+        OptionsPopup optionsPopup = new OptionsPopup(main.setting, bitmapFont, bundle, main.manager);
         BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), stage, bundle);
         selectedSpot = null;
         stage.addActor(appBar.getStack());
@@ -96,6 +97,18 @@ public class ChessScreen extends InputAdapter implements Screen {
         multiplexer.addProcessor(this);
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
+
+        if(main.getMode() == ChessMode.ONLINE) {
+            ChessGameOnlineEvent.getInstance().setPlayerMoveListener((from, to) -> {
+                Spot start = board.getSpot(from.charAt(0) - '0', from.charAt(1) - '0');
+                Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
+                Move move = new Move(start,end);
+                board.handleMoveColorAndSound(start, end, chessSound, chessGameManager);
+                scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont, main.manager);
+                chessGameManager.switchPlayer(board);
+            });
+            main.socketClient.getMoveFromOpponent();
+        }
     }
 
     @Override
@@ -105,20 +118,27 @@ public class ChessScreen extends InputAdapter implements Screen {
         batch.draw(chessImage.getChessBoard(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
         batch.end();
 
-        Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
-        shapeRenderer.end();
-        Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+        if(main.setting.isRotate()) {
+            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+            shapeRenderer.end();
+            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
-        batch.begin();
-        if(setting.isRotate()) {
+            batch.begin();
             board.renderRotateBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+            batch.end();
         }else {
-            board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-        }
-        batch.end();
+            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+            shapeRenderer.end();
+            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
+            batch.begin();
+            board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+            batch.end();
+        }
 
         if(board.isPromoting()) {
             board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage);
@@ -130,17 +150,17 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            switch (main.getMode()) {
-                case TWO_PERSONS:
-                    handleClick(screenX, screenY);
-                    break;
-                case AI:
-                    handleClickWhenPlayWithAI(screenX, screenY);
-                    break;
-                case ONLINE:
-                    handleClickWhenPlayOnline(screenX, screenY);
-                    break;
-            }
+        switch (main.getMode()) {
+            case TWO_PERSONS:
+                handleClick(screenX, screenY);
+                break;
+            case AI:
+                handleClickWhenPlayWithAI(screenX, screenY);
+                break;
+            case ONLINE:
+                handleClickWhenPlayOnline(screenX, screenY);
+                break;
+        }
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
@@ -152,13 +172,17 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleClickWhenPlayOnline(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessOnlinePlayer)) {
-            handleClick(screenX, screenY);
+            handlePlayerClickWhenPlayOnline(screenX, screenY);
         }
     }
 
     private void handleClick(int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
+        if(main.setting.isRotate()) {
+            boardX = 7 - boardX;
+            boardY = 7 - boardY;
+        }
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
@@ -228,6 +252,10 @@ public class ChessScreen extends InputAdapter implements Screen {
     private void handlePlayerClickWhenPlayWithAI(int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
+        if(main.setting.isRotate()) {
+            boardX = 7 - boardX;
+            boardY = 7 - boardY;
+        }
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
@@ -280,6 +308,79 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 chessGameManager.switchPlayer(board);
                             });
                             thread.start();
+                        }else {
+                            board.warnIllegalMove(selectedSpot.getPiece().isWhite());
+                            selectedSpot.setShowColor(true);
+                            chessSound.playIllegalSound();
+                        }
+                    }else {
+                        if(secondSpot.getPiece() != null) {
+                            selectedSpot.setShowColor(false);
+                            selectedSpot = secondSpot;
+                            board.clearGuidePoint();
+                            selectedSpot.setShowColor(true);
+                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+                        }else {
+                            selectedSpot = null;
+                            board.clearGuidePoint();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void handlePlayerClickWhenPlayOnline(int screenX, int screenY) {
+        int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
+        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
+        if(main.setting.isRotate()) {
+            boardX = 7 - boardX;
+            boardY = 7 - boardY;
+        }
+        if (board.isWithinBoard(boardX, boardY)) {
+            if(board.isPromoting()) {
+                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager);
+            }else {
+                if (selectedSpot == null) {
+                    selectedSpot = board.getSpot(boardY, boardX);
+                    selectedSpot.setShowColor(true);
+                    if(selectedSpot.getPiece() instanceof Pawn) {
+                        ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
+                    }
+                    if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
+                        if(!selectedSpot.isIdentificationColor()) {
+                            selectedSpot.setShowColor(false);
+                        }
+                        selectedSpot = null;
+                    }else {
+                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+                    }
+                } else {
+                    Spot secondSpot = board.getSpot(boardY, boardX);
+                    Move move = new Move(selectedSpot, secondSpot);
+                    Board testBoard = board.cloneBoard();
+                    boolean canMove = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    if(canMove && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                        if(selectedSpot.getPiece() instanceof Pawn ) {
+                            if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
+                                board.setPromoting(true);
+                                board.setPromotingSpot(secondSpot);
+                            }
+                        }
+                        board.clearColorAndPoint();
+                        move.makeMove(testBoard);
+                        if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
+                            main.socketClient.makeMove(selectedSpot.getX() + "" + selectedSpot.getY(), secondSpot.getX() + "" + secondSpot.getY());
+                            scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory), bitmapFont, main.manager);
+                            selectedSpot = null;
+                            chessGameManager.switchPlayer(board);
+                            if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
+                                chessSound.playGameEndSound();
+                                EndGamePopup popup = new EndGamePopup(bitmapFont, main.manager.getBundle("vi"), main.manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                stage.addActor(popup.getPopup());
+                                multiplexer.removeProcessor(0);
+                            }
                         }else {
                             board.warnIllegalMove(selectedSpot.getPiece().isWhite());
                             selectedSpot.setShowColor(true);

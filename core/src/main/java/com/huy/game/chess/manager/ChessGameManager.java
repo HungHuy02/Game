@@ -2,6 +2,7 @@ package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.core.Piece;
 import com.huy.game.chess.enums.ChessMode;
 
@@ -33,6 +34,32 @@ public class ChessGameManager {
         }
 
         currentPlayer = player1;
+        timer = new Timer();
+        timeList = new HashMap<>();
+        timeList.put("play1", 0);
+        timeList.put("play2", 0);
+        timeList.put("1", 500);
+        timeList.put("2", 500);
+        handleTimer("1");
+    }
+
+    public ChessGameManager(ChessMode mode, boolean isWhite) {
+        switch (mode) {
+            case TWO_PERSONS:
+                player1 = new ChessPlayer(true);
+                player2 = new ChessPlayer(false);
+                break;
+            case AI:
+                player1 = new ChessPlayer(true);
+                player2 = new ChessAIPlayer(false);
+                break;
+            case ONLINE:
+                player1 = new ChessPlayer(isWhite);
+                player2 = new ChessOnlinePlayer(!isWhite);
+                break;
+        }
+
+        currentPlayer = isWhite ? player1 : player2;
         timer = new Timer();
         timeList = new HashMap<>();
         timeList.put("play1", 0);

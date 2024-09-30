@@ -39,16 +39,12 @@ public class GameHistory {
 
     public String changeToFullAlgebraicNotation(int x, int y, Piece startPiece,Piece endPiece) {
         String move = endPiece != null ? "x" + changePositionToAlgebraicNotation(x, y) : changePositionToAlgebraicNotation(x, y);
-        if(startPiece instanceof Knight) {
-            move = "N" + move;
-        }else if(startPiece instanceof Bishop) {
-            move = "B" + move;
-        }else if(startPiece instanceof Queen) {
-            move = "Q" + move;
-        }else if(startPiece instanceof Rook) {
-            move = "R" + move;
-        }else if(startPiece instanceof King) {
-            move = "K" + move;
+        switch (startPiece.getType()) {
+            case KNIGHT ->  move = "N" + move;
+            case BISHOP -> move = "B" + move;
+            case QUEEN -> move = "Q" + move;
+            case ROOK -> move = "R" + move;
+            case KING -> move = "K" + move;
         }
         return move;
     }

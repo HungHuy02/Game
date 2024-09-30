@@ -12,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.huy.game.Main;
+import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.chess.manager.Player;
 import com.huy.game.chess.ui.BottomAppBar;
 import com.huy.game.chess.ui.Colors;
 import com.huy.game.chess.ui.PlayerInfo;
@@ -60,7 +62,16 @@ public class ChessMatchScreen implements Screen {
         stage.addActor(topAppBar.getStack());
         stage.addActor(info.getInfo());
         stage.addActor(bottomAppBar.getStack());
-        chessImage.dispose();
+
+        ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite) -> {
+            Player.getInstance().setData(name, isWhite);
+            if(!isWhite) {
+                main.setting.setRotate(true);
+            }
+            Gdx.app.postRunnable(main::toChessScreen);
+        });
+
+        main.socketClient.requestToPlay();
     }
 
     @Override
@@ -100,7 +111,6 @@ public class ChessMatchScreen implements Screen {
     public void dispose() {
         stage.dispose();
         batch.dispose();
-        chessImage.dispose();
         font.dispose();
     }
 }
