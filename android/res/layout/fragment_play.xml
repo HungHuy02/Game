@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="80dp"
         android:text="@string/ten_minute_text"
         app:icon="@drawable/timer_24px"
         app:cornerRadius="4dp"

@@ -10,6 +10,7 @@ import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceColor;
 import com.huy.game.chess.enums.TimeType;
+import com.huy.game.shared.network.SocketIOClient;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
@@ -19,19 +20,19 @@ public class AndroidLauncher extends AndroidApplication {
         Intent intent = getIntent();
         ChessMode mode =  ChessMode.valueOf(intent.getStringExtra(Constants.BUNDLE_MODE));
         TimeType type = TimeType.valueOf(intent.getStringExtra(Constants.BUNDLE_TIME));
+        AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
+        configuration.useImmersiveMode = true;
         switch (mode) {
             case AI, TWO_PERSONS -> {
                 PieceColor player1Color = PieceColor.valueOf(intent.getStringExtra(Constants.BUNDLE_PLAYER1_COLOR));
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 String player2Name = intent.getStringExtra(Constants.BUNDLE_PLAYER2_NAME);
+                initialize(new Main(mode), configuration);
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
+                initialize(new Main(mode, new SocketIOClient()), configuration);
             }
         }
-
-        AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
-        configuration.useImmersiveMode = true; // Recommended, but not required.
-        initialize(new Main(mode), configuration);
     }
 }

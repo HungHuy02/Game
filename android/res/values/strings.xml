@@ -40,4 +40,5 @@
     <string name="rotate_board_text">Xoay bàn cờ</string>
     <string name="none_text">Không có</string>
     <string name="play_with_piece_text">CHƠI VỚI QUÂN</string>
+    <string name="accept_policy_text">Tôi đã đọc và đồng ý với Điều khoản và chính sách Quyền riêng tư</string>
 </resources>
