@@ -1,7 +1,8 @@
-const userRouter = require('./users')
+const userRouter = require('./users.js');
+const authUserRouter = require('./authUser.js');
 
 function route(app) {
-  app.use("/user", userRouter);
+  app.use("/auth/user", authUserRouter);
 }
 
 module.exports = route;
