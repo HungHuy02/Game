@@ -38,7 +38,7 @@ module.exports = function(io) {
                 });
 
                 opponentPlayer.socket.emit("opponentFound", {
-                    opponentName: opponentPlayer.playerName,
+                    opponentName: currentUser.playerName,
                     isWhite: !pieceColor,
                 });
 

@@ -1,12 +1,17 @@
 package com.huy.game.android;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.huy.game.R;
+import com.huy.game.android.utils.Constants;
+import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.databinding.ActivityMainBinding;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 

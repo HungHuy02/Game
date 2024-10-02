@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.huy.game.R;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayFragmentViewModel;
@@ -168,7 +169,7 @@ public class PlayFragment extends Fragment {
                 default -> TimeType.NO_TIME;
             };
             intent.putExtra(Constants.BUNDLE_TIME, type.toString());
-            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, "test");
+            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
             startActivity(intent);
         });
     }

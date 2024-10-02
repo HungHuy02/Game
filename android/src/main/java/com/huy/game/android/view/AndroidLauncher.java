@@ -10,6 +10,8 @@ import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceColor;
 import com.huy.game.chess.enums.TimeType;
+import com.huy.game.chess.manager.OpponentPlayer;
+import com.huy.game.chess.manager.Player;
 import com.huy.game.shared.network.SocketIOClient;
 
 /** Launches the Android application. */
@@ -27,10 +29,13 @@ public class AndroidLauncher extends AndroidApplication {
                 PieceColor player1Color = PieceColor.valueOf(intent.getStringExtra(Constants.BUNDLE_PLAYER1_COLOR));
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 String player2Name = intent.getStringExtra(Constants.BUNDLE_PLAYER2_NAME);
+                Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE);
+                OpponentPlayer.getInstance().setData(player2Name, !(player1Color == PieceColor.WHITE));
                 initialize(new Main(mode), configuration);
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
+                Player.getInstance().setName(player1Name);
                 initialize(new Main(mode, new SocketIOClient()), configuration);
             }
         }

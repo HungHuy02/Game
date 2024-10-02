@@ -4,41 +4,54 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
-import com.huy.game.android.viewmodel.TwoPersonsPlaySetupViewModel;
+import com.huy.game.android.viewmodel.PlayWithAISetupViewModel;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceColor;
 import com.huy.game.chess.enums.TimeType;
-import com.huy.game.databinding.ActivityTwoPersonsPlaySetUpBinding;
+import com.huy.game.databinding.ActivityPlayWithAiSetUpBinding;
 
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
+public class PlayWithAISetupActivity extends AppCompatActivity implements View.OnClickListener {
 
-public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private TwoPersonsPlaySetupViewModel viewModel;
+    private PlayWithAISetupViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String text = "test";
-
-        ActivityTwoPersonsPlaySetUpBinding binding = ActivityTwoPersonsPlaySetUpBinding.inflate(getLayoutInflater());
+        ActivityPlayWithAiSetUpBinding binding = ActivityPlayWithAiSetUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        binding.tfWhite.setText(text);
-        binding.tfBlack.setText(getText(R.string.player_text));
 
-        viewModel = new ViewModelProvider(this).get(TwoPersonsPlaySetupViewModel.class);
+        viewModel = new ViewModelProvider(this).get(PlayWithAISetupViewModel.class);
+
+        viewModel.getPositionColor().observe(this, position -> {
+            clearButtonsBorder(binding);
+            switch (position) {
+                case 1:
+                    binding.btnWhite.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
+                    break;
+                case 2:
+                    binding.btnWhiteBlack.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
+                    break;
+                case 3:
+                    binding.btnBlack.setBackground(AppCompatResources.getDrawable(this ,R.drawable.button_stroke));
+                    break;
+            }
+        });
 
         viewModel.getPosition().observe(this, position -> {
             clearButtonsStroke(binding);
@@ -87,7 +100,7 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
         });
 
         StorageUtils storageUtils = StorageUtils.getInstance(this);
-        int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION_2P);
+        int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION_AI);
         viewModel.setPosition(position);
 
         binding.btnNone.setOnClickListener(this);
@@ -100,6 +113,9 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
         binding.btn10m.setOnClickListener(this);
         binding.btn15mp10.setOnClickListener(this);
         binding.btn30m.setOnClickListener(this);
+        binding.btnBlack.setOnClickListener((v) -> viewModel.setPositionColor(3));
+        binding.btnWhite.setOnClickListener((v) -> viewModel.setPositionColor(1));
+        binding.btnWhiteBlack.setOnClickListener((v) -> viewModel.setPositionColor(2));
 
         viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
 
@@ -107,16 +123,9 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
 
         binding.btnControlTime.setOnClickListener((v) -> viewModel.setShowButtons(Boolean.FALSE.equals(viewModel.showButtons().getValue())));
 
-        binding.btnSwap.setOnClickListener((v) -> {
-            String whitePlayerName = Objects.requireNonNull(binding.tfWhite.getText()).toString();
-            String blackPlayerName = Objects.requireNonNull(binding.tfBlack.getText()).toString();
-            binding.tfWhite.setText(blackPlayerName);
-            binding.tfBlack.setText(whitePlayerName);
-        });
-
         binding.btnPlay.setOnClickListener((v) -> {
             Intent intent = new Intent(this, AndroidLauncher.class);
-            intent.putExtra(Constants.BUNDLE_MODE, ChessMode.TWO_PERSONS.toString());
+            intent.putExtra(Constants.BUNDLE_MODE, ChessMode.AI.toString());
             int positionTime = Optional.ofNullable(viewModel.getPosition().getValue()).orElse(0);
             TimeType type = switch (positionTime) {
                 case 1 -> TimeType.ONE_MINUTE;
@@ -131,13 +140,26 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
                 default -> TimeType.NO_TIME;
             };
             intent.putExtra(Constants.BUNDLE_TIME, type.toString());
-            intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, PieceColor.WHITE.toString());
-            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, binding.tfWhite.getText());
-            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, binding.tfBlack.getText());
+            int positionColor = Optional.ofNullable(viewModel.getPositionColor().getValue()).orElse(1);
+            PieceColor pieceColor = switch (positionColor) {
+                case 1 -> PieceColor.WHITE;
+                case 2 -> {
+                    Random random = new Random();
+                    int color = random.nextInt(2) + 1;
+                    if(color == 1) {
+                        yield PieceColor.WHITE;
+                    }else {
+                        yield PieceColor.BLACK;
+                    }
+                }
+                default -> PieceColor.BLACK;
+            };
+            intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, pieceColor.toString());
+            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
+            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Constants.AI_NAME);
             startActivity(intent);
             finish();
         });
-
     }
 
     @Override
@@ -169,7 +191,7 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
     }
 
     private void handleData(StorageUtils utils ,int position) {
-        utils.setIntValue(Constants.DATASTORE_POSITION_2P, position);
+        utils.setIntValue(Constants.DATASTORE_POSITION_AI, position);
         viewModel.setPosition(position);
     }
 
@@ -182,7 +204,17 @@ public class TwoPersonsPlaySetupActivity extends AppCompatActivity implements Vi
         button.setBackgroundTintList(buttonColor);
     }
 
-    private void clearButtonsStroke(ActivityTwoPersonsPlaySetUpBinding binding) {
+    private void clearButtonsBorder(ActivityPlayWithAiSetUpBinding binding) {
+        clearButtonBorder(binding.btnBlack);
+        clearButtonBorder(binding.btnWhite);
+        clearButtonBorder(binding.btnWhiteBlack);
+    }
+
+    private void clearButtonBorder(ImageButton button) {
+        button.setBackground(AppCompatResources.getDrawable(this ,R.drawable.transparent_button));
+    }
+
+    private void clearButtonsStroke(ActivityPlayWithAiSetUpBinding binding) {
         clearButtonStroke(binding.btnNone);
         clearButtonStroke(binding.btn1m);
         clearButtonStroke(binding.btn3m);
