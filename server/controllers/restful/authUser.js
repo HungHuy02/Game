@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const bcrypt = require('bcrypt');
 const jwtUtil = require('../../utils/jwtUtil');
+const jwt = require("jsonwebtoken");
 
 const checkExistingUser = asyncHandler(async (req, res) => {
     const { email } = req.query;
@@ -68,6 +69,15 @@ const login = asyncHandler(async (req, res) => {
     if(user && await bcrypt.compare(password, user.password)) {
         const accessToken = jwtUtil.generateAccessToken(user.id, user.name);
         const refreshToken = jwtUtil.generateRefreshToken(user.id);
+        const updateUser = await prisma.user.update({
+            where: {email: email},
+            data: {refresh_token: refreshToken}
+        });
+
+        if(!updateUser) {
+            res.status(400);
+            throw new Error('error');
+        }
 
         return res.status(200).json({
             success: true,
@@ -87,8 +97,36 @@ const login = asyncHandler(async (req, res) => {
     }
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(401).json({ error: "No refresh token" });
+      }
+    
+    try {
+        const decodedToken = await jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const response = await prisma.user.findUnique({
+            where: {id: decodedToken.id}
+        })
+    
+        if (!response) {
+          return res.status(401).json({ error: "Invalid refresh token" });
+        }
+
+        if (refreshToken !== response.refresh_token) {
+            return res.status(401).json({ error: "Invalid refresh token" });
+        }
+    
+        const newAccessToken = jwtUtil.generateAccessToken(response.id, response.name);
+        return res.status(200).json({ success: true, newAccessToken });
+    } catch (error) {
+        return res.status(401).json({ error: "Invalid refresh token" });
+    }
+});
+
 module.exports = {
     checkExistingUser,
     register,
     login,
+    refreshAccessToken,
   };

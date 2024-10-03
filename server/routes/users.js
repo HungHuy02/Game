@@ -3,6 +3,7 @@ var router = express.Router();
 
 const userController = require('../controllers/restful/user');
 
-router.post('/updateUser', userController.updateUser);
+router.get('/get-current', userController.getCurrentUser);
+router.post('/update-user', userController.updateUser);
 
 module.exports = router;

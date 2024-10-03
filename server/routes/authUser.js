@@ -6,5 +6,6 @@ const authUserController = require('../controllers/restful/authUser');
 router.get("/check-existing-user", authUserController.checkExistingUser);
 router.post("/login", authUserController.login);
 router.post("/register", authUserController.register);
+router.post("/refresh-token", authUserController.refreshAccessToken);
 
 module.exports = router;
