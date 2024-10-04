@@ -1,4 +1,4 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -170,6 +170,16 @@ public class PlayFragment extends Fragment {
             };
             intent.putExtra(Constants.BUNDLE_TIME, type.toString());
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
+            startActivity(intent);
+        });
+
+        fragmentPlayBinding.userImage.setOnClickListener((v) -> {
+            Intent intent = new Intent(this.getContext(), ProfileActivity.class);
+            startActivity(intent);
+        });
+
+        fragmentPlayBinding.settingBtn.setOnClickListener((v) -> {
+            Intent intent = new Intent(this.getContext(), SettingActivity.class);
             startActivity(intent);
         });
     }

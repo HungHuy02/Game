@@ -1,13 +1,12 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.huy.game.android.base.BaseActivity;
 import com.huy.game.databinding.ActivityLoginWayBinding;
 
-public class LoginWayActivity extends AppCompatActivity {
+public class LoginWayActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

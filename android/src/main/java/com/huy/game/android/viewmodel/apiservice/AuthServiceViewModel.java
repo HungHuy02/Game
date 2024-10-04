@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 import com.huy.game.android.models.request.LoginRequest;
 import com.huy.game.android.models.request.RegisterRequest;
 import com.huy.game.android.models.response.LoginResponse;
+import com.huy.game.android.models.response.RefreshResponse;
 import com.huy.game.android.models.response.RegisterResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.network.retrofit.repository.AuthRepository;

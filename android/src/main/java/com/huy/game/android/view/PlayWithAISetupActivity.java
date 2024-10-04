@@ -1,4 +1,4 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
+import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
@@ -25,7 +26,7 @@ import com.huy.game.databinding.ActivityPlayWithAiSetUpBinding;
 import java.util.Optional;
 import java.util.Random;
 
-public class PlayWithAISetupActivity extends AppCompatActivity implements View.OnClickListener {
+public class PlayWithAISetupActivity extends BaseActivity implements View.OnClickListener {
 
     private PlayWithAISetupViewModel viewModel;
 

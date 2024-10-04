@@ -9,11 +9,17 @@ public class LoginResponse {
     private boolean success;
     @SerializedName("message")
     private String message;
+    @SerializedName("accessToken")
+    private String accessToken;
+    @SerializedName("refreshToken")
+    private String refreshToken;
     @SerializedName("userData")
     private User user;
 
-    public LoginResponse(boolean success, String message,User user) {
+    public LoginResponse(boolean success, String accessToken, String refreshToken, User user) {
         this.success = success;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.user = user;
     }
 
@@ -23,6 +29,14 @@ public class LoginResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
     public User getUser() {

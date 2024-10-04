@@ -5,6 +5,7 @@ public class UserState {
     private static UserState Instance;
     private String name;
     private String email;
+    private String language;
 
     private UserState() {
 
@@ -36,5 +37,13 @@ public class UserState {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

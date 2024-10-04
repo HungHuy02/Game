@@ -20,7 +20,7 @@
         android:theme="@style/GdxTheme"
         tools:ignore="UnusedAttribute">
         <activity
-            android:name="com.huy.game.android.AndroidLauncher"
+            android:name="com.huy.game.android.view.AndroidLauncher"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout"
             android:exported="false"
             android:label="@string/app_name"
@@ -29,7 +29,7 @@
         </activity>
 
         <activity
-            android:name="com.huy.game.android.LoginWayActivity"
+            android:name="com.huy.game.android.view.MainActivity"
             android:exported="true"
             android:theme="@style/GdxThemeApp">
             <intent-filter>
@@ -39,32 +39,42 @@
         </activity>
 
         <activity
-            android:name="com.huy.game.android.LoginActivity"
+            android:name="com.huy.game.android.view.LoginActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
         <activity
-            android:name="com.huy.game.android.RegisterActivity"
+            android:name="com.huy.game.android.view.RegisterActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
         <activity
-            android:name="com.huy.game.android.MainActivity"
+            android:name="com.huy.game.android.view.LoginWayActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
         <activity
-            android:name="com.huy.game.android.ChangeTimeActivity"
+            android:name="com.huy.game.android.view.ChangeTimeActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
         <activity
-            android:name="com.huy.game.android.TwoPersonsPlaySetupActivity"
+            android:name="com.huy.game.android.view.TwoPersonsPlaySetupActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 
         <activity
-            android:name="com.huy.game.android.PlayWithAISetupActivity"
+            android:name="com.huy.game.android.view.PlayWithAISetupActivity"
+            android:exported="false"
+            android:theme="@style/GdxThemeApp"/>
+
+        <activity
+            android:name="com.huy.game.android.view.SettingActivity"
+            android:exported="false"
+            android:theme="@style/GdxThemeApp"/>
+
+        <activity
+            android:name="com.huy.game.android.view.ProfileActivity"
             android:exported="false"
             android:theme="@style/GdxThemeApp"/>
 

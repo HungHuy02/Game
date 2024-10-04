@@ -1,4 +1,4 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,11 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
+import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.databinding.ActivityChangeTimeBinding;
 
-public class ChangeTimeActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChangeTimeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

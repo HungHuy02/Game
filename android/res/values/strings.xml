@@ -11,7 +11,7 @@
     <string name="create_account">Tạo một tài khoản</string>
     <string name="display_name">Tên hiển thị*</string>
     <string name="continue_text">Tiếp tục</string>
-    <string name="text">Causual Game</string>
+    <string name="text" translatable="false">Causual Game</string>
     <string name="text2">Trò chơi thông thường</string>
     <string name="play_text">Chơi</string>
     <string name="rank_text">Xếp hạng</string>
@@ -21,16 +21,16 @@
     <string name="time_text">Thời gian</string>
     <string name="super_flash_text">Siêu chớp</string>
     <string name="one_minute_text">1 phút</string>
-    <string name="one_minute_plus_one_text">1 | 1</string>
-    <string name="two_minute_plus_one_text">2 | 1</string>
+    <string name="one_minute_plus_one_text" translatable="false">1 | 1</string>
+    <string name="two_minute_plus_one_text" translatable="false">2 | 1</string>
     <string name="flash_text">Chớp</string>
     <string name="three_minute_text">3 phút</string>
-    <string name="three_minute_plus_two_text">3 | 2</string>
+    <string name="three_minute_plus_two_text" translatable="false">3 | 2</string>
     <string name="five_minute_text">5 phút</string>
-    <string name="five_minute_plus_five_text">5 | 5</string>
+    <string name="five_minute_plus_five_text" translatable="false">5 | 5</string>
     <string name="fast_text">Nhanh</string>
     <string name="ten_minute_text">10 phút</string>
-    <string name="fifteen_minute_plus_ten">15 | 10</string>
+    <string name="fifteen_minute_plus_ten" translatable="false">15 | 10</string>
     <string name="thirty_minute">30 phút</string>
     <string name="play_with_friend_offline_text">Chơi với bạn offline</string>
     <string name="white_piece_text">Quân trắng</string>
@@ -41,4 +41,15 @@
     <string name="none_text">Không có</string>
     <string name="play_with_piece_text">CHƠI VỚI QUÂN</string>
     <string name="accept_policy_text">Tôi đã đọc và đồng ý với Điều khoản và chính sách Quyền riêng tư</string>
+    <string name="setting_text">Cài đặt</string>
+    <string name="account_text">Tài khoản</string>
+    <string name="name_text">Tên</string>
+    <string name="email_text" translatable="false">Email</string>
+    <string name="delete_account_text">Xóa tài khoản</string>
+    <string name="update_text">Cập nhật</string>
+    <string name="detail_delete_action_text">Việc xóa tài khoản sẽ xóa vĩnh viễn tài khoản, trò chơi, thứ hạng của bạn. Không thể hoàn tác hành động này.</string>
+    <string name="language_text">Ngôn ngữ</string>
+    <string name="vietnamese_text">Tiếng Việt</string>
+    <string name="english_text">Tiếng Anh</string>
+    <string name="select_language_text">Chọn ngôn ngữ</string>
 </resources>

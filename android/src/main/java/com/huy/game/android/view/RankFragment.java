@@ -1,6 +1,5 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

@@ -1,8 +1,10 @@
 package com.huy.game.android.network.retrofit.api;
 
 import com.huy.game.android.models.request.LoginRequest;
+import com.huy.game.android.models.request.RefreshRequest;
 import com.huy.game.android.models.request.RegisterRequest;
 import com.huy.game.android.models.response.LoginResponse;
+import com.huy.game.android.models.response.RefreshResponse;
 import com.huy.game.android.models.response.RegisterResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 
@@ -22,4 +24,7 @@ public interface AuthApi {
 
     @POST("/auth/user/register")
     Call<RegisterResponse> register(@Body RegisterRequest request);
+
+    @POST("/auth/user/refresh-token")
+    Call<RefreshResponse> refreshToken(@Body RefreshRequest request);
 }

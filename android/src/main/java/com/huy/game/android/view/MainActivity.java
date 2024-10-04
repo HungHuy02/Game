@@ -1,25 +1,49 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.huy.game.R;
-import com.huy.game.android.utils.Constants;
-import com.huy.game.android.utils.StorageUtils;
+import com.huy.game.android.base.BaseActivity;
+import com.huy.game.android.globalstate.UserState;
+import com.huy.game.android.models.User;
+import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
 import com.huy.game.databinding.ActivityMainBinding;
 
-import java.util.Locale;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        com.huy.game.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        UserServiceViewModel viewModel = new ViewModelProvider(this).get(UserServiceViewModel.class);
+        viewModel.getCurrentUser(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if(response.isSuccessful()) {
+                    assert response.body() != null;
+                    UserState.getInstance().setData(response.body().getName(), response.body().getEmail());
+                }else if(response.code() != 401){
+                    Toast.makeText(MainActivity.this, "Lỗi không xác định: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable throwable) {
+                Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();

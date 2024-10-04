@@ -1,14 +1,16 @@
-package com.huy.game.android;
+package com.huy.game.android.view;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.models.request.RegisterRequest;
 import com.huy.game.android.models.response.RegisterResponse;
 import com.huy.game.android.viewmodel.apiservice.AuthServiceViewModel;
@@ -18,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private ActivityRegisterBinding binding;
 
@@ -42,7 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             authServiceViewModel.register(request, new Callback<>() {
                 @Override
-                public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+                public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
                     if(response.isSuccessful()) {
                         Toast.makeText( RegisterActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginWayActivity.class);
@@ -59,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<RegisterResponse> call, Throwable throwable) {
+                public void onFailure(@NonNull Call<RegisterResponse> call, @NonNull Throwable throwable) {
                     Log.e("error", throwable.toString());
                 }
             });
