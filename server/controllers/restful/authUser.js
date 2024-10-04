@@ -118,7 +118,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         }
     
         const newAccessToken = jwtUtil.generateAccessToken(response.id, response.name);
-        return res.status(200).json({ success: true, newAccessToken });
+        return res.status(200).json({ success: true, accessToken: newAccessToken });
     } catch (error) {
         return res.status(401).json({ error: "Invalid refresh token" });
     }

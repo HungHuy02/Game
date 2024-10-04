@@ -43,11 +43,46 @@ const updateUser = asyncHandler(async (req, res) => {
     });
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+    const id = req.user.id;
+    const user = await prisma.user.delete({
+        where: {id: id},
+    });
+    if(user) {
+        res.status(400);
+        throw new Error("error");
+    }
+    return res.status(200).json({
+        success: true,
+        message: "Delete successful",
+    })
+});
 
+const logout = asyncHandler(async (req, res) => {
+    const id = req.user.id;
+    const user = await prisma.user.update({
+        where: {id: id},
+        data: {
+            refresh_token: null
+        }
+    });
+
+    if(user) {
+        res.status(400);
+        throw new Error("error");
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Logout successfully"
+    });
+})
 
 
 module.exports = {
     getCurrentUser,
     updateUser,
+    deleteUser,
+    logout,
 };
 
