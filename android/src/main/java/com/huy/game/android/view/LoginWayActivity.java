@@ -8,23 +8,33 @@ import com.huy.game.databinding.ActivityLoginWayBinding;
 
 public class LoginWayActivity extends BaseActivity {
 
+    private ActivityLoginWayBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        com.huy.game.databinding.ActivityLoginWayBinding binding = ActivityLoginWayBinding.inflate(getLayoutInflater());
+        binding = ActivityLoginWayBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        loginButton();
+        emailButton();
+        guestButton();
+    }
 
+    private void loginButton() {
         binding.loginBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         });
+    }
 
+    private void emailButton() {
         binding.emailBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
         });
+    }
 
+    private void guestButton() {
         binding.guestBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

@@ -78,6 +78,10 @@ dependencies {
   implementation "androidx.datastore:datastore-preferences-rxjava3:1.1.1"
   implementation 'io.socket:socket.io-client:2.1.1'
 
+  implementation 'com.cloudinary:cloudinary-android:2.5.0'
+  implementation 'com.cloudinary:cloudinary-android-download:2.5.0'
+  implementation 'com.cloudinary:cloudinary-android-preprocess:2.5.0'
+
   implementation ("com.squareup.retrofit2:retrofit:2.11.0")
   implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 

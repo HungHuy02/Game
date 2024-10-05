@@ -42,7 +42,7 @@
     <string name="play_with_piece_text">CHƠI VỚI QUÂN</string>
     <string name="accept_policy_text">Tôi đã đọc và đồng ý với Điều khoản và chính sách Quyền riêng tư</string>
     <string name="setting_text">Cài đặt</string>
-    <string name="account_text">Tài khoản</string>
+    <string name="account_text">Tài khoản của tôi</string>
     <string name="name_text">Tên</string>
     <string name="email_text" translatable="false">Email</string>
     <string name="delete_account_text">Xóa tài khoản</string>
@@ -52,4 +52,6 @@
     <string name="vietnamese_text">Tiếng Việt</string>
     <string name="english_text">Tiếng Anh</string>
     <string name="select_language_text">Chọn ngôn ngữ</string>
+    <string name="logout_text">Đăng xuất</string>
+    <string name="change_text">Sửa</string>
 </resources>

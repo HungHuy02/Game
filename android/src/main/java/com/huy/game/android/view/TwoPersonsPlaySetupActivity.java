@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
@@ -27,19 +26,25 @@ import java.util.Optional;
 
 public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.OnClickListener {
 
+    private ActivityTwoPersonsPlaySetUpBinding binding;
     private TwoPersonsPlaySetupViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActivityTwoPersonsPlaySetUpBinding binding = ActivityTwoPersonsPlaySetUpBinding.inflate(getLayoutInflater());
+        binding = ActivityTwoPersonsPlaySetUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        binding.tfWhite.setText(UserState.getInstance().getName());
-        binding.tfBlack.setText(getText(R.string.player_text));
+        setupViewModel();
+        setupName();
+        setupButtons();
+        backButton();
+        controlTimeButton();
+        swapButton();
+        playButton();
+    }
 
+    private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(TwoPersonsPlaySetupViewModel.class);
-
         viewModel.getPosition().observe(this, position -> {
             clearButtonsStroke(binding);
             switch (position) {
@@ -85,11 +90,18 @@ public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.On
                     break;
             }
         });
-
         StorageUtils storageUtils = StorageUtils.getInstance(this);
         int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION_2P);
         viewModel.setPosition(position);
+        viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
+    }
 
+    private void setupName() {
+        binding.tfWhite.setText(UserState.getInstance().getName());
+        binding.tfBlack.setText(getText(R.string.player_text));
+    }
+
+    private void setupButtons() {
         binding.btnNone.setOnClickListener(this);
         binding.btn1m.setOnClickListener(this);
         binding.btn3m.setOnClickListener(this);
@@ -100,20 +112,26 @@ public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.On
         binding.btn10m.setOnClickListener(this);
         binding.btn15mp10.setOnClickListener(this);
         binding.btn30m.setOnClickListener(this);
+    }
 
-        viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
-
+    private void backButton() {
         binding.backBtn.setOnClickListener((v) -> finish());
+    }
 
+    private void controlTimeButton() {
         binding.btnControlTime.setOnClickListener((v) -> viewModel.setShowButtons(Boolean.FALSE.equals(viewModel.showButtons().getValue())));
+    }
 
+    private void swapButton() {
         binding.btnSwap.setOnClickListener((v) -> {
             String whitePlayerName = Objects.requireNonNull(binding.tfWhite.getText()).toString();
             String blackPlayerName = Objects.requireNonNull(binding.tfBlack.getText()).toString();
             binding.tfWhite.setText(blackPlayerName);
             binding.tfBlack.setText(whitePlayerName);
         });
+    }
 
+    private void playButton() {
         binding.btnPlay.setOnClickListener((v) -> {
             Intent intent = new Intent(this, AndroidLauncher.class);
             intent.putExtra(Constants.BUNDLE_MODE, ChessMode.TWO_PERSONS.toString());
@@ -132,12 +150,11 @@ public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.On
             };
             intent.putExtra(Constants.BUNDLE_TIME, type.toString());
             intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, PieceColor.WHITE.toString());
-            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, binding.tfWhite.getText().toString());
-            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, binding.tfBlack.getText().toString());
+            intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, Objects.requireNonNull(binding.tfWhite.getText()).toString());
+            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Objects.requireNonNull(binding.tfBlack.getText()).toString());
             startActivity(intent);
             finish();
         });
-
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.huy.game.android.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -8,6 +9,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -19,18 +23,27 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.huy.game.R;
 import com.huy.game.android.globalstate.UserState;
+import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayFragmentViewModel;
+import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.TimeType;
+import com.huy.game.databinding.AccountMenuLayoutBinding;
 import com.huy.game.databinding.FragmentPlayBinding;
 
 import java.util.Optional;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class PlayFragment extends Fragment {
 
     private FragmentPlayBinding fragmentPlayBinding;
+    private PlayFragmentViewModel viewModel;
+    private ActivityResultLauncher<Intent> launcher;
 
     @Nullable
     @Override
@@ -42,7 +55,18 @@ public class PlayFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        PlayFragmentViewModel viewModel = new ViewModelProvider(this).get(PlayFragmentViewModel.class);
+        setupViewModel(view);
+        setupLauncher();
+        timeButton();
+        playTwoButton();
+        playWithAIButton();
+        newButton();
+        userImage();
+        settingButton();
+    }
+
+    private void setupViewModel(View view) {
+        viewModel = new ViewModelProvider(this).get(PlayFragmentViewModel.class);
         Drawable bulletDrawable = AppCompatResources.getDrawable(view.getContext(), R.drawable.icons8_bullet_39);
         Drawable flashDrawable = AppCompatResources.getDrawable(view.getContext(), R.drawable.flash_on_24px);
         Drawable timerDrawable = AppCompatResources.getDrawable(view.getContext(), R.drawable.timer_24px);
@@ -119,12 +143,10 @@ public class PlayFragment extends Fragment {
             viewModel.setSelectedTime(time);
             viewModel.setSelectedIcon(icon);
         });
+    }
 
-        StorageUtils storageUtils = StorageUtils.getInstance(getContext());
-        int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION);
-        viewModel.setPosition(position);
-
-        ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+    private void setupLauncher() {
+        launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
@@ -135,23 +157,34 @@ public class PlayFragment extends Fragment {
                 }
             }
         );
+    }
 
+    private void timeButton() {
+        StorageUtils storageUtils = StorageUtils.getInstance(getContext());
+        int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION);
+        viewModel.setPosition(position);
         fragmentPlayBinding.btnTime.setOnClickListener((v) -> {
             Intent intent = new Intent(fragmentPlayBinding.getRoot().getContext(), ChangeTimeActivity.class);
             intent.putExtra(Constants.BUNDLE_POSITION, position == -1 ? 7 : position);
             launcher.launch(intent);
         });
+    }
 
+    private void playTwoButton() {
         fragmentPlayBinding.btnPlayTwo.setOnClickListener((v) -> {
             Intent intent = new Intent(this.getContext(), TwoPersonsPlaySetupActivity.class);
             startActivity(intent);
         });
+    }
 
+    private void playWithAIButton() {
         fragmentPlayBinding.btnPlayAi.setOnClickListener((v) -> {
             Intent intent = new Intent(this.getContext(), PlayWithAISetupActivity.class);
             startActivity(intent);
         });
+    }
 
+    private void newButton() {
         fragmentPlayBinding.btnNew.setOnClickListener((v) -> {
             Intent intent = new Intent(this.getContext(), AndroidLauncher.class);
             intent.putExtra(Constants.BUNDLE_MODE, ChessMode.ONLINE.toString());
@@ -172,15 +205,65 @@ public class PlayFragment extends Fragment {
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
             startActivity(intent);
         });
+    }
 
+
+    private void userImage() {
         fragmentPlayBinding.userImage.setOnClickListener((v) -> {
-            Intent intent = new Intent(this.getContext(), ProfileActivity.class);
-            startActivity(intent);
-        });
+            PopupWindow popupWindow = new PopupWindow(v.getContext());
+            AccountMenuLayoutBinding binding = AccountMenuLayoutBinding.inflate(getLayoutInflater());
+            binding.tvName.setText(UserState.getInstance().getName());
+            binding.btnAccount.setOnClickListener((V) -> {
+                popupWindow.dismiss();
+                Intent intent = new Intent(V.getContext(), ProfileActivity.class);
+                startActivity(intent);
+            });
+            binding.btnLogout.setOnClickListener((V) -> {
+                UserServiceViewModel userServiceViewModel = new ViewModelProvider(PlayFragment.this).get(UserServiceViewModel.class);
+                userServiceViewModel.logout(new Callback<>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ScalarBooleanResponse> call, @NonNull Response<ScalarBooleanResponse> response) {
+                        if(response.isSuccessful()) {
+                            popupWindow.dismiss();
+                            Toast.makeText(getContext(), "Đăng xuât thành công", Toast.LENGTH_SHORT).show();
+                            StorageUtils.getInstance(V.getContext()).setStringValue(Constants.DATASTORE_ACCESS_TOKEN, "null");
+                            Intent intent = new Intent(V.getContext(), LoginWayActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }else {
+                            Toast.makeText(getContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(@NonNull Call<ScalarBooleanResponse> call, @NonNull Throwable throwable) {
+                        Toast.makeText(V.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+            popupWindow.setContentView(binding.getRoot());
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.showAsDropDown(v, -30, 0);
+            dimBehind(popupWindow);
+        });
+    }
+
+    private void settingButton() {
         fragmentPlayBinding.settingBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(this.getContext(), SettingActivity.class);
             startActivity(intent);
         });
+    }
+
+
+    private void dimBehind(PopupWindow popupWindow) {
+        View container = popupWindow.getContentView().getRootView();
+        Context context = popupWindow.getContentView().getContext();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams p = (WindowManager.LayoutParams) container.getLayoutParams();
+        p.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        p.dimAmount = 0.3f;
+        wm.updateViewLayout(container, p);
     }
 }

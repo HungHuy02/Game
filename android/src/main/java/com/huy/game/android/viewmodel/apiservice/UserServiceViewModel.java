@@ -19,4 +19,12 @@ public class UserServiceViewModel extends ViewModel {
     public void updateUser(User user, Callback<ScalarBooleanResponse> callback) {
         repository.updateUser(user, callback);
     }
+
+    public void logout(Callback<ScalarBooleanResponse> callback) {
+        repository.logout(callback);
+    }
+
+    public void deleteUser(Callback<ScalarBooleanResponse> callback) {
+        repository.deleteUser(callback);
+    }
 }

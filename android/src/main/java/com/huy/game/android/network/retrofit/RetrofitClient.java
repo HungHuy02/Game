@@ -74,7 +74,8 @@ public class RetrofitClient {
             if (response.code() == 401) {
                 if(chain.request().url().toString().endsWith("token")) {
                     Intent intent = new Intent( context, LoginWayActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     return response;
                 }else {

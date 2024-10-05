@@ -5,6 +5,7 @@ import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.network.retrofit.RetrofitClient;
 import com.huy.game.android.network.retrofit.api.UserApi;
 
+import retrofit2.Call;
 import retrofit2.Callback;
 
 public class UserRepository {
@@ -17,5 +18,13 @@ public class UserRepository {
 
     public void updateUser(User user, Callback<ScalarBooleanResponse> callback) {
         userApi.updateUser(user).enqueue(callback);
+    }
+
+    public void logout(Callback<ScalarBooleanResponse> callback) {
+        userApi.logout().enqueue(callback);
+    }
+
+    public void deleteUser(Callback<ScalarBooleanResponse> callback) {
+        userApi.delete().enqueue(callback);
     }
 }

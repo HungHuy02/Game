@@ -6,6 +6,7 @@ public class UserState {
     private String name;
     private String email;
     private String language;
+    private String imageUrl;
 
     private UserState() {
 
@@ -45,5 +46,13 @@ public class UserState {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

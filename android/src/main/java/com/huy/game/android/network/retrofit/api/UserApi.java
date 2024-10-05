@@ -15,4 +15,10 @@ public interface UserApi {
 
     @POST("/user/update-user")
     Call<ScalarBooleanResponse> updateUser(@Body User user);
+
+    @POST("/user/logout")
+    Call<ScalarBooleanResponse> logout();
+
+    @POST("/user/delete-user")
+    Call<ScalarBooleanResponse> delete();
 }

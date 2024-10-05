@@ -20,10 +20,20 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
 
+    private ActivityMainBinding binding;
+    private UserServiceViewModel viewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UserServiceViewModel viewModel = new ViewModelProvider(this).get(UserServiceViewModel.class);
+        setupViewModel();
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        handleBottomNavigation();
+    }
+
+    private void setupViewModel() {
+        viewModel = new ViewModelProvider(this).get(UserServiceViewModel.class);
         viewModel.getCurrentUser(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -40,11 +50,9 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-
+    private void handleBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.item_1) {

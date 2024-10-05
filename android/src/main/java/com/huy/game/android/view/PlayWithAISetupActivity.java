@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -29,14 +28,21 @@ import java.util.Random;
 public class PlayWithAISetupActivity extends BaseActivity implements View.OnClickListener {
 
     private PlayWithAISetupViewModel viewModel;
+    private ActivityPlayWithAiSetUpBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActivityPlayWithAiSetUpBinding binding = ActivityPlayWithAiSetUpBinding.inflate(getLayoutInflater());
+        binding = ActivityPlayWithAiSetUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setupViewModel();
+        setupButtons();
+        backButton();
+        controlTimeButton();
+        playButton();
+    }
 
+    private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(PlayWithAISetupViewModel.class);
 
         viewModel.getPositionColor().observe(this, position -> {
@@ -103,7 +109,10 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
         StorageUtils storageUtils = StorageUtils.getInstance(this);
         int position = storageUtils.getIntValue(Constants.DATASTORE_POSITION_AI);
         viewModel.setPosition(position);
+        viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
+    }
 
+    private void setupButtons() {
         binding.btnNone.setOnClickListener(this);
         binding.btn1m.setOnClickListener(this);
         binding.btn3m.setOnClickListener(this);
@@ -117,13 +126,17 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
         binding.btnBlack.setOnClickListener((v) -> viewModel.setPositionColor(3));
         binding.btnWhite.setOnClickListener((v) -> viewModel.setPositionColor(1));
         binding.btnWhiteBlack.setOnClickListener((v) -> viewModel.setPositionColor(2));
+    }
 
-        viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
-
+    private void backButton() {
         binding.backBtn.setOnClickListener((v) -> finish());
+    }
 
+    private void controlTimeButton() {
         binding.btnControlTime.setOnClickListener((v) -> viewModel.setShowButtons(Boolean.FALSE.equals(viewModel.showButtons().getValue())));
+    }
 
+    private void playButton() {
         binding.btnPlay.setOnClickListener((v) -> {
             Intent intent = new Intent(this, AndroidLauncher.class);
             intent.putExtra(Constants.BUNDLE_MODE, ChessMode.AI.toString());

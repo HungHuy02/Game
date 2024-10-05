@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
@@ -18,13 +17,18 @@ import com.huy.game.databinding.ActivityChangeTimeBinding;
 
 public class ChangeTimeActivity extends BaseActivity implements View.OnClickListener {
 
+    private ActivityChangeTimeBinding binding;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        com.huy.game.databinding.ActivityChangeTimeBinding binding = ActivityChangeTimeBinding.inflate(getLayoutInflater());
+        binding = ActivityChangeTimeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        binding.backBtn.setOnClickListener((v) -> getOnBackPressedDispatcher().onBackPressed());
+        backButton();
+        setupButtons();
+    }
+
+    private void setupButtons() {
         int position = getIntent().getIntExtra(Constants.BUNDLE_POSITION, 7);
         switch (position) {
             case 1:
@@ -64,6 +68,10 @@ public class ChangeTimeActivity extends BaseActivity implements View.OnClickList
         binding.btn10m.setOnClickListener(this);
         binding.btn15mp10.setOnClickListener(this);
         binding.btn30m.setOnClickListener(this);
+    }
+
+    private void backButton() {
+        binding.backBtn.setOnClickListener((v) -> finish());
     }
 
     @Override

@@ -17,15 +17,27 @@ import com.huy.game.databinding.BottomSheetLayoutBinding;
 
 public class SettingActivity extends BaseActivity {
 
+    private ActivitySettingBinding binding;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActivitySettingBinding binding = ActivitySettingBinding.inflate(getLayoutInflater());
+        binding = ActivitySettingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setupLanguageImage();
+        backButton();
+        changeLanguageButton();
+    }
 
+    private void setupLanguageImage() {
         binding.languageImage.setImageResource(UserState.getInstance().getLanguage().equals("vi") ? R.drawable.icons8_vietnam_48 : R.drawable.icons8_usa_48);
+    }
 
+    private void backButton() {
+        binding.backBtn.setOnClickListener((v) -> finish());
+    }
+
+    private void changeLanguageButton() {
         binding.btnChangeLanguage.setOnClickListener((v) -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(SettingActivity.this);
             BottomSheetLayoutBinding bottomSheetLayoutBinding = BottomSheetLayoutBinding.inflate(getLayoutInflater());
@@ -43,7 +55,7 @@ public class SettingActivity extends BaseActivity {
                     UserState.getInstance().setLanguage(language);
                     StorageUtils.getInstance(view.getContext()).setStringValue(Constants.DATASTORE_LANGUAGE, language);
                     Intent intent = new Intent(view.getContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }

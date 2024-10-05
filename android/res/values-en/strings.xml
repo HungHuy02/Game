@@ -36,7 +36,7 @@
     <string name="play_with_piece_text">Play with color</string>
     <string name="accept_policy_text">I have read and agree to the Terms and Privacy Policy</string>
     <string name="setting_text">Setting</string>
-    <string name="account_text">Account</string>
+    <string name="account_text">My account</string>
     <string name="name_text">Name</string>
     <string name="delete_account_text">Delete account</string>
     <string name="update_text">Update</string>
@@ -45,4 +45,6 @@
     <string name="vietnamese_text">Vietnamese</string>
     <string name="english_text">English</string>
     <string name="select_language_text">Select language</string>
+    <string name="logout_text">Logout</string>
+    <string name="change_text">Change</string>
 </resources>
