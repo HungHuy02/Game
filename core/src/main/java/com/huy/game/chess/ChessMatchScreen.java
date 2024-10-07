@@ -12,28 +12,47 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.huy.game.Main;
+import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
+import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.chess.manager.ChessSound;
+import com.huy.game.chess.manager.OpponentPlayer;
 import com.huy.game.chess.manager.Player;
 import com.huy.game.chess.ui.BottomAppBar;
 import com.huy.game.chess.ui.Colors;
 import com.huy.game.chess.ui.PlayerInfo;
 import com.huy.game.chess.ui.TopAppBar;
 
+import javax.inject.Inject;
+
 
 public class ChessMatchScreen implements Screen {
 
-    private Stage stage;
     private final Main main;
+    private Stage stage;
+
+    @Inject
+    ChessGameAssesManager manager;
+    @Inject
+    SpriteBatch batch;
+    @Inject
+    ChessImage chessImage;
+    @Inject
+    BitmapFont font;
+    @Inject
+    I18NBundle bundle;
+    @Inject
+    BoardSetting setting;
+    @Inject
+    ChessSound chessSound;
+
     private Animation<Texture> animation;
     private Container<Image> image;
     private float stateTime;
     private Texture opacityBoard;
     private float centerX;
     private float centerY;
-    private SpriteBatch batch;
-    private ChessImage chessImage;
-    private BitmapFont font;
 
     public ChessMatchScreen(Main main) {
         this.main = main;
@@ -41,13 +60,9 @@ public class ChessMatchScreen implements Screen {
 
     @Override
     public void show() {
-        main.manager.loadForChessMathScreen();
-        batch = new SpriteBatch();
-        opacityBoard = main.manager.getOpacityBoard();
-        I18NBundle bundle = main.manager.getBundle("vi");
-        chessImage = new ChessImage(main.manager);
-        font = main.manager.getFont();
         stage = new Stage();
+        manager.loadForChessMathScreen();
+        opacityBoard = manager.getOpacityBoard();
         PlayerInfo info = new PlayerInfo();
         animation = info.animation(chessImage);
         image = info.imageForChessMatchScreen(chessImage.getbBishop(), chessImage);
@@ -64,14 +79,15 @@ public class ChessMatchScreen implements Screen {
         stage.addActor(bottomAppBar.getStack());
 
         ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite) -> {
-            Player.getInstance().setData(name, isWhite);
-            if(!isWhite) {
-                main.setting.setRotate(true);
+            OpponentPlayer.getInstance().setData(name, isWhite);
+            if(isWhite) {
+                setting.setRotate(true);
             }
+            Player.getInstance().setWhite(!isWhite);
             Gdx.app.postRunnable(main::toChessScreen);
         });
 
-        main.socketClient.requestToPlay();
+        main.socketClient.requestToPlayGame(Player.getInstance().getName());
     }
 
     @Override
@@ -111,6 +127,5 @@ public class ChessMatchScreen implements Screen {
     public void dispose() {
         stage.dispose();
         batch.dispose();
-        font.dispose();
     }
 }
