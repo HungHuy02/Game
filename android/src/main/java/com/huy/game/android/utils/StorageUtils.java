@@ -51,19 +51,16 @@ public class StorageUtils {
         if (ourInstance.datastore == null) {
             ourInstance.datastore = new RxPreferenceDataStoreBuilder(context, STORE_NAME).build();
         }
-
         return ourInstance;
     }
 
     public boolean setStringValue(String Key, String value){
         Preferences.Key<String> PREF_KEY = PreferencesKeys.stringKey(Key);
-
         Single<Preferences> updateResult =  datastore.updateDataAsync(prefsIn -> {
             MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
             mutablePreferences.set(PREF_KEY, value);
             return Single.just(mutablePreferences);
         }).onErrorReturnItem(pref_error);
-
         return updateResult.blockingGet() != pref_error;
     }
 
@@ -75,23 +72,39 @@ public class StorageUtils {
 
     public boolean setIntValue(String key, int value) {
         Preferences.Key<Integer> PREF_KEY = PreferencesKeys.intKey(key);
-
         Single<Preferences> updateResult =  datastore.updateDataAsync(prefsIn -> {
             MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
             mutablePreferences.set(PREF_KEY, value);
             return Single.just(mutablePreferences);
         }).onErrorReturnItem(pref_error);
-
         return updateResult.blockingGet() != pref_error;
     }
 
     public int getIntValue(String key) {
         Preferences.Key<Integer> PREF_KEY = PreferencesKeys.intKey(key);
-
         Single<Integer> value = datastore.data()
             .firstOrError()
             .map(prefs -> prefs.get(PREF_KEY))
             .onErrorReturnItem(-1);
+        return value.blockingGet();
+    }
+
+    public boolean setBooleanValue(String key, boolean value) {
+        Preferences.Key<Boolean> PREF_KEY = PreferencesKeys.booleanKey(key);
+        Single<Preferences> updateResult = datastore.updateDataAsync(prefsIn -> {
+            MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+            mutablePreferences.set(PREF_KEY, value);
+            return Single.just(mutablePreferences);
+        }).onErrorReturnItem(pref_error);
+        return updateResult.blockingGet() != pref_error;
+    }
+
+    public boolean getBooleanValue(String key) {
+        Preferences.Key<Boolean> PREF_KEY = PreferencesKeys.booleanKey(key);
+        Single<Boolean> value = datastore.data()
+            .firstOrError()
+            .map(prefs -> prefs.get(PREF_KEY))
+            .onErrorReturnItem(false);
         return value.blockingGet();
     }
 }

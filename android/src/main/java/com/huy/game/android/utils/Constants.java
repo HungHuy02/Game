@@ -13,6 +13,7 @@ public class Constants {
     public static final String DATASTORE_POSITION_2P = "position-2p";
     public static final String DATASTORE_POSITION_AI = "position-ai";
     public static final String DATASTORE_LANGUAGE = "language";
+    public static final String DATASTORE_MUTE = "mute";
     public static final String DATASTORE_ACCESS_TOKEN = "access-token";
     public static final String DATASTORE_REFRESH_TOKEN = "refresh-token";
 

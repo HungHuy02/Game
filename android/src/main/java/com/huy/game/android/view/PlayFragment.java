@@ -21,6 +21,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.huy.game.R;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
@@ -63,6 +64,12 @@ public class PlayFragment extends Fragment {
         newButton();
         userImage();
         settingButton();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupUserImage();
     }
 
     private void setupViewModel(View view) {
@@ -207,8 +214,16 @@ public class PlayFragment extends Fragment {
         });
     }
 
+    private void setupUserImage() {
+        if(UserState.getInstance().getImageUrl() != null) {
+            Glide.with(this)
+                .load(UserState.getInstance().getImageUrl())
+                .into(fragmentPlayBinding.userImage);
+        }
+    }
 
     private void userImage() {
+        setupUserImage();
         fragmentPlayBinding.userImage.setOnClickListener((v) -> {
             PopupWindow popupWindow = new PopupWindow(v.getContext());
             AccountMenuLayoutBinding binding = AccountMenuLayoutBinding.inflate(getLayoutInflater());

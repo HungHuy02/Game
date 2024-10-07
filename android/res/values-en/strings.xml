@@ -47,4 +47,6 @@
     <string name="select_language_text">Select language</string>
     <string name="logout_text">Logout</string>
     <string name="change_text">Change</string>
+    <string name="volume_up_text">Turn on sound</string>
+    <string name="volume_off_text">Sound off</string>
 </resources>

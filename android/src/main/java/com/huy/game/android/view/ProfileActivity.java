@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.huy.game.R;
@@ -45,6 +46,7 @@ public class ProfileActivity extends BaseActivity {
         setupViewModel();
         setupLauncher();
         backButton();
+        setupImage();
         changeImage();
         setName();
         updateButton();
@@ -63,6 +65,8 @@ public class ProfileActivity extends BaseActivity {
         viewModel = new ViewModelProvider(this).get(UserServiceViewModel.class);
     }
 
+
+
     private void setupLauncher() {
         launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -80,6 +84,15 @@ public class ProfileActivity extends BaseActivity {
     private void backButton() {
         binding.backBtn.setOnClickListener((v) -> finish());
     }
+
+    private void setupImage() {
+        if(UserState.getInstance().getImageUrl() != null) {
+            Glide.with(this)
+                .load(UserState.getInstance().getImageUrl())
+                .into(binding.image);
+        }
+    }
+
 
     private void changeImage() {
         binding.imageChange.setOnClickListener((v) -> {
@@ -121,6 +134,8 @@ public class ProfileActivity extends BaseActivity {
                     public void onSuccess(String requestId, Map resultData) {
                         String secureUrl = (String) resultData.get("secure_url");
                         assert secureUrl != null;
+                        user.setImageUrl(secureUrl);
+                        UserState.getInstance().setImageUrl(secureUrl);
                         updateUser(user);
                     }
 

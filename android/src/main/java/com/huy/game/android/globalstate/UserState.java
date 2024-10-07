@@ -5,7 +5,6 @@ public class UserState {
     private static UserState Instance;
     private String name;
     private String email;
-    private String language;
     private String imageUrl;
 
     private UserState() {
@@ -19,9 +18,10 @@ public class UserState {
         return Instance;
     }
 
-    public void setData(String name, String email) {
+    public void setData(String name, String email, String imageUrl) {
         this.name = name;
         this.email = email;
+        this.imageUrl = imageUrl;
     }
 
     public String getName() {
@@ -38,14 +38,6 @@ public class UserState {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
     }
 
     public String getImageUrl() {

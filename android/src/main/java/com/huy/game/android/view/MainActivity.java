@@ -12,6 +12,7 @@ import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.User;
 import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
+import com.huy.game.chess.manager.GameSetting;
 import com.huy.game.databinding.ActivityMainBinding;
 
 import retrofit2.Call;
@@ -39,7 +40,7 @@ public class MainActivity extends BaseActivity {
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
                     assert response.body() != null;
-                    UserState.getInstance().setData(response.body().getName(), response.body().getEmail());
+                    UserState.getInstance().setData(response.body().getName(), response.body().getEmail(), response.body().getImageUrl());
                 }else if(response.code() != 401){
                     Toast.makeText(MainActivity.this, "Lỗi không xác định: " + response.code(), Toast.LENGTH_SHORT).show();
                 }

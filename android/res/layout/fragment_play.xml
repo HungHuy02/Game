@@ -23,7 +23,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/person_24px"
-            app:tint="@color/black"
             android:scaleType="centerCrop"/>
 
         <com.google.android.material.imageview.ShapeableImageView

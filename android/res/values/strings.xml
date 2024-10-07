@@ -54,4 +54,6 @@
     <string name="select_language_text">Chọn ngôn ngữ</string>
     <string name="logout_text">Đăng xuất</string>
     <string name="change_text">Sửa</string>
+    <string name="volume_up_text">Bật âm thanh</string>
+    <string name="volume_off_text">Tắt âm thanh</string>
 </resources>
