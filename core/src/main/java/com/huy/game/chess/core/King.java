@@ -1,6 +1,8 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
@@ -12,6 +14,10 @@ public class King extends Piece {
     private boolean isSafe = true;
     private boolean isCastling = false;
     private boolean isCalculate = false;
+
+    public boolean isHasMove() {
+        return hasMove;
+    }
 
     public void setHasMove() {
         hasMove = true;

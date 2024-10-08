@@ -18,6 +18,7 @@ public class Board {
     private Spot wKingSpot;
     private Spot bKingSpot;
     private Spot promotingSpot;
+    private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
     private final List<String> movedList = new ArrayList<>();
@@ -74,6 +75,14 @@ public class Board {
 
     public void setPromotingSpot(Spot promotingSpot) {
         this.promotingSpot = promotingSpot;
+    }
+
+    public Spot getPossibleEnPassantTargetsSpot() {
+        return possibleEnPassantTargetsSpot;
+    }
+
+    public void setPossibleEnPassantTargetsSpot(Spot possibleEnPassantTargetsSpot) {
+        this.possibleEnPassantTargetsSpot = possibleEnPassantTargetsSpot;
     }
 
     public void setEnd(){

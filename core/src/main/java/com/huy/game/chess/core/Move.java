@@ -1,5 +1,7 @@
 package com.huy.game.chess.core;
 
+import com.huy.game.chess.manager.ChessGameManager;
+
 public class Move {
     private Spot start;
     private Spot end;
@@ -21,11 +23,12 @@ public class Move {
         return end;
     }
 
-    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history) {
+    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager){
         history.addStateHash(hashing.makeAMove(start, end));
         String text = board.addMove(start, end);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
+        history.addFEN(board, end.getPiece().isWhite(), manager);
         start.setShowColor(true);
         end.setShowColor(true);
         return text;
