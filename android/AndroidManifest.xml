@@ -10,6 +10,7 @@
     <application
         android:name=".android.base.Application"
         android:enableOnBackInvokedCallback="true"
+        android:extractNativeLibs="true"
         android:allowBackup="true"
         android:appCategory="game"
         android:fullBackupContent="true"

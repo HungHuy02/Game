@@ -12,7 +12,6 @@ import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.User;
 import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
-import com.huy.game.chess.manager.GameSetting;
 import com.huy.game.databinding.ActivityMainBinding;
 
 import retrofit2.Call;
