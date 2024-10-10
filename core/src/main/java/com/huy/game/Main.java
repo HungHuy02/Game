@@ -9,6 +9,7 @@ import com.huy.game.chess.component.DaggerChessGameComponent;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.interfaces.Stockfish;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.interfaces.SocketClient;
 
@@ -19,6 +20,7 @@ public class Main extends Game {
 
     private ChessGameComponent component;
     public SocketClient socketClient;
+    public Stockfish stockfish = null;
 
     @Inject
     ChessGameAssesManager manager;
@@ -31,7 +33,6 @@ public class Main extends Game {
 
     private ChessMode mode;
 
-
     public Main(ChessMode mode) {
         this.mode = mode;
     }
@@ -42,6 +43,11 @@ public class Main extends Game {
         client.connect();
     }
 
+    public Main(ChessMode mode, Stockfish stockfish) {
+        this.mode = mode;
+        this.stockfish = stockfish;
+    }
+
     public ChessMode getMode() {
         return mode;
     }
@@ -50,6 +56,9 @@ public class Main extends Game {
     public void create() {
         component = DaggerChessGameComponent.create();
         component.inject(this);
+        new Thread(() -> {
+            stockfish.init();
+        }).start();
         manager.loadAll();
         setSetting();
         switch (mode) {

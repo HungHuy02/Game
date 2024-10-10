@@ -39,12 +39,14 @@ public class Move {
         board.setSpot(start.getX(), start.getY(), null);
     }
 
-    public String makeAIMove(Board board) {
+    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager) {
+        history.addStateHash(hashing.makeAMove(start, end));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
         String text = board.addMove(startSpot, board.getSpot(end.getX(), end.getY()));
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
         startSpot.setShowColor(true);
         board.setSpot(start.getX(), start.getY(), null);
+        history.addFEN(board, end.getPiece().isWhite(), manager);
         return text;
     }
 

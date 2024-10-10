@@ -22,6 +22,14 @@ public class Player {
         this.isWhite = isWhite;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setWhite(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
+
     public String getName() {
         return name;
     }

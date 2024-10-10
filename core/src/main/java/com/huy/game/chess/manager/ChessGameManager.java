@@ -2,9 +2,10 @@ package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
-import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.core.Piece;
+import com.huy.game.chess.enums.Difficulty;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.interfaces.Stockfish;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,49 +18,28 @@ public class ChessGameManager {
     private Timer timer;
     private Map<String, Integer> timeList;
 
-    public ChessGameManager(ChessMode mode) {
-        switch (mode) {
-            case TWO_PERSONS:
-                player1 = new ChessPlayer(true);
-                player2 = new ChessPlayer(false);
-                break;
-            case AI:
-                player1 = new ChessPlayer(true);
-                player2 = new ChessAIPlayer(false);
-                break;
-            case ONLINE:
-                player1 = new ChessPlayer(true);
-                player2 = new ChessOnlinePlayer(false);
-                break;
-        }
-
-        currentPlayer = player1;
-        timer = new Timer();
-        timeList = new HashMap<>();
-        timeList.put("play1", 0);
-        timeList.put("play2", 0);
-        timeList.put("1", 500);
-        timeList.put("2", 500);
-        handleTimer("1");
+    public ChessGameManager(ChessMode mode, boolean isWhite, Stockfish stockfish) {
+        setupPlayer(mode,isWhite, stockfish);
+        setupTime();
     }
 
-    public ChessGameManager(ChessMode mode, boolean isWhite) {
+    private void setupPlayer(ChessMode mode, boolean isWhite, Stockfish stockfish) {
+        player1 = new ChessPlayer(isWhite);
         switch (mode) {
-            case TWO_PERSONS:
-                player1 = new ChessPlayer(true);
-                player2 = new ChessPlayer(false);
-                break;
-            case AI:
-                player1 = new ChessPlayer(true);
-                player2 = new ChessAIPlayer(false);
-                break;
-            case ONLINE:
-                player1 = new ChessPlayer(isWhite);
-                player2 = new ChessOnlinePlayer(!isWhite);
-                break;
+            case TWO_PERSONS -> player2 = new ChessPlayer(!isWhite);
+            case AI -> {
+                switch (mode.getDifficulty()) {
+                    case EASY -> player2 = new ChessEasyAIPlayer(!isWhite);
+                    case HARD -> player2 = new ChessHardAIPlayer(!isWhite, stockfish);
+                }
+            }
+            case ONLINE -> player2 = new ChessOnlinePlayer(!isWhite);
         }
-
         currentPlayer = isWhite ? player1 : player2;
+    }
+
+
+    private void setupTime() {
         timer = new Timer();
         timeList = new HashMap<>();
         timeList.put("play1", 0);

@@ -17,7 +17,9 @@ import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayWithAISetupViewModel;
+import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.Difficulty;
 import com.huy.game.chess.enums.PieceColor;
 import com.huy.game.chess.enums.TimeType;
 import com.huy.game.databinding.ActivityPlayWithAiSetUpBinding;
@@ -139,7 +141,9 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
     private void playButton() {
         binding.btnPlay.setOnClickListener((v) -> {
             Intent intent = new Intent(this, AndroidLauncher.class);
-            intent.putExtra(Constants.BUNDLE_MODE, ChessMode.AI.toString());
+            ChessMode chessMode = ChessMode.AI;
+            chessMode.setDifficulty(Difficulty.HARD);
+            intent.putExtra(Constants.BUNDLE_MODE, chessMode.toString());
             int positionTime = Optional.ofNullable(viewModel.getPosition().getValue()).orElse(0);
             TimeType type = switch (positionTime) {
                 case 1 -> TimeType.ONE_MINUTE;

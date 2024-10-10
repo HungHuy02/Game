@@ -92,4 +92,8 @@ public class GameHistory {
     public void addBoard(Board board) {
         boardList.add(board.cloneBoard());
     }
+
+    public String getNewestFEN() {
+        return fenList.get(fenList.size() - 1);
+    }
 }

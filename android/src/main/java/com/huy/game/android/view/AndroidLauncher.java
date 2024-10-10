@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.huy.game.Main;
+import com.huy.game.android.stockfish.StockfishAndroid;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceColor;
@@ -31,7 +32,11 @@ public class AndroidLauncher extends AndroidApplication {
                 String player2Name = intent.getStringExtra(Constants.BUNDLE_PLAYER2_NAME);
                 Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE);
                 OpponentPlayer.getInstance().setData(player2Name, !(player1Color == PieceColor.WHITE));
-                initialize(new Main(mode), configuration);
+                if(mode == ChessMode.AI) {
+                    initialize(new Main(mode, new StockfishAndroid(getApplicationContext())), configuration);
+                }else {
+                    initialize(new Main(mode), configuration);
+                }
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);

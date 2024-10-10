@@ -30,12 +30,12 @@ android {
     versionCode 1
     versionName "1.0"
     multiDexEnabled true
-    externalNativeBuild {
-      cmake {
-        targets 'stockfish'
-        cppFlags ''
-      }
-    }
+//    externalNativeBuild {
+//      cmake {
+//        targets 'stockfish'
+//        cppFlags ''
+//      }
+//    }
   }
   compileOptions {
     sourceCompatibility "17"
@@ -55,12 +55,12 @@ android {
   dataBinding {
     enabled = true
   }
-  externalNativeBuild {
-    cmake {
-      path file('src/main/cpp/CMakeLists.txt')
-      version '3.22.1'
-    }
-  }
+//  externalNativeBuild {
+//    cmake {
+//      path file('src/main/cpp/CMakeLists.txt')
+//      version '3.22.1'
+//    }
+//  }
 }
 
 repositories {
