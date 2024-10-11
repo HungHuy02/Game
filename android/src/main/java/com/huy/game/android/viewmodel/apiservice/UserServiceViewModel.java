@@ -3,6 +3,7 @@ package com.huy.game.android.viewmodel.apiservice;
 import androidx.lifecycle.ViewModel;
 
 import com.huy.game.android.models.User;
+import com.huy.game.android.models.response.DeleteImageResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.network.retrofit.repository.UserRepository;
 
@@ -26,5 +27,9 @@ public class UserServiceViewModel extends ViewModel {
 
     public void deleteUser(Callback<ScalarBooleanResponse> callback) {
         repository.deleteUser(callback);
+    }
+
+    public void deleteImage(Callback<DeleteImageResponse> callback) {
+        repository.deleteImage(callback);
     }
 }

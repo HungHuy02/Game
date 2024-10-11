@@ -36,9 +36,10 @@ public class Cloudinary {
         }
     }
 
-    public void uploadImage(Uri uri, UploadCallback callback) {
+    public void uploadImage(Uri uri, String id, UploadCallback callback) {
         MediaManager.get().upload(uri)
             .unsigned("mgljwhjt")
+            .option("public_id", id)
 //          .option("moderation", "aws_rek")
             .callback(callback)
             .dispatch();

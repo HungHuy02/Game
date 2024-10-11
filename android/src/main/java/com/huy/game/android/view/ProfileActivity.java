@@ -18,6 +18,7 @@ import com.huy.game.R;
 import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.User;
+import com.huy.game.android.models.response.DeleteImageResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.network.cloudinary.Cloudinary;
 import com.huy.game.android.viewmodel.ProfileActivityViewModel;
@@ -118,41 +119,62 @@ public class ProfileActivity extends BaseActivity {
                 updateName = true;
             }
             if(profileActivityViewModel.getImageUri().getValue() != null) {
-                Cloudinary.getInstance().init(ProfileActivity.this);
-                Cloudinary.getInstance().uploadImage(profileActivityViewModel.getImageUri().getValue() ,new UploadCallback() {
-                    @Override
-                    public void onStart(String requestId) {
-
-                    }
-
-                    @Override
-                    public void onProgress(String requestId, long bytes, long totalBytes) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(String requestId, Map resultData) {
-                        String secureUrl = (String) resultData.get("secure_url");
-                        assert secureUrl != null;
-                        user.setImageUrl(secureUrl);
-                        UserState.getInstance().setImageUrl(secureUrl);
-                        updateUser(user);
-                    }
-
-                    @Override
-                    public void onError(String requestId, ErrorInfo error) {
-                        Toast.makeText(ProfileActivity.this, error.getDescription(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onReschedule(String requestId, ErrorInfo error) {
-
-                    }
-                });
+                deleteImage(user);
             }else {
                 if(updateName) {
                     updateUser(user);
                 }
+            }
+        });
+    }
+
+    private void deleteImage(User user) {
+        viewModel.deleteImage(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<DeleteImageResponse> call, @NonNull Response<DeleteImageResponse> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    uploadImage(user, response.body().getId().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<DeleteImageResponse> call, @NonNull Throwable throwable) {
+                Toast.makeText(ProfileActivity.this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void uploadImage(User user, String id) {
+        Cloudinary.getInstance().init(ProfileActivity.this);
+        Cloudinary.getInstance().uploadImage(profileActivityViewModel.getImageUri().getValue() , id,new UploadCallback() {
+            @Override
+            public void onStart(String requestId) {
+
+            }
+
+            @Override
+            public void onProgress(String requestId, long bytes, long totalBytes) {
+
+            }
+
+            @Override
+            public void onSuccess(String requestId, Map resultData) {
+                String secureUrl = (String) resultData.get("secure_url");
+                assert secureUrl != null;
+                user.setImageUrl(secureUrl);
+                UserState.getInstance().setImageUrl(secureUrl);
+                updateUser(user);
+            }
+
+            @Override
+            public void onError(String requestId, ErrorInfo error) {
+                Toast.makeText(ProfileActivity.this, error.getDescription(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onReschedule(String requestId, ErrorInfo error) {
+
             }
         });
     }

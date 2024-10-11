@@ -39,8 +39,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
-                    assert response.body() != null;
-                    UserState.getInstance().setData(response.body().getName(), response.body().getEmail(), response.body().getImageUrl());
+                    User user = response.body();
+                    assert user != null;
+                    UserState.getInstance().setName(user.getName());
+                    UserState.getInstance().setEmail(user.getEmail());
+                    if (user.getImageUrl() != null) {
+                        UserState.getInstance().setImageUrl(user.getImageUrl());
+                    }
                 }else if(response.code() != 401){
                     Toast.makeText(MainActivity.this, "Lỗi không xác định: " + response.code(), Toast.LENGTH_SHORT).show();
                 }

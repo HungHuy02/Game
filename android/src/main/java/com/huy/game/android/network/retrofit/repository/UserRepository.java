@@ -1,6 +1,7 @@
 package com.huy.game.android.network.retrofit.repository;
 
 import com.huy.game.android.models.User;
+import com.huy.game.android.models.response.DeleteImageResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.network.retrofit.RetrofitClient;
 import com.huy.game.android.network.retrofit.api.UserApi;
@@ -26,5 +27,9 @@ public class UserRepository {
 
     public void deleteUser(Callback<ScalarBooleanResponse> callback) {
         userApi.delete().enqueue(callback);
+    }
+
+    public void deleteImage(Callback<DeleteImageResponse> callback) {
+        userApi.deleteImage().enqueue(callback);
     }
 }

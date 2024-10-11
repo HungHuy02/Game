@@ -1,6 +1,7 @@
 package com.huy.game.android.network.retrofit.api;
 
 import com.huy.game.android.models.User;
+import com.huy.game.android.models.response.DeleteImageResponse;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 
 import retrofit2.Call;
@@ -21,4 +22,7 @@ public interface UserApi {
 
     @POST("/user/delete-user")
     Call<ScalarBooleanResponse> delete();
+
+    @POST("/user/delete-image")
+    Call<DeleteImageResponse> deleteImage();
 }
