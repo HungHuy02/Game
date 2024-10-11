@@ -86,7 +86,8 @@ const login = asyncHandler(async (req, res) => {
             userData: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                imageUrl: user.image_url
             }
         });
     }else {
