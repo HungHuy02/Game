@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const cloudinary = require("../../config/cloudinaryConfig");
+const redis = require('../../utils/redisRankUtil');
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const { id } = req.user;
@@ -46,12 +47,16 @@ const deleteUserImage = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-    const { name, email, imageUrl} = req.body;
+    const { name, email, imageUrl, score} = req.body;
     const { id } = req.user;
     const updateData = {};
     if(name) updateData.name = name;
     if(email) updateData.email = email;
     if(imageUrl) updateData.image_url = imageUrl; 
+    if(score) {
+        updateData.elo = elo;
+        await redis.updateUserScore(id, elo, name);
+    }
     if (Object.keys(updateData).length === 0) {
         return res.status(400).json({
             success: false,
@@ -101,7 +106,7 @@ const logout = asyncHandler(async (req, res) => {
         success: true,
         message: "Logout successfully"
     });
-})
+});
 
 
 module.exports = {

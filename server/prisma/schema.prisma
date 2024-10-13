@@ -19,5 +19,6 @@ model User {
   email   String  @unique
   image_url String?
   password String
+  elo Int
   refresh_token String?
 }

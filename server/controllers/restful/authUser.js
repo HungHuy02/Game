@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require('bcrypt');
 const jwtUtil = require('../../utils/jwtUtil');
 const jwt = require("jsonwebtoken");
+const redis = require('../../utils/redisRankUtil');
 
 const checkExistingUser = asyncHandler(async (req, res) => {
     const { email } = req.query;
@@ -35,14 +36,17 @@ const register = asyncHandler(async (req, res) => {
         });
     }else {
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt)
+        const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = await prisma.user.create({
             data: {
                 name: name,
                 email: email,
                 password: hashedPassword,
+                elo: 400,
             }
         });
+
+        await redis.updateUserScore(newUser.id, 400, name);
     
         return res.status(200).json({
             success: newUser ? true : false,
