@@ -10,11 +10,14 @@ public class User {
     private String email;
     @SerializedName("imageUrl")
     private String imageUrl;
+    @SerializedName("elo")
+    private int elo;
 
-    public User(String name, String email, String imageUrl) {
+    public User(String name, String email, String imageUrl, int elo) {
         this.name = name;
         this.email = email;
         this.imageUrl = imageUrl;
+        this.elo = elo;
     }
 
     public User() {}
@@ -40,5 +43,13 @@ public class User {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public int getElo() {
+        return elo;
+    }
+
+    public void setElo(int elo) {
+        this.elo = elo;
     }
 }

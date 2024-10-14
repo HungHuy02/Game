@@ -68,7 +68,7 @@ public class LoginActivity extends BaseActivity {
                     storageUtils.setStringValue(Constants.DATASTORE_ACCESS_TOKEN, loginResponse.getAccessToken());
                     storageUtils.setStringValue(Constants.DATASTORE_REFRESH_TOKEN, loginResponse.getRefreshToken());
                     User user = loginResponse.getUser();
-                    UserState.getInstance().setData(user.getName(), user.getEmail(), user.getImageUrl());
+                    UserState.getInstance().setData(user.getName(), user.getEmail(), user.getImageUrl(), user.getElo());
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);

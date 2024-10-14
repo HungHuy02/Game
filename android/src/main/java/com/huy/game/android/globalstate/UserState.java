@@ -6,6 +6,7 @@ public class UserState {
     private String name;
     private String email;
     private String imageUrl;
+    private int elo;
 
     private UserState() {
 
@@ -18,10 +19,11 @@ public class UserState {
         return Instance;
     }
 
-    public void setData(String name, String email, String imageUrl) {
+    public void setData(String name, String email, String imageUrl, int elo) {
         this.name = name;
         this.email = email;
         this.imageUrl = imageUrl;
+        this.elo = elo;
     }
 
     public String getName() {
@@ -46,5 +48,17 @@ public class UserState {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public static void setInstance(UserState instance) {
+        Instance = instance;
+    }
+
+    public int getElo() {
+        return elo;
+    }
+
+    public void setElo(int elo) {
+        this.elo = elo;
     }
 }

@@ -56,4 +56,6 @@
     <string name="change_text">Sửa</string>
     <string name="volume_up_text">Bật âm thanh</string>
     <string name="volume_off_text">Tắt âm thanh</string>
+    <string name="ranking_text" translatable="false">%1$d.</string>
+    <string name="elo_text" translatable="false">%1$d</string>
 </resources>

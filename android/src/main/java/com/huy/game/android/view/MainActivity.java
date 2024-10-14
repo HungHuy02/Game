@@ -1,7 +1,6 @@
 package com.huy.game.android.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +45,7 @@ public class MainActivity extends BaseActivity {
                     if (user.getImageUrl() != null) {
                         UserState.getInstance().setImageUrl(user.getImageUrl());
                     }
+                    UserState.getInstance().setElo(user.getElo());
                 }else if(response.code() != 401){
                     Toast.makeText(MainActivity.this, "Lỗi không xác định: " + response.code(), Toast.LENGTH_SHORT).show();
                 }

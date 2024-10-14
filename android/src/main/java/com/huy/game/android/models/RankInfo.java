@@ -6,6 +6,8 @@ public class RankInfo {
 
     @SerializedName("id")
     private long id;
+    @SerializedName("ranking")
+    private int rank;
     @SerializedName("name")
     private String name;
     @SerializedName("score")
@@ -13,6 +15,10 @@ public class RankInfo {
 
     public long getId() {
         return id;
+    }
+
+    public int getRank() {
+        return rank;
     }
 
     public String getName() {

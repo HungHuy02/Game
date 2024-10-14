@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.huy.game.R;
 import com.huy.game.android.adapter.RecyclerViewAdapter;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.RankInfo;
 import com.huy.game.android.models.response.GetAllRankResponse;
 import com.huy.game.android.viewmodel.apiservice.RankServiceViewModel;
@@ -29,7 +31,6 @@ public class RankFragment extends Fragment {
 
     private FragmentRankBinding fragmentRankBinding;
     private RankServiceViewModel viewModel;
-    private RecyclerViewAdapter adapter;
 
     @Nullable
     @Override
@@ -41,17 +42,8 @@ public class RankFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupRecyclerView();
         setupViewModel();
     }
-
-    private void setupRecyclerView() {
-        adapter = new RecyclerViewAdapter();
-        RecyclerView recyclerView = fragmentRankBinding.listView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
-    }
-
 
     private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(RankServiceViewModel.class);
@@ -61,17 +53,29 @@ public class RankFragment extends Fragment {
                 if(response.isSuccessful()) {
                     assert response.body() != null;
                     List<RankInfo> list = response.body().getList();
-                    adapter.setList(list);
-                    adapter.notifyDataSetChanged();
+                    setupRecyclerView(list);
+                    setupCurrentRank(response.body().getRank());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GetAllRankResponse> call, @NonNull Throwable throwable) {
-                Toast.makeText(getContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void setupRecyclerView(List<RankInfo> list) {
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter();
+        adapter.setList(list);
+        RecyclerView recyclerView = fragmentRankBinding.listView;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+    }
 
+    private void setupCurrentRank(int rank) {
+        fragmentRankBinding.tvIndex.setText(String.format(getResources().getString(R.string.ranking_text), rank));
+        fragmentRankBinding.tvName.setText(UserState.getInstance().getName());
+        fragmentRankBinding.tvScore.setText(String.format(getResources().getString(R.string.elo_text), UserState.getInstance().getElo()));
+    }
 }

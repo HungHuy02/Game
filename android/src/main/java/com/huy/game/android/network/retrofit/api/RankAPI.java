@@ -7,6 +7,6 @@ import retrofit2.http.GET;
 
 public interface RankAPI {
 
-    @GET("/rank/get-rank")
+    @GET("/rank/get-all-rank-user")
     Call<GetAllRankResponse> getAllRank();
 }
