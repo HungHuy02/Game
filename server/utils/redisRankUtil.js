@@ -17,7 +17,9 @@ const getUserRanking = async (userId) => {
 const getRank = async (limit) => {
     try {
         const result = [];
-        const userRankingSet = await redisClient.zRangeWithScores(REDIS_KEY, 0, limit);
+        const userRankingSet = await redisClient.ZRANGE_WITHSCORES(REDIS_KEY, 0, limit, {
+            REV: true,
+          });
         const topUserScore = [];
         const topUserId = [];
         userRankingSet.forEach((value) => {

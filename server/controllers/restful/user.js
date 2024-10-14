@@ -15,6 +15,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             imageUrl: user.image_url,
+            elo: user.elo,
         });
     }else {
         res.status(400);
@@ -47,13 +48,13 @@ const deleteUserImage = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-    const { name, email, imageUrl, score} = req.body;
+    const { name, email, imageUrl, elo} = req.body;
     const { id } = req.user;
     const updateData = {};
     if(name) updateData.name = name;
     if(email) updateData.email = email;
     if(imageUrl) updateData.image_url = imageUrl; 
-    if(score) {
+    if(elo) {
         updateData.elo = elo;
         await redis.updateUserScore(id, elo, name);
     }
