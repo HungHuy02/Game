@@ -30,6 +30,7 @@ import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.manager.OpponentPlayer;
 import com.huy.game.chess.manager.Player;
 import com.huy.game.chess.ui.BottomAppBar;
+import com.huy.game.chess.ui.CheckPopup;
 import com.huy.game.chess.ui.Colors;
 import com.huy.game.chess.ui.EndGamePopup;
 import com.huy.game.chess.ui.NotationHistoryScrollPane;
@@ -84,8 +85,9 @@ public class ChessScreen extends InputAdapter implements Screen {
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
-        OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager);
-        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), stage, bundle);
+        CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage);
+        OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage);
+        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(),stage, bundle);
         selectedSpot = null;
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
@@ -101,7 +103,6 @@ public class ChessScreen extends InputAdapter implements Screen {
         multiplexer.addProcessor(this);
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
-
         if(main.getMode() == ChessMode.ONLINE) {
             ChessGameOnlineEvent.getInstance().setPlayerMoveListener((from, to) -> {
                 Spot start = board.getSpot(from.charAt(0) - '0', from.charAt(1) - '0');
