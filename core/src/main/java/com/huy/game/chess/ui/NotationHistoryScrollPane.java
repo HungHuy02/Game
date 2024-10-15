@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -12,7 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.huy.game.chess.core.FEN;
 import com.huy.game.chess.manager.ChessGameAssesManager;
+import com.huy.game.chess.manager.ChessGameHistoryManager;
+import com.huy.game.chess.manager.ChessImage;
 
 public class NotationHistoryScrollPane {
 
@@ -37,7 +39,7 @@ public class NotationHistoryScrollPane {
         scrollPane.setPosition(0, Gdx.graphics.getHeight() - 150);
     }
 
-    public void addValue(String value, BitmapFont font, ChessGameAssesManager manager) {
+    public void addValue(String value, BitmapFont font, ChessGameAssesManager manager, ChessGameHistoryManager historyManager, ChessImage chessImage) {
         if(index >= 1) {
             Actor child = horizontalGroup.getChild(index);
             if(child instanceof TextButton) {
@@ -75,10 +77,12 @@ public class NotationHistoryScrollPane {
                         ((TextButton) child).getStyle().up = null;
                     }
                 }
+                historyManager.setRePlay(true);
                 index = horizontalGroup.getChildren().indexOf(button, true);
+                historyManager.setBoard(FEN.fenToBoard(historyManager.getHistory().getFEN(index), chessImage));
                 Actor child = horizontalGroup.getChild(index);
                 if(child instanceof  TextButton) {
-                    ((TextButton) child).getStyle().up = skin.getDrawable("button-normal");
+                    button.getStyle().up = skin.getDrawable("button-normal");
                 }
             }
         });

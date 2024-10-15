@@ -2,6 +2,7 @@ package com.huy.game.chess.core;
 
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.manager.ChessGameManager;
+import com.huy.game.chess.manager.ChessImage;
 
 public class FEN {
 
@@ -100,6 +101,142 @@ public class FEN {
     private static void fullMoveNumber(StringBuilder builder, ChessGameManager manager) {
         builder.append(' ');
         builder.append(manager.getCurrentPlayer().getTurn());
+    }
+
+    public static Board fenToBoard(String fen, ChessImage chessImage) {
+        Board board = new Board();
+        String[] parts = fen.split(" ");
+        board.setSpots(positionToSpots(parts[0], chessImage, board));
+        handleMoveNext(parts[1]);
+        handleCastlingRights(parts[2], board.getSpots());
+        handlePossibleEnPassantTargets(board, board.getSpots(), parts[3]);
+        handleHalfmoveClock(parts[4]);
+        handleFullMoveNumber(parts[5]);
+        return board;
+    }
+
+    private static Spot[][] positionToSpots(String position, ChessImage chessImage, Board board) {
+        Spot[][] spots = new Spot[8][8];
+        String[] rows = position.split("/");
+        for(int i = 0; i <= 7; i++) {
+            int index = 0;
+            for(int j = 0; j < rows[i].length(); j++) {
+                char c = rows[i].charAt(j);
+                int value = checkIndex(c);
+                int x = 7 - i;
+                if(value == 0) {
+                    spots[x][index] = checkChar(c, x, index, chessImage, board);
+                    index++;
+                }else {
+                    for(int k = index; k < index + value; k++) {
+                        spots[x][k] = new Spot(null, x, k);
+                    }
+                    index += value;
+                }
+            }
+        }
+        return spots;
+    }
+
+    private static int checkIndex(char c) {
+        switch (c) {
+            case '1' -> {
+                return 1;
+            }
+            case '2' -> {
+                return 2;
+            }
+            case '3' -> {
+                return 3;
+            }
+            case '4' -> {
+                return 4;
+            }
+            case '5' -> {
+                return 5;
+            }
+            case '6' -> {
+                return 6;
+            }
+            case '7' -> {
+                return 7;
+            }
+            case '8' -> {
+                return 8;
+            }
+        }
+        return 0;
+    }
+
+    private static Spot checkChar(char c, int x, int y, ChessImage chessImage, Board board) {
+        boolean isKingSpot = false;
+        Piece piece = switch (c) {
+            case 'b' -> new Bishop(false, chessImage.getbBishop());
+            case 'k' -> {
+                isKingSpot = true;
+                yield  new King(false, chessImage.getbKing());
+            }
+            case 'n' -> new Knight(false, chessImage.getbKnight());
+            case 'r' -> new Rook(false, chessImage.getbRook());
+            case 'p' -> new Pawn(false, chessImage.getbPawn());
+            case 'q' -> new Queen(false, chessImage.getbQueen());
+            case 'B' -> new Bishop(true, chessImage.getwBishop());
+            case 'K' -> {
+                isKingSpot = true;
+                yield  new King(true, chessImage.getwKing());
+            }
+            case 'N' -> new Knight(true, chessImage.getwKnight());
+            case 'R' -> new Rook(true, chessImage.getwRock());
+            case 'P' -> new Pawn(true, chessImage.getwPawn());
+            case 'Q' -> new Queen(true, chessImage.getwQueen());
+            default -> null;
+        };
+        Spot spot = new Spot(piece, x, y);
+        if(isKingSpot) {
+            if (piece.isWhite()) {
+                board.setwKingSpot(spot);
+            }else {
+                board.setbKingSpot(spot);
+            }
+        }
+        return spot;
+    }
+
+    private static boolean handleMoveNext(String moveNext) {
+        return moveNext.equals("w") ? true : false;
+    }
+
+    private static void handleCastlingRights(String castlingRights, Spot[][] spots) {
+//        if(!castlingRights.equals("-")) {
+//            for(int i = 0; i < castlingRights.length(); i++) {
+//                switch (castlingRights.charAt(i)) {
+//                    case 'k' ->
+//                    case 'q' ->
+//                    case 'K' ->
+//                    case 'Q' ->
+//                }
+//            }
+//        }
+    }
+
+    private static void handlePossibleEnPassantTargets(Board board, Spot[][] spots, String possibleEnPassantTargets) {
+        if (!possibleEnPassantTargets.equals("-")) {
+            int x = possibleEnPassantTargets.charAt(0) - '1';
+            int y = possibleEnPassantTargets.charAt(1) - 'a';
+            if(spots[x][y].getPiece() instanceof Pawn) {
+//                spots[x][y].getPiece().
+                board.setPossibleEnPassantTargetsSpot(spots[x][y]);
+            }
+        }
+
+    }
+
+    private static int handleHalfmoveClock(String halfmoveClock) {
+        return Integer.parseInt(halfmoveClock);
+    }
+
+    private static int handleFullMoveNumber(String fullMoveNumber) {
+        return Integer.parseInt(fullMoveNumber);
     }
 
 }

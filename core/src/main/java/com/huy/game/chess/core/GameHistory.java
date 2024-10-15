@@ -82,11 +82,7 @@ public class GameHistory {
     }
 
     public String getMove(int index) {
-        if(index % 3 == 1) {
-            return movedList.get(index + index / 3);
-        }else {
-            return movedList.get(index + index / 3 + 1);
-        }
+        return movedList.get(index - index / 3 - 1);
     }
 
     public void addBoard(Board board) {
@@ -95,5 +91,9 @@ public class GameHistory {
 
     public String getNewestFEN() {
         return fenList.get(fenList.size() - 1);
+    }
+
+    public String getFEN(int index) {
+        return fenList.get(index - index / 3 - 1);
     }
 }
