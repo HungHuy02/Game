@@ -3,8 +3,8 @@ package com.huy.game.chess.manager;
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.Piece;
-import com.huy.game.chess.enums.Difficulty;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
 
 import java.util.HashMap;
@@ -17,35 +17,68 @@ public class ChessGameManager {
     private ChessPlayer currentPlayer;
     private Timer timer;
     private Map<String, Integer> timeList;
+    private int plusTime;
 
-    public ChessGameManager(ChessMode mode, boolean isWhite, Stockfish stockfish) {
-        setupPlayer(mode,isWhite, stockfish);
-        setupTime();
+    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish) {
+        int time = handleTime(timeType);
+        setupPlayer(mode,isWhite, stockfish, time);
+        setupTime(time);
     }
 
-    private void setupPlayer(ChessMode mode, boolean isWhite, Stockfish stockfish) {
-        player1 = new ChessPlayer(isWhite);
+    private int handleTime(TimeType timeType) {
+        return switch (timeType) {
+            case ONE_MINUTE -> 60;
+            case ONE_MINUTE_PLUS_ONE -> {
+                plusTime = 1;
+                yield 60;
+            }
+            case TWO_MINUTE_PLUS_ONE -> {
+                plusTime = 1;
+                yield 120;
+            }
+            case THREE_MINUTE -> 180;
+            case THREE_MINUTE_PLUS_TWO -> {
+                plusTime = 2;
+                yield  180;
+            }
+            case FIVE_MINUTE -> 300;
+            case FIVE_MINUTE_PLUS_FIVE -> {
+                plusTime = 5;
+                yield 300;
+            }
+            case TEN_MINUTE -> 600;
+            case FIFTEEN_MINUTE_PLUS_TEN -> {
+                plusTime = 10;
+                yield  900;
+            }
+            case THIRTY_MINUTE -> 1800;
+            case NO_TIME -> 0;
+        };
+    }
+
+    private void setupPlayer(ChessMode mode, boolean isWhite, Stockfish stockfish, int time) {
+        player1 = new ChessPlayer(isWhite, time);
         switch (mode) {
-            case TWO_PERSONS -> player2 = new ChessPlayer(!isWhite);
+            case TWO_PERSONS -> player2 = new ChessPlayer(!isWhite, time);
             case AI -> {
                 switch (mode.getDifficulty()) {
-                    case EASY -> player2 = new ChessEasyAIPlayer(!isWhite);
-                    case HARD -> player2 = new ChessHardAIPlayer(!isWhite, stockfish);
+                    case EASY -> player2 = new ChessEasyAIPlayer(!isWhite, time);
+                    case HARD -> player2 = new ChessHardAIPlayer(!isWhite, time, stockfish);
                 }
             }
-            case ONLINE -> player2 = new ChessOnlinePlayer(!isWhite);
+            case ONLINE -> player2 = new ChessOnlinePlayer(!isWhite, time);
         }
         currentPlayer = isWhite ? player1 : player2;
     }
 
 
-    private void setupTime() {
+    private void setupTime(int time) {
         timer = new Timer();
         timeList = new HashMap<>();
         timeList.put("play1", 0);
         timeList.put("play2", 0);
-        timeList.put("1", 500);
-        timeList.put("2", 500);
+        timeList.put("1", time);
+        timeList.put("2", time);
         handleTimer("1");
     }
 
@@ -53,10 +86,15 @@ public class ChessGameManager {
     public void switchPlayer(Board board) {
         if(!board.isPromoting()) {
             cancelTimer();
+            int timeRemain = currentPlayer.getTimeRemain() + plusTime;
             if(currentPlayer == player1) {
+                timeList.put("1",timeRemain );
+                currentPlayer.setTimeRemain(timeRemain);
                 currentPlayer = player2;
                 handleTimer("2");
             }else {
+                timeList.put("2", timeRemain);
+                currentPlayer.setTimeRemain(timeRemain);
                 currentPlayer = player1;
                 handleTimer("1");
             }

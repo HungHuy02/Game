@@ -6,8 +6,8 @@ import com.huy.game.chess.core.Move;
 
 public class ChessEasyAIPlayer extends ChessAIPlayer{
 
-    public ChessEasyAIPlayer(boolean isWhite) {
-        super(isWhite);
+    public ChessEasyAIPlayer(boolean isWhite, int time) {
+        super(isWhite, time);
     }
 
     @Override

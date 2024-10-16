@@ -1,5 +1,6 @@
 package com.huy.game.chess.core;
 
+import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.manager.ChessGameManager;
 
 public class Move {
@@ -25,7 +26,7 @@ public class Move {
 
     public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager){
         history.addStateHash(hashing.makeAMove(start, end));
-        String text = board.addMove(start, end);
+        String text = history.addMove(start, end);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
         history.addFEN(board, end.getPiece().isWhite(), manager);
@@ -42,7 +43,7 @@ public class Move {
     public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager) {
         history.addStateHash(hashing.makeAMove(start, end));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
-        String text = board.addMove(startSpot, board.getSpot(end.getX(), end.getY()));
+        String text = history.addMove(startSpot, board.getSpot(end.getX(), end.getY()));
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
         startSpot.setShowColor(true);
         board.setSpot(start.getX(), start.getY(), null);

@@ -8,8 +8,8 @@ import java.util.function.Consumer;
 
 public abstract class ChessAIPlayer extends ChessPlayer{
 
-    public ChessAIPlayer(boolean isWhite) {
-        super(isWhite);
+    public ChessAIPlayer(boolean isWhite, int time) {
+        super(isWhite, time);
     }
 
     public abstract Move findBestMove(Board board, String fen);

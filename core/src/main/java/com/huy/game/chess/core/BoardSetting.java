@@ -3,6 +3,7 @@ package com.huy.game.chess.core;
 public class BoardSetting {
     private boolean isRotate = false;
     private boolean isShowGuidePoint = true;
+    private boolean isAutoRotate = false;
 
     public BoardSetting() {
 
@@ -22,5 +23,13 @@ public class BoardSetting {
 
     public void setShowGuidePoint(boolean showGuidePoint) {
         isShowGuidePoint = showGuidePoint;
+    }
+
+    public boolean isAutoRotate() {
+        return isAutoRotate;
+    }
+
+    public void setAutoRotate(boolean autoRotate) {
+        isAutoRotate = autoRotate;
     }
 }

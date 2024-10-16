@@ -10,9 +10,6 @@ import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.ui.Colors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Board {
     private Spot[][] spots = new Spot[8][8];
     private Spot wKingSpot;
@@ -21,7 +18,6 @@ public class Board {
     private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
-    private final List<String> movedList = new ArrayList<>();
 
     public void setSpots(Spot[][] spots) {
         this.spots = spots;
@@ -106,31 +102,6 @@ public class Board {
 
     public Spot getKingSpot(boolean isWhite) {
         return isWhite ? wKingSpot : bKingSpot;
-    }
-
-    public String addMove(Spot start, Spot end) {
-        String beforeMove = changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null);
-        String afterMove = changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece());
-        movedList.add(beforeMove + " " + afterMove);
-        return afterMove;
-    }
-
-    public String changeToFullAlgebraicNotation(int x, int y, Piece startPiece,Piece endPiece) {
-        String move = endPiece != null ? "x" + changePositionToAlgebraicNotation(x, y) : changePositionToAlgebraicNotation(x, y);
-        switch (startPiece.getType()) {
-            case PAWN -> move = "N" + move;
-            case BISHOP -> move = "B" + move;
-            case QUEEN -> move = "Q" + move;
-            case ROOK -> move = "R" + move;
-            case KING -> move = "K" + move;
-        }
-        return move;
-    }
-
-    public String changePositionToAlgebraicNotation(int x, int y) {
-        char col = (char) ('a' + y);
-        int row = x + 1;
-        return "" + col + row;
     }
 
     public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, ChessSound chessSound, ChessGameManager chessGameManager) {

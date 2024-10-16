@@ -14,10 +14,15 @@ public class ChessPlayer {
     private Map<String, Integer> map;
     private int value = 0;
     private int turn = 1;
-    private int timeRemain = 500;
+    private int timeRemain;
 
-    public ChessPlayer(boolean isWhite) {
+    public ChessPlayer(boolean isWhite, int timeRemain) {
         this.isWhite = isWhite;
+        this.timeRemain = timeRemain;
+        setupMap();
+    }
+
+    private void setupMap() {
         map = new HashMap<>();
         map.put("p", 0);
         map.put("k", 0);

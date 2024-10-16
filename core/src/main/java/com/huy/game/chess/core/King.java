@@ -3,6 +3,7 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
@@ -49,9 +50,9 @@ public class King extends Piece {
     }
 
     @Override
-    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
+    public MoveType canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }
         int x = Math.abs(end.getX() - start.getX());
         int y = Math.abs(end.getY() - start.getY());
@@ -66,15 +67,15 @@ public class King extends Piece {
                 }
                 if(rookPiece !=null && rookPiece.isWhite() == this.isWhite() && rookPiece instanceof Rook) {
                     if (((Rook) rookPiece).isHasMove()) {
-                        return false;
+                        return MoveType.CAN_NOT_MOVE;
                     }
                     for(int i = 1; i <= 2; i++) {
                         Piece checkPiece = spots[start.getX()][start.getY() + directionY * i].getPiece();
                         if(checkPiece != null) {
-                            return false;
+                            return MoveType.CAN_NOT_MOVE;
                         }else {
                             if(!board.isPositionSafe(start.getX(), start.getY() + directionY * i, this.isWhite())) {
-                                return false;
+                                return MoveType.CAN_NOT_MOVE;
                             }
                         }
                     }
@@ -90,23 +91,22 @@ public class King extends Piece {
                         isCastling = true;
                     }
                     board.getSpot(start.getX(), start.getY() + directionY * 2).setShowMovePoint(true);
-                    return true;
+                    return MoveType.CASTLING;
                 }else {
-                    return false;
+                    return MoveType.CAN_NOT_MOVE;
                 }
             }else {
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }else {
             if (x <= 1 && y <= 1) {
-                if(!isAICalculate()) {
-                    if(end.getPiece()!= null) {
-                        board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
-                    }
+                if(end.getPiece()!= null) {
+                    board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                    return MoveType.CAPTURE;
                 }
-                return true;
+                return MoveType.NORMAL;
             }else {
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }
     }
@@ -163,7 +163,7 @@ public class King extends Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots,start, end)) {
+        if(canMove(board, spots,start, end) != MoveType.CAN_NOT_MOVE) {
             move.makeMove(board);
             if(board.isPositionSafe(x, y, end.getPiece().isWhite())) {
                 move.unMove(board);
@@ -179,7 +179,7 @@ public class King extends Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots,start, end)) {
+        if(canMove(board, spots,start, end) != MoveType.CAN_NOT_MOVE) {
             move.makeMove(testBoard);
             if(testBoard.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);

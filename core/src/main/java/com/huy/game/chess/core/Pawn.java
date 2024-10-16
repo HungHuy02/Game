@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
@@ -51,43 +52,44 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
+    public MoveType canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }
         int x = end.getX() - start.getX();
         int y = Math.abs(end.getY() - start.getY());
         if(this.isWhite()) {
             if(x < 0) {
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }else {
             if(x > 0) {
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }
         x = Math.abs(x);
         if(x > 2 || y >= 2) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         } else if(x > 1 && y == 0){
             if(spots[Integer.signum(end.getX() - start.getX()) + start.getX()][start.getY()].getPiece() == null) {
                 if(this.isWhite() && start.getX() == 1 && end.getPiece() == null) {
                     isMoveTwo = true;
-                    return true;
+                    return MoveType.NORMAL;
                 }
                 if(!this.isWhite() && start.getX() == 6 && end.getPiece() == null) {
                     isMoveTwo = true;
-                    return true;
+                    return MoveType.NORMAL;
                 }
             }
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }else if(x == 1 && y == 1){
             if(end.getPiece() != null) {
                 isMoveTwo = false;
                 if(!isAICalculate()) {
                     board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                    return MoveType.CAPTURE;
                 }
-                return true;
+                return MoveType.NORMAL;
             }else {
                 Piece checkPiece = spots[start.getX()][start.getY() + (end.getY() - start.getY())].getPiece();
                 if(checkPiece instanceof Pawn && checkPiece.isWhite() != this.isWhite()) {
@@ -98,30 +100,30 @@ public class Pawn extends Piece {
                                 if(!isCalculate) {
                                     board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), null);
                                 }
-                                return true;
+                                return MoveType.EN_PASSANT;
                             }
                         }else {
                             if(this.turn - pawn.turn == 1) {
                                 if(!isCalculate) {
                                     board.setSpot(start.getX(), start.getY() + (end.getY() - start.getY()), null);
                                 }
-                                return true;
+                                return MoveType.EN_PASSANT;
                             }
                         }
                     }
                 }
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }else if(x == 0 && y != 0) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }else if(y == 1) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }else {
             if(end.getPiece() == null) {
                 isMoveTwo = false;
-                return true;
+                return MoveType.NORMAL;
             }else {
-                return false;
+                return MoveType.CAN_NOT_MOVE;
             }
         }
     }

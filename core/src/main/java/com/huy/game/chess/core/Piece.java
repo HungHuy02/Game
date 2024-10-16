@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public abstract class Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots,start, end)) {
+        if(canMove(board, spots,start, end) != MoveType.CAN_NOT_MOVE) {
             move.makeMove(board);
             if(board.isKingSafe(end.getPiece().isWhite)) {
                 move.unMove(board);
@@ -68,7 +69,7 @@ public abstract class Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots, start, end)) {
+        if(canMove(board, spots, start, end) != MoveType.CAN_NOT_MOVE) {
             move.makeMove(testBoard);
             if(testBoard.isKingSafe(checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
@@ -77,7 +78,7 @@ public abstract class Piece {
         }
     }
 
-    public abstract boolean canMove(Board board, Spot[][] spots,Spot start, Spot end);
+    public abstract MoveType canMove(Board board, Spot[][] spots, Spot start, Spot end);
 
     public abstract boolean calculateMove(Board board, Spot checkSpot);
 

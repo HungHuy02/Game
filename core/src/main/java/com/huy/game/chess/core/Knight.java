@@ -1,6 +1,7 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
 import java.util.ArrayList;
@@ -26,21 +27,20 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean canMove(Board board, Spot[][] spots, Spot start, Spot end) {
+    public MoveType canMove(Board board, Spot[][] spots, Spot start, Spot end) {
         if(end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }
         int x = Math.abs(start.getX() - end.getX());
         int y = Math.abs(start.getY() - end.getY());
         if(x * y == 2) {
-            if(!isAICalculate()) {
-                if(end.getPiece() != null) {
-                    board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
-                }
+            if(end.getPiece() != null) {
+                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                return MoveType.CAPTURE;
             }
-            return true;
+            return MoveType.NORMAL;
         }else {
-            return false;
+            return MoveType.CAN_NOT_MOVE;
         }
     }
 

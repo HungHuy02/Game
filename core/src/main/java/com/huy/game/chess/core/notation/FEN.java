@@ -1,12 +1,22 @@
-package com.huy.game.chess.core;
+package com.huy.game.chess.core.notation;
 
 import com.badlogic.gdx.utils.StringBuilder;
+import com.huy.game.chess.core.Bishop;
+import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.GameHistory;
+import com.huy.game.chess.core.King;
+import com.huy.game.chess.core.Knight;
+import com.huy.game.chess.core.Pawn;
+import com.huy.game.chess.core.Piece;
+import com.huy.game.chess.core.Queen;
+import com.huy.game.chess.core.Rook;
+import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 
 public class FEN {
 
-    public static String generateFEN(Board board ,Spot[][] spots, boolean isWhite, GameHistory history, ChessGameManager manager) {
+    public static String generateFEN(Board board , Spot[][] spots, boolean isWhite, GameHistory history, ChessGameManager manager) {
         StringBuilder builder = new StringBuilder();
         piecePosition(spots, builder);
         moveNext(builder, isWhite);

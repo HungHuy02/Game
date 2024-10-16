@@ -20,6 +20,8 @@ import com.huy.game.chess.core.Pawn;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.MoveType;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.chess.manager.ChessAIPlayer;
 import com.huy.game.chess.manager.ChessGameAssesManager;
@@ -81,7 +83,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameHistoryManager = new ChessGameHistoryManager(gameHistory);
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
-        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), main.stockfish);
+        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), TimeType.FIFTEEN_MINUTE_PLUS_TEN, main.stockfish);
         PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList());
         PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList());
         board = new Board();
@@ -125,32 +127,9 @@ public class ChessScreen extends InputAdapter implements Screen {
         batch.end();
 
         if(chessGameHistoryManager.isRePlay()) {
-            batch.begin();
-            chessGameHistoryManager.getBoard().renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-            batch.end();
+            renderBoard(chessGameHistoryManager.getBoard());
         }else {
-            if(setting.isRotate()) {
-                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
-                shapeRenderer.end();
-                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
-
-                batch.begin();
-                board.renderRotateBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-                batch.end();
-            }else {
-                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
-                shapeRenderer.end();
-                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
-
-                batch.begin();
-                board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-                batch.end();
-            }
-
+            renderBoard(board);
             if(board.isPromoting()) {
                 board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage);
             }
@@ -158,6 +137,30 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         stage.act(delta);
         stage.draw();
+    }
+
+    private void renderBoard(Board board) {
+        if(setting.isRotate()) {
+            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+            shapeRenderer.end();
+            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+
+            batch.begin();
+            board.renderRotateBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+            batch.end();
+        }else {
+            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+            shapeRenderer.end();
+            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+
+            batch.begin();
+            board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+            batch.end();
+        }
     }
 
     @Override
@@ -218,8 +221,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    boolean canMove = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(canMove && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
                         if(selectedSpot.getPiece() instanceof Pawn ) {
                             if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
                                 board.setPromoting(true);
@@ -291,8 +294,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    boolean canMove = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(canMove && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
                         if(selectedSpot.getPiece() instanceof Pawn ) {
                             if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
                                 board.setPromoting(true);
@@ -374,8 +377,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    boolean canMove = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(canMove && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
                         if(selectedSpot.getPiece() instanceof Pawn ) {
                             if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
                                 board.setPromoting(true);

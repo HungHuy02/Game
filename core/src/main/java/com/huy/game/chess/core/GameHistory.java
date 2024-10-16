@@ -1,6 +1,8 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.utils.StringBuilder;
+import com.huy.game.chess.core.notation.AlgebraicNotation;
+import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.manager.ChessGameManager;
 
 import java.util.ArrayList;
@@ -52,33 +54,25 @@ public class GameHistory {
 
     public String addMove(Spot start, Spot end) {
         halfmoveClock++;
-        String beforeMove = changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null);
-        String afterMove = changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece());
-        movedList.add(beforeMove + " " + afterMove);
+        String beforeMove = AlgebraicNotation.changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null, this);
+        String afterMove = AlgebraicNotation.changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece(), this);
+        StringBuilder builder = new StringBuilder(beforeMove);
+        builder.append(' ');
+        builder.append(afterMove);
+        movedList.add(builder.toString());
         return afterMove;
     }
 
-    public String changeToFullAlgebraicNotation(int x, int y, Piece startPiece,Piece endPiece) {
-        StringBuilder builder = new StringBuilder();
-        switch (startPiece.getType()) {
-            case PAWN -> halfmoveClock = 0;
-            case KNIGHT ->  builder.append('N');
-            case BISHOP -> builder.append('B');
-            case QUEEN -> builder.append('Q');
-            case ROOK -> builder.append('R');
-            case KING -> builder.append('K');
-        }
-        if(endPiece != null) {
-            builder.append('x');
-            halfmoveClock = 0;
-        }
-        changePositionToAlgebraicNotation(builder, x, y);
-        return builder.toString();
-    }
-
-    public void changePositionToAlgebraicNotation(StringBuilder builder ,int x, int y) {
-        builder.append((char) ('a' + y));
-        builder.append(x + 1);
+    public void handleMoveColor(Board board, int index) {
+        String[] positions = getMove(index).split(" ");
+        board.getSpot(
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(positions[0].charAt(positions[0].length() - 1)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(positions[0].charAt(positions[0].length() - 2))
+        ).setShowColor(true);
+        board.getSpot(
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(positions[1].charAt(positions[1].length() - 1)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(positions[1].charAt(positions[1].length() - 2))
+        ).setShowColor(true);
     }
 
     public String getMove(int index) {
@@ -95,5 +89,9 @@ public class GameHistory {
 
     public String getFEN(int index) {
         return fenList.get(index - index / 3 - 1);
+    }
+
+    public void resetHalfmoveClock() {
+        halfmoveClock = 0;
     }
 }

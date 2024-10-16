@@ -11,7 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.huy.game.chess.core.FEN;
+import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameHistoryManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -79,7 +80,9 @@ public class NotationHistoryScrollPane {
                 }
                 historyManager.setRePlay(true);
                 index = horizontalGroup.getChildren().indexOf(button, true);
-                historyManager.setBoard(FEN.fenToBoard(historyManager.getHistory().getFEN(index), chessImage));
+                Board board = FEN.fenToBoard(historyManager.getHistory().getFEN(index), chessImage);
+                historyManager.getHistory().handleMoveColor(board, index);
+                historyManager.setBoard(board);
                 Actor child = horizontalGroup.getChild(index);
                 if(child instanceof  TextButton) {
                     button.getStyle().up = skin.getDrawable("button-normal");
