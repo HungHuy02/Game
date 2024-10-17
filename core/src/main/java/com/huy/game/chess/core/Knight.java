@@ -35,13 +35,23 @@ public class Knight extends Piece {
         int y = Math.abs(start.getY() - end.getY());
         if(x * y == 2) {
             if(end.getPiece() != null) {
-                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 return MoveType.CAPTURE;
             }
             return MoveType.NORMAL;
         }else {
             return MoveType.CAN_NOT_MOVE;
         }
+    }
+
+    @Override
+    public boolean isCheckOpponentKing(Board board, Spot[][] spots, Spot spot) {
+        Spot king = board.getKingSpot(!isWhite());
+        int x = Math.abs(king.getX() - spot.getX());
+        int y = Math.abs(king.getY() - spot.getY());
+        if(x * y == 2) {
+            return true;
+        }
+        return false;
     }
 
     @Override

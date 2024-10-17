@@ -45,13 +45,34 @@ public class Bishop extends Piece {
                 currentY += directionY;
             }
             if(end.getPiece() != null) {
-                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 return MoveType.CAPTURE;
             }
             return MoveType.NORMAL;
         }else {
             return MoveType.CAN_NOT_MOVE;
         }
+    }
+
+    @Override
+    public boolean isCheckOpponentKing(Board board, Spot[][] spots, Spot spot) {
+        Spot king = board.getKingSpot(!isWhite());
+        int distanceX = Math.abs(king.getX() - spot.getX());
+        int distanceY = Math.abs(king.getY() - spot.getY());
+        if(distanceX == distanceY) {
+            int directionX = Integer.signum(king.getX() - spot.getX());
+            int directionY = Integer.signum(king.getY() - spot.getY());
+            int currentX = spot.getX() + directionX;
+            int currentY = spot.getY() + directionY;
+            while(currentX != king.getX() || currentY != king.getY()) {
+                if(spots[currentX][currentY].getPiece() != null) {
+                    return false;
+                }
+                currentX += directionX;
+                currentY += directionY;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

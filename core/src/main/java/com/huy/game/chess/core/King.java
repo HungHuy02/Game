@@ -1,8 +1,6 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
-import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
@@ -65,8 +63,8 @@ public class King extends Piece {
                 }else {
                     rookPiece = board.getSpot(start.getX(), 0).getPiece();
                 }
-                if(rookPiece !=null && rookPiece.isWhite() == this.isWhite() && rookPiece instanceof Rook) {
-                    if (((Rook) rookPiece).isHasMove()) {
+                if(rookPiece !=null && rookPiece.isWhite() == this.isWhite() && rookPiece instanceof Rook rook) {
+                    if (rook.isHasMove()) {
                         return MoveType.CAN_NOT_MOVE;
                     }
                     for(int i = 1; i <= 2; i++) {
@@ -79,36 +77,31 @@ public class King extends Piece {
                             }
                         }
                     }
-                    if(!isCalculate) {
-                        this.setHasMove();
-                        if(directionY > 0) {
-                            board.setSpot(start.getX(), 7, null);
-                            board.setSpot(start.getX(), start.getY() + 1, rookPiece);
-                        }else {
-                            board.setSpot(start.getX(), 0, null);
-                            board.setSpot(start.getX(), start.getY() - 1, rookPiece);
-                        }
-                        isCastling = true;
+                    if(directionY > 0) {
+                        return MoveType.CASTLING_KING_SIDE;
+                    }else {
+                        return MoveType.CASTLING_QUEEN_SIDE;
                     }
-                    board.getSpot(start.getX(), start.getY() + directionY * 2).setShowMovePoint(true);
-                    return MoveType.CASTLING;
                 }else {
                     return MoveType.CAN_NOT_MOVE;
                 }
             }else {
                 return MoveType.CAN_NOT_MOVE;
             }
-        }else {
-            if (x <= 1 && y <= 1) {
-                if(end.getPiece()!= null) {
-                    board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
-                    return MoveType.CAPTURE;
-                }
-                return MoveType.NORMAL;
-            }else {
-                return MoveType.CAN_NOT_MOVE;
+        }else if (x <= 1 && y <= 1) {
+            if(end.getPiece()!= null) {
+                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
+                return MoveType.CAPTURE;
             }
+            return MoveType.NORMAL;
+        }else {
+            return MoveType.CAN_NOT_MOVE;
         }
+    }
+
+    @Override
+    public boolean isCheckOpponentKing(Board board, Spot[][] spots, Spot spot) {
+        return false;
     }
 
     @Override
@@ -163,7 +156,9 @@ public class King extends Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots,start, end) != MoveType.CAN_NOT_MOVE) {
+        MoveType moveType = canMove(board, spots,start, end);
+        if(moveType != MoveType.CAN_NOT_MOVE) {
+            move.setMoveType(moveType);
             move.makeMove(board);
             if(board.isPositionSafe(x, y, end.getPiece().isWhite())) {
                 move.unMove(board);
@@ -179,10 +174,15 @@ public class King extends Piece {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        if(canMove(board, spots,start, end) != MoveType.CAN_NOT_MOVE) {
+        MoveType moveType = canMove(board, spots,start, end);
+        if(moveType != MoveType.CAN_NOT_MOVE) {
+            move.setMoveType(moveType);
             move.makeMove(testBoard);
             if(testBoard.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);
+                if (moveType == MoveType.CAPTURE) {
+                    board.getSpot(x, y).setCanBeCaptured(true);
+                }
             }
             move.unMove(testBoard);
         }

@@ -223,6 +223,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Board testBoard = board.cloneBoard();
                     MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
                     if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                        move.setMoveType(moveType);
                         if(selectedSpot.getPiece() instanceof Pawn ) {
                             if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
                                 board.setPromoting(true);
@@ -232,8 +233,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
@@ -305,8 +306,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
@@ -362,8 +363,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
                     selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() instanceof Pawn) {
-                        ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
+                    if(selectedSpot.getPiece() instanceof Pawn pawn) {
+                        pawn.setTurn(chessGameManager.getCurrentTurn());
                     }
                     if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
                         if(!selectedSpot.isIdentificationColor()) {
@@ -388,9 +389,9 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, chessSound, chessGameManager);
                             main.socketClient.makeMove(selectedSpot.getX() + "" + selectedSpot.getY(), secondSpot.getX() + "" + secondSpot.getY());
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {

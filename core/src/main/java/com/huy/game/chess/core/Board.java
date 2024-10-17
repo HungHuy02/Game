@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -124,6 +125,34 @@ public class Board {
             chessGameManager.putValue(secondSpot.getPiece());
         }else {
             chessSound.playMoveSound();
+        }
+    }
+
+    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, MoveType moveType, ChessSound chessSound, ChessGameManager chessGameManager) {
+        if(secondSpot.getPiece().isCheckOpponentKing(this, spots, secondSpot)) {
+            moveType = MoveType.CHECK;
+        }else {
+            if (isIndirectCheck(selectedSpot, secondSpot.getPiece().isWhite())) {
+                moveType = MoveType.CHECK;
+            }
+        }
+        switch (moveType) {
+            case NORMAL -> chessSound.playMoveSound();
+            case DOUBLE_STEP_PAWN ->  {
+                chessSound.playMoveSound();
+                if(selectedSpot.getPiece() instanceof Pawn pawn) {
+                    pawn.setTurn(chessGameManager.getCurrentTurn());
+                    setPossibleEnPassantTargetsSpot(selectedSpot);
+                }
+            }
+            case CAPTURE -> {
+                chessSound.playCaptureSound();
+                chessGameManager.putValue(secondSpot.getPiece());
+            }
+            case CHECK -> chessSound.playCheckSound();
+            case EN_PASSANT -> chessSound.playCaptureSound();
+            case CASTLING_KING_SIDE, CASTLING_QUEEN_SIDE -> chessSound.playCastleSound();
+//            case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP ->
         }
     }
 
@@ -292,6 +321,70 @@ public class Board {
         return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 
+    public boolean isIndirectCheck(Spot spot, boolean isWhite) {
+        Spot king = getKingSpot(!isWhite);
+        int distanceX = Math.abs(king.getX() - spot.getX());
+        int distanceY = Math.abs(king.getY() - spot.getY());
+        if(distanceX == 0 || distanceY == 0 || distanceX == distanceY) {
+            int directionX = Integer.signum(spot.getX() - king.getX());
+            int directionY = Integer.signum(spot.getY() - king.getY());
+            int currentX = spot.getX() + directionX;
+            int currentY = spot.getY() + directionY;
+            loop:
+            while(isWithinBoard(currentX, currentY)) {
+                Piece test = spots[currentX][currentY].getPiece();
+                if(test != null) {
+                    if(test.isWhite() == isWhite) {
+                        if (distanceX != 0 && directionY != 0) {
+                            switch (test.getType()) {
+                                case BISHOP, QUEEN -> {
+                                    directionX = -directionX;
+                                    directionY = -directionY;
+                                    currentX = spot.getX() + directionX;
+                                    currentY = spot.getY() + directionY;
+                                    while (currentX != king.getX() && currentY != king.getY()) {
+                                        if(spots[currentX][currentY] != null) {
+                                            break loop;
+                                        }
+                                        currentX += directionX;
+                                        currentY += directionY;
+                                    }
+                                    return true;
+                                }
+                                default -> {
+                                    break loop;
+                                }
+                            }
+                        }else {
+                            switch (test.getType()) {
+                                case ROOK, QUEEN -> {
+                                    directionX = -directionX;
+                                    directionY = -directionY;
+                                    currentX = spot.getX() + directionX;
+                                    currentY = spot.getY() + directionY;
+                                    while (currentX != king.getX() && currentY != king.getY()) {
+                                        if(spots[currentX][currentY] != null) {
+                                            break loop;
+                                        }
+                                        currentX += directionX;
+                                        currentY += directionY;
+                                    }
+                                    return true;
+                                }
+                                default -> {
+                                    break loop;
+                                }
+                            }
+                        }
+                    }
+                }
+                currentX += directionX;
+                currentY += directionY;
+            }
+        }
+        return false;
+    }
+
     public boolean isCheckmate(boolean isWhite) {
         if(!isKingSafe(isWhite)) {
             if(canKingMove(isWhite)) {
@@ -317,11 +410,12 @@ public class Board {
         }
     }
 
+
+
     public boolean canKingMove(boolean isWhite) {
         Spot kingSpot = getKingSpot(isWhite);
         return kingSpot.getPiece().calculateMove(this, kingSpot);
     }
-
 
     public boolean isKingSafe(boolean isWhite) {
         Spot kingSpot = getKingSpot(isWhite);
