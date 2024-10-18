@@ -1,10 +1,6 @@
 package com.huy.game.chess.manager;
 
-import com.huy.game.chess.core.Bishop;
-import com.huy.game.chess.core.Pawn;
-import com.huy.game.chess.core.Piece;
-import com.huy.game.chess.core.Queen;
-import com.huy.game.chess.core.Rook;
+import com.huy.game.chess.enums.PieceType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +37,7 @@ public class ChessPlayer {
     }
 
     public void setWhite(boolean isWhite) {
-        isWhite = isWhite;
+        this.isWhite = isWhite;
     }
 
     public int getValue() {
@@ -56,22 +52,28 @@ public class ChessPlayer {
         return turn;
     }
 
-    public void putValue(Piece piece) {
-        if(piece instanceof Pawn) {
-            map.put("p", map.get("p") + 1);
-            value += 1;
-        }else if(piece instanceof Bishop) {
-            map.put("b", map.get("b") + 1);
-            value += 3;
-        }else if(piece instanceof Rook) {
-            map.put("r", map.get("r") + 1);
-            value += 5;
-        }else if(piece instanceof Queen) {
-            map.put("q", map.get("q") + 1);
-            value += 9;
-        }else {
-            map.put("k", map.get("k") + 1);
-            value += 3;
+    public void putValue(PieceType type) {
+        switch (type) {
+            case PAWN -> {
+                map.put("p", map.get("p") + 1);
+                value += 1;
+            }
+            case BISHOP -> {
+                map.put("b", map.get("b") + 1);
+                value += 3;
+            }
+            case KNIGHT -> {
+                map.put("k", map.get("k") + 1);
+                value += 3;
+            }
+            case QUEEN -> {
+                map.put("q", map.get("q") + 1);
+                value += 9;
+            }
+            case ROOK -> {
+                map.put("r", map.get("r") + 1);
+                value += 5;
+            }
         }
     }
 

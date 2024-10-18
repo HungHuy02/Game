@@ -3,6 +3,7 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.core.notation.FEN;
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.manager.ChessGameManager;
 
 import java.util.ArrayList;
@@ -52,26 +53,25 @@ public class GameHistory {
         }
     }
 
-    public String addMove(Spot start, Spot end) {
+    public String addMove(Spot start, Spot end, Move move) {
         halfmoveClock++;
-        String beforeMove = AlgebraicNotation.changeToFullAlgebraicNotation(start.getX(), start.getY(), start.getPiece(),null, this);
-        String afterMove = AlgebraicNotation.changeToFullAlgebraicNotation(end.getX(), end.getY(), start.getPiece(), end.getPiece(), this);
+        String beforeMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(start);
+        String afterMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(end);
         StringBuilder builder = new StringBuilder(beforeMove);
-        builder.append(' ');
         builder.append(afterMove);
         movedList.add(builder.toString());
-        return afterMove;
+        return AlgebraicNotation.changeToFullAlgebraicNotation(start, end, move, this);
     }
 
     public void handleMoveColor(Board board, int index) {
-        String[] positions = getMove(index).split(" ");
+        String move = getMove(index);
         board.getSpot(
-            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(positions[0].charAt(positions[0].length() - 1)),
-            AlgebraicNotation.changeColAlgebraicNotationToColPosition(positions[0].charAt(positions[0].length() - 2))
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(1)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(0))
         ).setShowColor(true);
         board.getSpot(
-            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(positions[1].charAt(positions[1].length() - 1)),
-            AlgebraicNotation.changeColAlgebraicNotationToColPosition(positions[1].charAt(positions[1].length() - 2))
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(3)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(2))
         ).setShowColor(true);
     }
 

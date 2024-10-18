@@ -51,6 +51,9 @@ public class Board {
         testBoard.setSpots(cloneSpots(spots));
         testBoard.setwKingSpot(testBoard.getSpots()[wKingSpot.getX()][wKingSpot.getY()]);
         testBoard.setbKingSpot(testBoard.getSpots()[bKingSpot.getX()][bKingSpot.getY()]);
+        if (possibleEnPassantTargetsSpot != null) {
+            testBoard.setPossibleEnPassantTargetsSpot(testBoard.getSpots()[possibleEnPassantTargetsSpot.getX()][possibleEnPassantTargetsSpot.getY()]);
+        }
         return testBoard;
     }
 
@@ -105,54 +108,46 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, ChessSound chessSound, ChessGameManager chessGameManager) {
-        if(selectedSpot.getPiece() instanceof Pawn) {
-            if(((Pawn) selectedSpot.getPiece()).isMoveTwo()) {
-                ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
-            }
-        }
-        if(!isKingSafe(!chessGameManager.getCurrentPlayer().isWhite())) {
-            chessSound.playCheckSound();
-        }else if(selectedSpot.getPiece() instanceof King) {
-            if(((King) selectedSpot.getPiece()).isCastling()) {
-                ((King) selectedSpot.getPiece()).setCastling(false);
-                chessSound.playCastleSound();
-            }else {
-                chessSound.playMoveSound();
-            }
-        }else if(secondSpot.getPiece() != null) {
-            chessSound.playCaptureSound();
-            chessGameManager.putValue(secondSpot.getPiece());
-        }else {
-            chessSound.playMoveSound();
-        }
-    }
-
-    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, MoveType moveType, ChessSound chessSound, ChessGameManager chessGameManager) {
+    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, Move move, ChessSound chessSound, ChessGameManager chessGameManager) {
         if(secondSpot.getPiece().isCheckOpponentKing(this, spots, secondSpot)) {
-            moveType = MoveType.CHECK;
+            move.setCheck(true);
         }else {
             if (isIndirectCheck(selectedSpot, secondSpot.getPiece().isWhite())) {
-                moveType = MoveType.CHECK;
+                move.setCheck(true);
             }
         }
-        switch (moveType) {
+        possibleEnPassantTargetsSpot = null;
+        switch (move.getMoveType()) {
             case NORMAL -> chessSound.playMoveSound();
             case DOUBLE_STEP_PAWN ->  {
                 chessSound.playMoveSound();
-                if(selectedSpot.getPiece() instanceof Pawn pawn) {
+                if(secondSpot.getPiece() instanceof Pawn pawn) {
                     pawn.setTurn(chessGameManager.getCurrentTurn());
-                    setPossibleEnPassantTargetsSpot(selectedSpot);
+                    possibleEnPassantTargetsSpot = secondSpot;
                 }
             }
             case CAPTURE -> {
                 chessSound.playCaptureSound();
-                chessGameManager.putValue(secondSpot.getPiece());
+                chessGameManager.putValue(secondSpot.getPiece().getType());
             }
-            case CHECK -> chessSound.playCheckSound();
-            case EN_PASSANT -> chessSound.playCaptureSound();
+            case EN_PASSANT -> {
+                chessSound.playCaptureSound();
+                chessGameManager.putValue(PieceType.PAWN);
+            }
             case CASTLING_KING_SIDE, CASTLING_QUEEN_SIDE -> chessSound.playCastleSound();
-//            case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP ->
+            case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP -> {
+                chessSound.playPromoteSound();
+                chessGameManager.putValue(switch (move.getMoveType()) {
+                    case PROMOTE_TO_QUEEN -> PieceType.QUEEN;
+                    case PROMOTE_TO_KNIGHT -> PieceType.KNIGHT;
+                    case PROMOTE_TO_ROOK -> PieceType.ROOK;
+                    case PROMOTE_TO_BISHOP -> PieceType.BISHOP;
+                    default -> throw new IllegalStateException("Unexpected value: " + move.getMoveType());
+                });
+            }
+        }
+        if (move.isCheck()) {
+            chessSound.playCheckSound();
         }
     }
 
@@ -497,11 +492,7 @@ public class Board {
     }
 
     public boolean isKingInCheckByKnight(int positionX, int positionY, boolean isWhite) {
-        int[][] knightMoves = {
-            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
-            {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
-        };
-        for (int[] move : knightMoves) {
+        for (int[] move : Knight.knightMoves()) {
             int x = positionX + move[0];
             int y = positionY + move[1];
             if(isWithinBoard(x, y)) {
@@ -570,35 +561,40 @@ public class Board {
         }
     }
 
-    public void showPromoteSelection(SpriteBatch batch,ShapeRenderer shapeRenderer,float centerX, float centerY, ChessImage chessImage) {
+    public void showPromoteSelection(SpriteBatch batch,ShapeRenderer shapeRenderer,float centerX, float centerY, ChessImage chessImage, BoardSetting setting) {
         float padding = chessImage.getSpotSize() / 10f;
         float scale = (chessImage.getSpotSize() - (2 * padding)) / chessImage.getPieceSize();
         float scaledSide = scale * chessImage.getPieceSize();
-        float x = centerX + chessImage.getSpotSize() * promotingSpot.getY();
-        if(promotingSpot.getX() == 7) {
-            float y = centerY + chessImage.getSpotSize() * promotingSpot.getX() - 3 * chessImage.getSpotSize();
-
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
-            shapeRenderer.end();
-
-            batch.begin();
+        int spotX, spotY;
+        if(setting.isRotate()) {
+            spotX = 7 - promotingSpot.getX();
+            spotY = 7 - promotingSpot.getY();
+        }else {
+            spotX = promotingSpot.getX();
+            spotY = promotingSpot.getY();
+        }
+        float x = centerX + chessImage.getSpotSize() * spotY ;
+        float y;
+        if((promotingSpot.getX() == 7 && !setting.isRotate()) || (promotingSpot.getX() == 0 && setting.isRotate()) ) {
+            y = centerY + chessImage.getSpotSize() * spotX - 3 * chessImage.getSpotSize();
+        }else {
+            y = centerY;
+        }
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
+        shapeRenderer.end();
+        batch.begin();
+        if (promotingSpot.getPiece().isWhite()) {
             batch.draw(chessImage.getwRock(), x + padding, y + padding , scaledSide, scaledSide);
             batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
             batch.draw(chessImage.getwQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
         }else {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.rect(x, centerY, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
-            shapeRenderer.end();
-
-            batch.begin();
-            batch.draw(chessImage.getbRook(), x + padding, centerY + padding , scaledSide, scaledSide);
-            batch.draw(chessImage.getbBishop(), x + padding, centerY + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
-            batch.draw(chessImage.getbKnight(), x + padding, centerY + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
-            batch.draw(chessImage.getbQueen(), x + padding, centerY + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
+            batch.draw(chessImage.getbRook(), x + padding, y + padding , scaledSide, scaledSide);
+            batch.draw(chessImage.getbBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
+            batch.draw(chessImage.getbKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
+            batch.draw(chessImage.getbQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
         }
         batch.end();
     }

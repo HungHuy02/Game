@@ -67,11 +67,11 @@ public abstract class Piece {
         return false;
     }
 
-    public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots,Spot checkSpot, int x, int y) {
+    public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots, Spot checkSpot, int x, int y) {
         Spot start = spots[checkSpot.getX()][checkSpot.getY()];
         Spot end = spots[x][y];
         Move move = new Move(start, end);
-        MoveType moveType = canMove(board, spots, start, end);
+        MoveType moveType = canMove(testBoard, spots, start, end);
         if(moveType != MoveType.CAN_NOT_MOVE) {
             move.setMoveType(moveType);
             move.makeMove(testBoard);

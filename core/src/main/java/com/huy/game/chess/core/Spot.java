@@ -3,6 +3,8 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.graphics.Color;
 import com.huy.game.chess.ui.Colors;
 
+import java.util.Objects;
+
 public class Spot {
     private Piece piece;
     private int x;
@@ -119,5 +121,18 @@ public class Spot {
 
     public void setShowMovePoint(boolean showMovePoint) {
         this.showMovePoint = showMovePoint;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Spot spot = (Spot) o;
+        return x == spot.x && y == spot.y && Objects.equals(piece, spot.piece);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(piece, x, y);
     }
 }

@@ -30,6 +30,7 @@ import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessOnlinePlayer;
 import com.huy.game.chess.manager.ChessSound;
+import com.huy.game.chess.manager.GameSetting;
 import com.huy.game.chess.manager.OpponentPlayer;
 import com.huy.game.chess.manager.Player;
 import com.huy.game.chess.ui.BottomAppBar;
@@ -111,8 +112,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                 Spot start = board.getSpot(from.charAt(0) - '0', from.charAt(1) - '0');
                 Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
                 Move move = new Move(start,end);
-                board.handleMoveColorAndSound(start, end, chessSound, chessGameManager);
                 scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                board.handleMoveColorAndSound(start, end, move, chessSound, chessGameManager);
                 chessGameManager.switchPlayer(board);
             });
             main.socketClient.getMoveFromOpponent();
@@ -131,7 +132,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         }else {
             renderBoard(board);
             if(board.isPromoting()) {
-                board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage);
+                board.showPromoteSelection(batch ,shapeRenderer, centerX, centerY, chessImage, setting);
             }
         }
 
@@ -221,25 +222,19 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
                     if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
                         move.setMoveType(moveType);
-                        if(selectedSpot.getPiece() instanceof Pawn ) {
-                            if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
-                                board.setPromoting(true);
-                                board.setPromotingSpot(secondSpot);
-                            }
-                        }
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
                                 chessSound.playGameEndSound();
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle("vi"), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
                                 stage.addActor(popup.getPopup());
                                 multiplexer.removeProcessor(0);
                             }
@@ -295,23 +290,17 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
                     if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
-                        if(selectedSpot.getPiece() instanceof Pawn ) {
-                            if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
-                                board.setPromoting(true);
-                                board.setPromotingSpot(secondSpot);
-                            }
-                        }
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle("vi"), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
                                 stage.addActor(popup.getPopup());
                                 multiplexer.removeProcessor(0);
                             }
@@ -319,8 +308,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                                 board.clearColor();
                                 if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer) {
                                     Move aiMove = ((ChessAIPlayer) chessGameManager.getCurrentPlayer()).findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
-                                    board.handleMoveColorAndSound(board.getSpot(aiMove.getStart().getX(), aiMove.getStart().getY()), board.getSpot(aiMove.getEnd().getX(), aiMove.getEnd().getY()), chessSound, chessGameManager);
                                     String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager);
+                                    board.handleMoveColorAndSound(board.getSpot(aiMove.getStart().getX(), aiMove.getStart().getY()), board.getSpot(aiMove.getEnd().getX(), aiMove.getEnd().getY()), aiMove, chessSound, chessGameManager);
                                     Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
                                     chessGameManager.switchPlayer(board);
                                 }
@@ -378,25 +367,19 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Spot secondSpot = board.getSpot(boardY, boardX);
                     Move move = new Move(selectedSpot, secondSpot);
                     Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(board, testBoard.getSpots(),selectedSpot, secondSpot);
+                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
                     if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
-                        if(selectedSpot.getPiece() instanceof Pawn ) {
-                            if((selectedSpot.getX() == 6 && selectedSpot.getPiece().isWhite()) || (selectedSpot.getX() == 1 && !selectedSpot.getPiece().isWhite())) {
-                                board.setPromoting(true);
-                                board.setPromotingSpot(secondSpot);
-                            }
-                        }
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             main.socketClient.makeMove(selectedSpot.getX() + "" + selectedSpot.getY(), secondSpot.getX() + "" + secondSpot.getY());
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, moveType,chessSound, chessGameManager);
+                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
                             if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
                                 chessSound.playGameEndSound();
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle("vi"), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
                                 stage.addActor(popup.getPopup());
                                 multiplexer.removeProcessor(0);
                             }

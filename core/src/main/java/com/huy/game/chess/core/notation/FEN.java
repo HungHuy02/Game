@@ -118,7 +118,7 @@ public class FEN {
         String[] parts = fen.split(" ");
         board.setSpots(positionToSpots(parts[0], chessImage, board));
         handleMoveNext(parts[1]);
-        handleCastlingRights(parts[2], board.getSpots());
+        handleCastlingRights(parts[2], board, board.getSpots());
         handlePossibleEnPassantTargets(board, board.getSpots(), parts[3]);
         handleHalfmoveClock(parts[4]);
         handleFullMoveNumber(parts[5]);
@@ -213,28 +213,20 @@ public class FEN {
     }
 
     private static boolean handleMoveNext(String moveNext) {
-        return moveNext.equals("w") ? true : false;
+        return moveNext.equals("w");
     }
 
-    private static void handleCastlingRights(String castlingRights, Spot[][] spots) {
-//        if(!castlingRights.equals("-")) {
-//            for(int i = 0; i < castlingRights.length(); i++) {
-//                switch (castlingRights.charAt(i)) {
-//                    case 'k' ->
-//                    case 'q' ->
-//                    case 'K' ->
-//                    case 'Q' ->
-//                }
-//            }
-//        }
+    private static void handleCastlingRights(String castlingRights, Board board, Spot[][] spots) {
+        if(castlingRights.equals("-")) {
+
+        }
     }
 
     private static void handlePossibleEnPassantTargets(Board board, Spot[][] spots, String possibleEnPassantTargets) {
         if (!possibleEnPassantTargets.equals("-")) {
-            int x = possibleEnPassantTargets.charAt(0) - '1';
-            int y = possibleEnPassantTargets.charAt(1) - 'a';
+            int x = AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(possibleEnPassantTargets.charAt(1));
+            int y = AlgebraicNotation.changeColAlgebraicNotationToColPosition(possibleEnPassantTargets.charAt(0));
             if(spots[x][y].getPiece() instanceof Pawn) {
-//                spots[x][y].getPiece().
                 board.setPossibleEnPassantTargetsSpot(spots[x][y]);
             }
         }

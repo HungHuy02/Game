@@ -10,13 +10,11 @@ import java.util.List;
 public class Pawn extends Piece {
 
     private int turn;
-    private boolean isMoveTwo = false;
     private boolean isCalculate = false;
 
     public Pawn(Pawn pawn) {
         super(pawn.isWhite());
         turn = pawn.turn;
-        isMoveTwo = pawn.isMoveTwo;
         setType(PieceType.PAWN);
     }
 
@@ -33,10 +31,6 @@ public class Pawn extends Piece {
         this.turn = turn;
     }
 
-    public boolean isMoveTwo() {
-        return isMoveTwo;
-    }
-
     private int[][] pawnMoves(Spot checkSpot) {
         int[][] pawnMoves;
         if (checkSpot.getPiece().isWhite()) {
@@ -49,6 +43,15 @@ public class Pawn extends Piece {
             };
         }
         return pawnMoves;
+    }
+
+    private MoveType[] promoting() {
+        return new MoveType[] {
+            MoveType.PROMOTE_TO_QUEEN,
+            MoveType.PROMOTE_TO_KNIGHT,
+            MoveType.PROMOTE_TO_ROOK,
+            MoveType.PROMOTE_TO_BISHOP
+        };
     }
 
     @Override
@@ -80,18 +83,26 @@ public class Pawn extends Piece {
             return MoveType.CAN_NOT_MOVE;
         } else if (x == 1 && y == 1) {
             if (end.getPiece() != null) {
+                if(start.getX() == 1 && !this.isWhite()) {
+                    return MoveType.PROMOTE;
+                }
+                if(start.getX() == 6 && this.isWhite()) {
+                    return MoveType.PROMOTE;
+                }
                 return MoveType.CAPTURE;
             } else {
-                Piece checkPiece = spots[start.getX()][end.getY()].getPiece();
-                if (checkPiece instanceof Pawn pawn && checkPiece.isWhite() != this.isWhite()) {
-                    if (pawn.isMoveTwo) {
-                        if (pawn.isWhite()) {
-                            if (pawn.turn == this.turn) {
-                                return MoveType.EN_PASSANT;
-                            }
-                        } else {
-                            if (this.turn - pawn.turn == 1) {
-                                return MoveType.EN_PASSANT;
+                Spot checkSpot = spots[start.getX()][end.getY()];
+                if (board.getPossibleEnPassantTargetsSpot() != null) {
+                    if (board.getPossibleEnPassantTargetsSpot().equals(checkSpot)) {
+                        if(checkSpot.getPiece() instanceof Pawn pawn) {
+                            if (start.getPiece().isWhite()) {
+                                if (pawn.turn == this.turn) {
+                                    return MoveType.EN_PASSANT;
+                                }
+                            } else {
+                                if (this.turn - pawn.turn == 1) {
+                                    return MoveType.EN_PASSANT;
+                                }
                             }
                         }
                     }
@@ -100,6 +111,12 @@ public class Pawn extends Piece {
             }
         } else if (x == 1 && y == 0) {
             if (end.getPiece() == null) {
+                if(start.getX() == 1 && !this.isWhite()) {
+                    return MoveType.PROMOTE;
+                }
+                if(start.getX() == 6 && this.isWhite()) {
+                    return MoveType.PROMOTE;
+                }
                 return MoveType.NORMAL;
             } else {
                 return MoveType.CAN_NOT_MOVE;
@@ -159,7 +176,7 @@ public class Pawn extends Piece {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
             if(board.isWithinBoard(x, y)) {
-                calculateForOnePoint(board, testBoard,spots,checkSpot, x, y);
+                calculateForOnePoint(board, testBoard, spots, checkSpot, x, y);
             }
         }
         isCalculate = false;

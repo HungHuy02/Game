@@ -19,7 +19,7 @@ public class Knight extends Piece {
         setType(PieceType.KNIGHT);
     }
 
-    private int[][] knightMoves() {
+    public static int[][] knightMoves() {
         return new int[][]{
             {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
             {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
