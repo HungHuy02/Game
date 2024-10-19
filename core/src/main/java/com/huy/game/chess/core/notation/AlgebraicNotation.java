@@ -86,7 +86,8 @@ public class AlgebraicNotation {
     }
 
     public static String changePositionToSimpleAlgebraicNotation(Spot spot) {
-        StringBuilder builder = new StringBuilder(changeColPositionToColAlgebraicNotation(spot.getY()));
+        StringBuilder builder = new StringBuilder();
+        builder.append(changeColPositionToColAlgebraicNotation(spot.getY()));
         builder.append(changeRowPositionToRowAlgebraicNotation(spot.getX()));
         return builder.toString();
     }

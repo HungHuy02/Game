@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class ChessPlayer {
     private boolean isWhite;
-    private Map<String, Integer> map;
+    private Map<String, Integer> capturedPieceMap;
+    private Map<PieceType, Integer> pieceNumberMap;
     private int value = 0;
     private int turn = 1;
     private int timeRemain;
@@ -15,21 +16,35 @@ public class ChessPlayer {
     public ChessPlayer(boolean isWhite, int timeRemain) {
         this.isWhite = isWhite;
         this.timeRemain = timeRemain;
-        setupMap();
+        setupCapturedPieceMap();
+        setupPieceMap();
     }
 
-    private void setupMap() {
-        map = new HashMap<>();
-        map.put("p", 0);
-        map.put("k", 0);
-        map.put("b", 0);
-        map.put("r", 0);
-        map.put("q", 0);
-        map.put("value", 0);
+    private void setupCapturedPieceMap() {
+        capturedPieceMap = new HashMap<>();
+        capturedPieceMap.put("p", 0);
+        capturedPieceMap.put("k", 0);
+        capturedPieceMap.put("b", 0);
+        capturedPieceMap.put("r", 0);
+        capturedPieceMap.put("q", 0);
+        capturedPieceMap.put("value", 0);
     }
 
-    public Map<String, Integer> getMap() {
-        return map;
+    private void setupPieceMap() {
+        pieceNumberMap = new HashMap<>();
+        pieceNumberMap.put(PieceType.PAWN, 8);
+        pieceNumberMap.put(PieceType.QUEEN, 1);
+        pieceNumberMap.put(PieceType.KNIGHT, 2);
+        pieceNumberMap.put(PieceType.BISHOP, 2);
+        pieceNumberMap.put(PieceType.ROOK, 2);
+    }
+
+    public Map<String, Integer> getCapturedPieceMap() {
+        return capturedPieceMap;
+    }
+
+    public Map<PieceType, Integer> getPieceMap() {
+        return pieceNumberMap;
     }
 
     public boolean isWhite() {
@@ -48,37 +63,49 @@ public class ChessPlayer {
         turn++;
     }
 
+    public void decreaseTurn(int numberTurnBack) {
+        turn -= numberTurnBack;
+    }
+
     public int getTurn() {
         return turn;
     }
 
-    public void putValue(PieceType type) {
+    public void addCapturedPiece(PieceType type) {
         switch (type) {
             case PAWN -> {
-                map.put("p", map.get("p") + 1);
+                capturedPieceMap.put("p", capturedPieceMap.get("p") + 1);
                 value += 1;
             }
             case BISHOP -> {
-                map.put("b", map.get("b") + 1);
+                capturedPieceMap.put("b", capturedPieceMap.get("b") + 1);
                 value += 3;
             }
             case KNIGHT -> {
-                map.put("k", map.get("k") + 1);
+                capturedPieceMap.put("k", capturedPieceMap.get("k") + 1);
                 value += 3;
             }
             case QUEEN -> {
-                map.put("q", map.get("q") + 1);
+                capturedPieceMap.put("q", capturedPieceMap.get("q") + 1);
                 value += 9;
             }
             case ROOK -> {
-                map.put("r", map.get("r") + 1);
+                capturedPieceMap.put("r", capturedPieceMap.get("r") + 1);
                 value += 5;
             }
         }
     }
 
-    public void putValue(int value) {
-        map.put("value", value);
+    public void addCapturedPiece(int value) {
+        capturedPieceMap.put("value", value);
+    }
+
+    public void decreasePieceNumber(PieceType type) {
+        pieceNumberMap.put(type, pieceNumberMap.get(type) - 1);
+    }
+
+    public void increasePieceNumber(PieceType type) {
+        pieceNumberMap.put(type, pieceNumberMap.get(type) + 1);
     }
 
     public void setTimeRemain(int timeRemain) {

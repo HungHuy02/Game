@@ -183,6 +183,28 @@ public class Pawn extends Piece {
     }
 
     @Override
+    public void calculateForOnePoint(Board board, Board testBoard, Spot[][] spots, Spot checkSpot, int x, int y) {
+        Spot start = spots[checkSpot.getX()][checkSpot.getY()];
+        Spot end = spots[x][y];
+        Move move = new Move(start, end);
+        MoveType moveType = canMove(testBoard, spots, start, end);
+        if(moveType != MoveType.CAN_NOT_MOVE) {
+            move.setMoveType(moveType);
+            move.makeMove(testBoard);
+            if(testBoard.isKingSafe(checkSpot.getPiece().isWhite())) {
+                board.getSpot(x, y).setShowMovePoint(true);
+                if (moveType == MoveType.CAPTURE ) {
+                    board.getSpot(x, y).setCanBeCaptured(true);
+                }
+            }
+            move.unMove(testBoard);
+            if (end.getPiece() != null) {
+                board.getSpot(x, y).setCanBeCaptured(true);
+            }
+        }
+    }
+
+    @Override
     public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
         isCalculate = true;

@@ -11,6 +11,11 @@ public class Rook extends Piece {
 
     private boolean hasMove = false;
 
+    public Rook(boolean white) {
+        super(white);
+        setType(PieceType.ROOK);
+    }
+
     public boolean isHasMove() {
         return hasMove;
     }

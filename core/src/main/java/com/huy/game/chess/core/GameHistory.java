@@ -7,13 +7,16 @@ import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.manager.ChessGameManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameHistory {
 
     private final List<String> movedList = new ArrayList<>();
     private final List<Long> stateHashList = new ArrayList<>();
     private final List<String> fenList = new ArrayList<>();
+    private final Map<Integer, int[]> timeMap = new HashMap<>();
     private final List<Board> boardList = new ArrayList<>();
     private int halfmoveClock = 0;
 
@@ -33,6 +36,10 @@ public class GameHistory {
 
     public void addFEN(Board board, boolean isWhite, ChessGameManager manager) {
         fenList.add(FEN.generateFEN(board, board.getSpots(), isWhite, this, manager));
+    }
+
+    public void addTimeRemain(int index, int player1RemainTime, int player2RemainTime) {
+        timeMap.put(index, new int[] {player1RemainTime, player2RemainTime});
     }
 
     private void check50MovesRule() {

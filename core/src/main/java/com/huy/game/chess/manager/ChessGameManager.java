@@ -2,13 +2,13 @@ package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
-import com.huy.game.chess.core.Piece;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChessGameManager {
@@ -83,7 +83,6 @@ public class ChessGameManager {
         handleTimer("1");
     }
 
-
     public void switchPlayer(Board board) {
         if(!board.isPromoting()) {
             cancelTimer();
@@ -104,14 +103,14 @@ public class ChessGameManager {
     }
 
     public void putValue(PieceType type) {
-        currentPlayer.putValue(type);
+        currentPlayer.addCapturedPiece(type);
         int value = player1.getValue() - player2.getValue();
         if(value > 0) {
-            player1.putValue(value);
-            player2.putValue(0);
+            player1.addCapturedPiece(value);
+            player2.addCapturedPiece(0);
         }else {
-            player1.putValue(0);
-            player2.putValue(Math.abs(value));
+            player1.addCapturedPiece(0);
+            player2.addCapturedPiece(Math.abs(value));
         }
     }
 

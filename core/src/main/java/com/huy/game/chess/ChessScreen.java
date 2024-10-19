@@ -85,8 +85,8 @@ public class ChessScreen extends InputAdapter implements Screen {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), TimeType.FIFTEEN_MINUTE_PLUS_TEN, main.stockfish);
-        PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList());
-        PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList());
+        PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getCapturedPieceMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList());
+        PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList());
         board = new Board();
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
@@ -112,7 +112,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 Spot start = board.getSpot(from.charAt(0) - '0', from.charAt(1) - '0');
                 Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
                 Move move = new Move(start,end);
-                scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                 board.handleMoveColorAndSound(start, end, move, chessSound, chessGameManager);
                 chessGameManager.switchPlayer(board);
             });
@@ -195,15 +195,20 @@ public class ChessScreen extends InputAdapter implements Screen {
     private void handleClick(int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
-        if(setting.isRotate()) {
-            boardX = 7 - boardX;
-            boardY = 7 - boardY;
-        }
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager);
+                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
+                if(board.getPromotingMove() != null) {
+                    board.getPromotingMove().handleSpecialMove(board, chessImage);
+                    board.handleMoveColorAndSound(board.getPromotingMove().getStart(), board.getPromotingMove().getEnd(), board.getPromotingMove(), chessSound, chessGameManager);
+                    chessGameManager.switchPlayer(board);
+                }
             }else {
+                if(setting.isRotate()) {
+                    boardX = 7 - boardX;
+                    boardY = 7 - boardY;
+                }
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
                     selectedSpot.setShowColor(true);
@@ -228,7 +233,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
@@ -270,7 +275,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager);
+                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
             }else {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
@@ -295,7 +300,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
@@ -347,7 +352,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager);
+                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
             }else {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
@@ -373,7 +378,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                             main.socketClient.makeMove(selectedSpot.getX() + "" + selectedSpot.getY(), secondSpot.getX() + "" + secondSpot.getY());
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);

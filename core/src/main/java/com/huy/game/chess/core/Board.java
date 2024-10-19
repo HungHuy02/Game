@@ -15,7 +15,7 @@ public class Board {
     private Spot[][] spots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
-    private Spot promotingSpot;
+    private Move promotingMove;
     private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
@@ -69,12 +69,12 @@ public class Board {
         return spots[x][y];
     }
 
-    public Spot getPromotingSpot() {
-        return promotingSpot;
+    public Move getPromotingMove() {
+        return promotingMove;
     }
 
-    public void setPromotingSpot(Spot promotingSpot) {
-        this.promotingSpot = promotingSpot;
+    public void setPromotingMove(Move promotingMove) {
+        this.promotingMove = promotingMove;
     }
 
     public Spot getPossibleEnPassantTargetsSpot() {
@@ -527,37 +527,45 @@ public class Board {
         }, 0, 0.5f);
     }
 
-    public void handlePawnPromotion(int boardX, int boardY,  ChessImage chessImage, ChessSound chessSound, ChessGameManager chessGameManager) {
+    public void handlePawnPromotion(int boardX, int boardY,  ChessImage chessImage, ChessSound chessSound, ChessGameManager chessGameManager, BoardSetting setting) {
         isPromoting = false;
-        if(boardX != getPromotingSpot().getY()) {
-            isPromoting = false;
-            promotingSpot = null;
+        int promoteY = promotingMove.getEnd().getY();
+        if(setting.isRotate()) {
+            promoteY = 7 - promoteY;
+        }
+        boolean isWhite = promotingMove.getEnd().getPiece().isWhite();
+        if(boardX != promoteY) {
+            promotingMove.unMove(this);
+            promotingMove = null;
+            clearColor();
         }else {
-            Piece piece;
-            if (promotingSpot.getPiece().isWhite()) {
-                piece = switch (boardY) {
-                    case 4 -> new Rook(true, chessImage.getwRock());
-                    case 5 -> new Bishop(true, chessImage.getwBishop());
-                    case 6 -> new Knight(true, chessImage.getwKnight());
-                    case 7 -> new Queen(true, chessImage.getwQueen());
-                    default -> null;
+            MoveType type;
+            if((isWhite && !setting.isRotate()) || (!isWhite && setting.isRotate())) {
+                switch (boardY) {
+                    case 4 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_ROOK);
+                    case 5 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_BISHOP);
+                    case 6 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_KNIGHT);
+                    case 7 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_QUEEN);
+                    default -> {
+                        promotingMove.setMoveType(MoveType.PROMOTE);
+                        promotingMove.unMove(this);
+                        clearColor();
+                    }
                 };
-            } else {
-                piece = switch (boardY) {
-                    case 0 -> new Queen(false, chessImage.getbQueen());
-                    case 1 -> new Knight(false, chessImage.getbKnight());
-                    case 2 -> new Bishop(false, chessImage.getbBishop());
-                    case 3 -> new Rook(false, chessImage.getbRook());
-                    case 4 -> new Rook(true, chessImage.getwRock());
-                    case 5 -> new Bishop(true, chessImage.getwBishop());
-                    case 6 -> new Knight(true, chessImage.getwKnight());
-                    case 7 -> new Queen(true, chessImage.getwQueen());
-                    default -> null;
+            }else {
+                switch (boardY) {
+                    case 0 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_ROOK);
+                    case 1 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_BISHOP);
+                    case 2 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_KNIGHT);
+                    case 3 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_QUEEN);
+                    default -> {
+                        promotingMove.setMoveType(MoveType.PROMOTE);
+                        promotingMove.unMove(this);
+                        clearColor();
+                    }
                 };
             }
-            setSpot(promotingSpot.getX(), promotingSpot.getY(), piece);
-            chessSound.playPromoteSound();
-            chessGameManager.switchPlayer(this);
+
         }
     }
 
@@ -567,15 +575,15 @@ public class Board {
         float scaledSide = scale * chessImage.getPieceSize();
         int spotX, spotY;
         if(setting.isRotate()) {
-            spotX = 7 - promotingSpot.getX();
-            spotY = 7 - promotingSpot.getY();
+            spotX = 7 - promotingMove.getEnd().getX();
+            spotY = 7 - promotingMove.getEnd().getY();
         }else {
-            spotX = promotingSpot.getX();
-            spotY = promotingSpot.getY();
+            spotX = promotingMove.getEnd().getX();
+            spotY = promotingMove.getEnd().getY();
         }
         float x = centerX + chessImage.getSpotSize() * spotY ;
         float y;
-        if((promotingSpot.getX() == 7 && !setting.isRotate()) || (promotingSpot.getX() == 0 && setting.isRotate()) ) {
+        if((promotingMove.getEnd().getX() == 7 && !setting.isRotate()) || (promotingMove.getEnd().getX() == 0 && setting.isRotate()) ) {
             y = centerY + chessImage.getSpotSize() * spotX - 3 * chessImage.getSpotSize();
         }else {
             y = centerY;
@@ -585,7 +593,7 @@ public class Board {
         shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
         shapeRenderer.end();
         batch.begin();
-        if (promotingSpot.getPiece().isWhite()) {
+        if (promotingMove.getEnd().getPiece().isWhite()) {
             batch.draw(chessImage.getwRock(), x + padding, y + padding , scaledSide, scaledSide);
             batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);
