@@ -157,8 +157,8 @@ public class King extends Piece {
         Spot end = spots[x][y];
         Move move = new Move(start, end);
         MoveType moveType = canMove(board, spots,start, end);
+        move.setMoveType(moveType);
         if(moveType != MoveType.CAN_NOT_MOVE) {
-            move.setMoveType(moveType);
             move.makeMove(board);
             if(board.isPositionSafe(x, y, end.getPiece().isWhite())) {
                 move.unMove(board);
@@ -175,8 +175,8 @@ public class King extends Piece {
         Spot end = spots[x][y];
         Move move = new Move(start, end);
         MoveType moveType = canMove(testBoard, spots, start, end);
+        move.setMoveType(moveType);
         if(moveType != MoveType.CAN_NOT_MOVE) {
-            move.setMoveType(moveType);
             move.makeMove(testBoard);
             if(testBoard.isPositionSafe(x, y, checkSpot.getPiece().isWhite())) {
                 board.getSpot(x, y).setShowMovePoint(true);

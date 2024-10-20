@@ -40,17 +40,7 @@ public class NotationHistoryScrollPane {
 
     public void addValue(String value, BitmapFont font, ChessGameAssesManager manager, ChessGameHistoryManager historyManager, ChessImage chessImage) {
         handleClearColor();
-        if(index % 3 == 2 || index == -1) {
-            Label.LabelStyle style = new Label.LabelStyle();
-            style.font = font;
-            style.fontColor = Colors.GREY_600;
-            Label label = new Label((index / 2 + 1) + ".", style);
-            Container<Label> labelContainer = new Container<>(label);
-            labelContainer.padLeft(16);
-            labelContainer.padRight(16);
-            horizontalGroup.addActor(labelContainer);
-            index++;
-        }
+        addSequenceNumber(font);
         Skin skin = manager.getSkin();
         index++;
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
@@ -75,6 +65,20 @@ public class NotationHistoryScrollPane {
         horizontalGroup.addActor(button);
         scrollPane.layout();
         scrollPane.setScrollX(horizontalGroup.getWidth());
+    }
+
+    private void addSequenceNumber(BitmapFont font) {
+        if(index % 3 == 2 || index == -1) {
+            Label.LabelStyle style = new Label.LabelStyle();
+            style.font = font;
+            style.fontColor = Colors.GREY_600;
+            Label label = new Label((index / 2 + 1) + ".", style);
+            Container<Label> labelContainer = new Container<>(label);
+            labelContainer.padLeft(16);
+            labelContainer.padRight(16);
+            horizontalGroup.addActor(labelContainer);
+            index++;
+        }
     }
 
     private void handleClearColor() {

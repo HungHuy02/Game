@@ -5,6 +5,7 @@ public class Player {
     private static Player Instance;
     private String name;
     private boolean isWhite;
+    private String imageUrl;
 
     private Player() {
 
@@ -36,5 +37,9 @@ public class Player {
 
     public boolean isWhite() {
         return isWhite;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 }

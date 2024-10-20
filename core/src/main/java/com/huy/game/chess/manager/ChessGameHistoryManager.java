@@ -39,6 +39,11 @@ public class ChessGameHistoryManager {
         board = history.changeFENToBoard(index, chessImage);
     }
 
+    public void setNewBoard(ChessImage chessImage) {
+        board = new Board();
+        board.resetBoard(chessImage);
+    }
+
     public int getIndex() {
         return index;
     }

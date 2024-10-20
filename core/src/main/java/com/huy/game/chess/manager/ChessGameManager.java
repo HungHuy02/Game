@@ -108,8 +108,10 @@ public class ChessGameManager {
         if(value > 0) {
             player1.addCapturedPiece(value);
             player2.addCapturedPiece(0);
+            player2.decreasePieceNumber(type);
         }else {
             player1.addCapturedPiece(0);
+            player1.decreasePieceNumber(type);
             player2.addCapturedPiece(Math.abs(value));
         }
     }

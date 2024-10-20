@@ -198,7 +198,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
+                board.handlePawnPromotion(boardX, boardY, setting);
                 if(board.getPromotingMove() != null) {
                     board.getPromotingMove().handleSpecialMove(board, chessImage);
                     board.handleMoveColorAndSound(board.getPromotingMove().getStart(), board.getPromotingMove().getEnd(), board.getPromotingMove(), chessSound, chessGameManager);
@@ -238,11 +238,18 @@ public class ChessScreen extends InputAdapter implements Screen {
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
-                            if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
-                                chessSound.playGameEndSound();
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                stage.addActor(popup.getPopup());
-                                multiplexer.removeProcessor(0);
+                            if(move.isCheck()) {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
+                            }else {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
                             }
                         }else {
                             board.warnIllegalMove(selectedSpot.getPiece().isWhite());
@@ -276,7 +283,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
+                board.handlePawnPromotion(boardX, boardY, setting);
             }else {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
@@ -305,11 +312,20 @@ public class ChessScreen extends InputAdapter implements Screen {
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
-                            if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                stage.addActor(popup.getPopup());
-                                multiplexer.removeProcessor(0);
+                            if(move.isCheck()) {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
+                            }else {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
                             }
+
                             Thread thread = new Thread(() -> {
                                 board.clearColor();
                                 if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer) {
@@ -353,7 +369,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, chessImage, chessSound, chessGameManager, setting);
+                board.handlePawnPromotion(boardX, boardY, setting);
             }else {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
@@ -383,11 +399,18 @@ public class ChessScreen extends InputAdapter implements Screen {
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
                             chessGameManager.switchPlayer(board);
-                            if(board.isCheckmate(chessGameManager.getCurrentPlayer().isWhite())) {
-                                chessSound.playGameEndSound();
-                                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                stage.addActor(popup.getPopup());
-                                multiplexer.removeProcessor(0);
+                            if(move.isCheck()) {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
+                            }else {
+                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                                    stage.addActor(popup.getPopup());
+                                    multiplexer.removeProcessor(0);
+                                }
                             }
                         }else {
                             board.warnIllegalMove(selectedSpot.getPiece().isWhite());

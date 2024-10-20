@@ -96,6 +96,8 @@ public class BottomAppBar {
                     manager.setRePlay(true);
                     scrollPane.handleChangeFocus(manager.getIndex(), assesManager);
                     manager.setBoard(chessImage);
+                }else {
+                    manager.setNewBoard(chessImage);
                 }
             }
         });

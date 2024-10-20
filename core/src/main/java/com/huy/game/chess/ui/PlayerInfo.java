@@ -10,10 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.chess.manager.OpponentPlayer;
+import com.huy.game.chess.manager.Player;
 
 import java.util.Map;
 
@@ -37,10 +38,11 @@ public class PlayerInfo {
         info.padRight(16);
         if(isPlayer1) {
             info.setPosition(0, (Gdx.graphics.getHeight() / 5) - chessImage.getScaledPieceSize());
+            info.addActor(image(image, chessImage, Player.getInstance().getImageUrl()));
         }else {
             info.setPosition(0, Gdx.graphics.getHeight() * 4 / 5);
+            info.addActor(image(image, chessImage, OpponentPlayer.getInstance().getImageUrl()));
         }
-        info.addActor(image(image, chessImage));
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
         info.addActor(new Timer(timeList, font, isPlayer1, chessImage));
     }
@@ -73,23 +75,25 @@ public class PlayerInfo {
         return avatar;
     }
 
-    private Image image(Texture image, ChessImage chessImage) {
+    private Image image(Texture image, ChessImage chessImage, String imageUrl) {
         Image avatar = new Image(image);
         float scale = chessImage.getScaledPieceSize() / image.getWidth();
         avatar.setOrigin(Align.center);
         avatar.setScale(scale);
-        Pixmap.downloadFromUrl("https://picsum.photos/seed/picsum/200/300", new Pixmap.DownloadPixmapResponseListener() {
-            @Override
-            public void downloadComplete(Pixmap pixmap) {
-                Texture texture = new Texture(pixmap);
-                avatar.setDrawable(new TextureRegionDrawable(texture));
-            }
+        if(imageUrl != null) {
+            Pixmap.downloadFromUrl( imageUrl, new Pixmap.DownloadPixmapResponseListener() {
+                @Override
+                public void downloadComplete(Pixmap pixmap) {
+                    Texture texture = new Texture(pixmap);
+                    avatar.setDrawable(new TextureRegionDrawable(texture));
+                }
 
-            @Override
-            public void downloadFailed(Throwable t) {
-
-            }
-        });
+                @Override
+                public void downloadFailed(Throwable t) {
+                    throw new RuntimeException(t.getMessage());
+                }
+            });
+        }
         return avatar;
     }
 

@@ -380,32 +380,26 @@ public class Board {
         return false;
     }
 
-    public boolean isCheckmate(boolean isWhite) {
-        if(!isKingSafe(isWhite)) {
-            if(canKingMove(isWhite)) {
-                return false;
-            }else {
-                for(int i = 0; i <= 7; i++) {
-                    for(int j = 0; j <= 7; j++) {
-                        Spot checkSpot = spots[i][j];
-                        Piece checkPiece = checkSpot.getPiece();
-                        if(checkPiece != null) {
-                            if(checkPiece.isWhite() == isWhite) {
-                                if(checkPiece.calculateMove(this,checkSpot)) {
-                                    return false;
-                                }
+    public boolean isHaveAvailableMove(boolean isWhite) {
+        if(canKingMove(isWhite)) {
+            return true;
+        }else {
+            for(int i = 0; i <= 7; i++) {
+                for(int j = 0; j <= 7; j++) {
+                    Spot checkSpot = spots[i][j];
+                    Piece checkPiece = checkSpot.getPiece();
+                    if(checkPiece != null) {
+                        if(checkPiece.isWhite() == isWhite) {
+                            if(checkPiece.calculateMove(this,checkSpot)) {
+                                return true;
                             }
                         }
                     }
                 }
             }
-            return true;
-        }else {
-            return false;
         }
+        return false;
     }
-
-
 
     public boolean canKingMove(boolean isWhite) {
         Spot kingSpot = getKingSpot(isWhite);
@@ -527,7 +521,7 @@ public class Board {
         }, 0, 0.5f);
     }
 
-    public void handlePawnPromotion(int boardX, int boardY,  ChessImage chessImage, ChessSound chessSound, ChessGameManager chessGameManager, BoardSetting setting) {
+    public void handlePawnPromotion(int boardX, int boardY, BoardSetting setting) {
         isPromoting = false;
         int promoteY = promotingMove.getEnd().getY();
         if(setting.isRotate()) {
@@ -539,7 +533,6 @@ public class Board {
             promotingMove = null;
             clearColor();
         }else {
-            MoveType type;
             if((isWhite && !setting.isRotate()) || (!isWhite && setting.isRotate())) {
                 switch (boardY) {
                     case 4 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_ROOK);
