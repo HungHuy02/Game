@@ -11,8 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.huy.game.chess.core.Board;
-import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameHistoryManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -41,12 +39,7 @@ public class NotationHistoryScrollPane {
     }
 
     public void addValue(String value, BitmapFont font, ChessGameAssesManager manager, ChessGameHistoryManager historyManager, ChessImage chessImage) {
-        if(index >= 1) {
-            Actor child = horizontalGroup.getChild(index);
-            if(child instanceof TextButton) {
-                ((TextButton) child).getStyle().up = null;
-            }
-        }
+        handleClearColor();
         if(index % 3 == 2 || index == -1) {
             Label.LabelStyle style = new Label.LabelStyle();
             style.font = font;
@@ -72,21 +65,11 @@ public class NotationHistoryScrollPane {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if(index != -1) {
-                    Actor child = horizontalGroup.getChild(index);
-                    if(child instanceof TextButton) {
-                        ((TextButton) child).getStyle().up = null;
-                    }
-                }
+                handleClearColor();
                 historyManager.setRePlay(true);
                 index = horizontalGroup.getChildren().indexOf(button, true);
-                Board board = FEN.fenToBoard(historyManager.getHistory().getFEN(index), chessImage);
-                historyManager.getHistory().handleMoveColor(board, index);
-                historyManager.setBoard(board);
-                Actor child = horizontalGroup.getChild(index);
-                if(child instanceof  TextButton) {
-                    button.getStyle().up = skin.getDrawable("button-normal");
-                }
+                historyManager.setBoard(changeToTrueIndex(index), chessImage);
+                handleNewColor(manager);
             }
         });
         horizontalGroup.addActor(button);
@@ -94,5 +77,41 @@ public class NotationHistoryScrollPane {
         scrollPane.setScrollX(horizontalGroup.getWidth());
     }
 
+    private void handleClearColor() {
+        if(index != -1) {
+            Actor child = horizontalGroup.getChild(index);
+            if(child instanceof TextButton textButton) {
+                textButton.getStyle().up = null;
+            }
+        }
+    }
 
+    private TextButton handleNewColor(ChessGameAssesManager manager) {
+        Skin skin = manager.getSkin();
+        Actor child = horizontalGroup.getChild(index);
+        if(child instanceof  TextButton button) {
+            button.getStyle().up = skin.getDrawable("button-normal");
+            return button;
+        }else {
+            throw new RuntimeException("Notation Scroll Pane error");
+        }
+    }
+
+    private void handleScroll(TextButton button) {
+        scrollPane.scrollTo(button.getX(), button.getY(), button.getWidth(), button.getHeight());
+    }
+
+    public void handleChangeFocus(int trueIndex, ChessGameAssesManager manager) {
+        handleClearColor();
+        index = changeToThisIndex(trueIndex);
+        handleScroll(handleNewColor(manager));
+    }
+
+    private int changeToTrueIndex(int index) {
+        return index - index / 3 - 1;
+    }
+
+    private int changeToThisIndex(int trueIndex) {
+        return trueIndex + 1 + trueIndex / 2;
+    }
 }

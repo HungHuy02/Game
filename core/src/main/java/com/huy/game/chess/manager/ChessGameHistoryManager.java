@@ -6,8 +6,9 @@ import com.huy.game.chess.core.GameHistory;
 public class ChessGameHistoryManager {
 
     private boolean isRePlay = false;
-    private GameHistory history;
+    private final GameHistory history;
     private Board board;
+    private int index = -1;
 
     public ChessGameHistoryManager(GameHistory history) {
         this.history = history;
@@ -29,7 +30,28 @@ public class ChessGameHistoryManager {
         return board;
     }
 
-    public void setBoard(Board board) {
-        this.board = board;
+    public void setBoard(int index, ChessImage chessImage) {
+        board = history.changeFENToBoard(index, chessImage);
+        this.index = index;
+    }
+
+    public void setBoard(ChessImage chessImage) {
+        board = history.changeFENToBoard(index, chessImage);
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public void increaseIndex() {
+        index++;
+    }
+
+    public void decreaseIndex() {
+        index--;
     }
 }

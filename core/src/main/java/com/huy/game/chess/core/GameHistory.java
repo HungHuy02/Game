@@ -3,8 +3,8 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.core.notation.FEN;
-import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.manager.ChessGameManager;
+import com.huy.game.chess.manager.ChessImage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,8 +82,14 @@ public class GameHistory {
         ).setShowColor(true);
     }
 
+    public Board changeFENToBoard(int index, ChessImage chessImage) {
+        Board board = FEN.fenToBoard(getFEN(index), chessImage);
+        handleMoveColor(board, index);
+        return board;
+    }
+
     public String getMove(int index) {
-        return movedList.get(index - index / 3 - 1);
+        return movedList.get(index);
     }
 
     public void addBoard(Board board) {
@@ -95,10 +101,14 @@ public class GameHistory {
     }
 
     public String getFEN(int index) {
-        return fenList.get(index - index / 3 - 1);
+        return fenList.get(index);
     }
 
     public void resetHalfmoveClock() {
         halfmoveClock = 0;
+    }
+
+    public int getNumberBoardSaved() {
+        return movedList.size();
     }
 }

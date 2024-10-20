@@ -92,7 +92,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         scrollPane = new NotationHistoryScrollPane();
         CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage);
         OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage);
-        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(),stage, bundle);
+        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
         selectedSpot = null;
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
@@ -233,6 +233,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
+                            chessGameHistoryManager.increaseIndex();
                             scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                             board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
                             selectedSpot = null;
