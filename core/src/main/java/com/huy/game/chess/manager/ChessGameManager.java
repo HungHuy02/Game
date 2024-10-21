@@ -8,7 +8,6 @@ import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ChessGameManager {
@@ -84,21 +83,18 @@ public class ChessGameManager {
     }
 
     public void switchPlayer(Board board) {
-        if(!board.isPromoting()) {
-            cancelTimer();
-            int timeRemain = currentPlayer.getTimeRemain() + plusTime;
-            if(currentPlayer == player1) {
-                timeList.put("1",timeRemain );
-                currentPlayer.setTimeRemain(timeRemain);
-                currentPlayer = player2;
-                handleTimer("2");
-            }else {
-                timeList.put("2", timeRemain);
-                currentPlayer.setTimeRemain(timeRemain);
-                currentPlayer = player1;
-                handleTimer("1");
-            }
-            currentPlayer.increaseTurn();
+        cancelTimer();
+        int timeRemain = currentPlayer.getTimeRemain() + plusTime;
+        if(currentPlayer == player1) {
+            timeList.put("1",timeRemain );
+            currentPlayer.setTimeRemain(timeRemain);
+            currentPlayer = player2;
+            handleTimer("2");
+        }else {
+            timeList.put("2", timeRemain);
+            currentPlayer.setTimeRemain(timeRemain);
+            currentPlayer = player1;
+            handleTimer("1");
         }
     }
 
@@ -144,10 +140,6 @@ public class ChessGameManager {
         timeList.put("play1", 0);
         timeList.put("play2", 0);
         timer.clear();
-    }
-
-    public int getCurrentTurn() {
-        return currentPlayer.getTurn();
     }
 
     public ChessPlayer getPlayer1() {

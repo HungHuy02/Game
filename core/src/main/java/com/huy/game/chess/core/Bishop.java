@@ -115,7 +115,6 @@ public class Bishop extends Piece {
     @Override
     public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
-        setAICalculate(true);
         for (int[] move: bishopMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
@@ -129,7 +128,6 @@ public class Bishop extends Piece {
                 }
             }
         }
-        setAICalculate(false);
         return list;
     }
 }

@@ -10,7 +10,6 @@ public class ChessPlayer {
     private Map<String, Integer> capturedPieceMap;
     private Map<PieceType, Integer> pieceNumberMap;
     private int value = 0;
-    private int turn = 1;
     private int timeRemain;
 
     public ChessPlayer(boolean isWhite, int timeRemain) {
@@ -57,18 +56,6 @@ public class ChessPlayer {
 
     public int getValue() {
         return value;
-    }
-
-    public void increaseTurn() {
-        turn++;
-    }
-
-    public void decreaseTurn(int numberTurnBack) {
-        turn -= numberTurnBack;
-    }
-
-    public int getTurn() {
-        return turn;
     }
 
     public void addCapturedPiece(PieceType type) {

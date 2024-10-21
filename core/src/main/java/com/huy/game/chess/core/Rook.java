@@ -9,19 +9,9 @@ import java.util.List;
 
 public class Rook extends Piece {
 
-    private boolean hasMove = false;
-
     public Rook(boolean white) {
         super(white);
         setType(PieceType.ROOK);
-    }
-
-    public boolean isHasMove() {
-        return hasMove;
-    }
-
-    public void setHasMove() {
-        this.hasMove = true;
     }
 
     private int[][] rookMoves() {
@@ -32,7 +22,6 @@ public class Rook extends Piece {
 
     public Rook(Rook rook) {
         super(rook.isWhite());
-        hasMove = rook.hasMove;
         setType(PieceType.ROOK);
     }
 
@@ -131,7 +120,6 @@ public class Rook extends Piece {
     @Override
     public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
-        setAICalculate(true);
         for (int[] move: rookMoves()) {
             for(int i = 1; i <= 7; i++) {
                 int x = move[0] * i + checkSpot.getX();
@@ -145,7 +133,6 @@ public class Rook extends Piece {
                 }
             }
         }
-        setAICalculate(false);
         return list;
     }
 }

@@ -16,7 +16,6 @@ import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.core.Move;
-import com.huy.game.chess.core.Pawn;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
 import com.huy.game.chess.enums.ChessMode;
@@ -113,7 +112,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
                 Move move = new Move(start,end);
                 scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                board.handleMoveColorAndSound(start, end, move, chessSound, chessGameManager);
+                board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
                 chessGameManager.switchPlayer(board);
             });
             main.socketClient.getMoveFromOpponent();
@@ -198,12 +197,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, setting);
-                if(board.getPromotingMove() != null) {
-                    board.getPromotingMove().handleSpecialMove(board, chessImage);
-                    board.handleMoveColorAndSound(board.getPromotingMove().getStart(), board.getPromotingMove().getEnd(), board.getPromotingMove(), chessSound, chessGameManager);
-                    chessGameManager.switchPlayer(board);
-                }
+                handlePawnPromotion(boardX, boardY);
             }else {
                 if(setting.isRotate()) {
                     boardX = 7 - boardX;
@@ -212,9 +206,6 @@ public class ChessScreen extends InputAdapter implements Screen {
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
                     selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() instanceof Pawn) {
-                        ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
-                    }
                     if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
                         if(!selectedSpot.isIdentificationColor()) {
                             selectedSpot.setShowColor(false);
@@ -233,40 +224,17 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            chessGameHistoryManager.increaseIndex();
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
-                            selectedSpot = null;
-                            chessGameManager.switchPlayer(board);
-                            if(move.isCheck()) {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                            if (moveType != MoveType.PROMOTE) {
+                                handleMove(move);
                             }else {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                                move.handleSpecialMove(board, chessImage);
                             }
+                            selectedSpot = null;
                         }else {
-                            board.warnIllegalMove(selectedSpot.getPiece().isWhite());
-                            selectedSpot.setShowColor(true);
-                            chessSound.playIllegalSound();
+                            handleWhenPerformIllegalMove();
                         }
                     }else {
-                        if(secondSpot.getPiece() != null) {
-                            selectedSpot.setShowColor(false);
-                            selectedSpot = secondSpot;
-                            board.clearGuidePoint();
-                            selectedSpot.setShowColor(true);
-                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
-                        }else {
-                            selectedSpot = null;
-                            board.clearGuidePoint();
-                        }
+                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
                     }
                 }
             }
@@ -276,21 +244,18 @@ public class ChessScreen extends InputAdapter implements Screen {
     private void handlePlayerClickWhenPlayWithAI(int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
-        if(setting.isRotate()) {
-            boardX = 7 - boardX;
-            boardY = 7 - boardY;
-        }
 
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, setting);
+                handlePawnPromotion(boardX, boardY);
             }else {
+                if(setting.isRotate()) {
+                    boardX = 7 - boardX;
+                    boardY = 7 - boardY;
+                }
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
                     selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() instanceof Pawn) {
-                        ((Pawn) selectedSpot.getPiece()).setTurn(chessGameManager.getCurrentTurn());
-                    }
                     if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
                         if(!selectedSpot.isIdentificationColor()) {
                             selectedSpot.setShowColor(false);
@@ -305,33 +270,22 @@ public class ChessScreen extends InputAdapter implements Screen {
                     Board testBoard = board.cloneBoard();
                     MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
                     if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+                        move.setMoveType(moveType);
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
-                            selectedSpot = null;
-                            chessGameManager.switchPlayer(board);
-                            if(move.isCheck()) {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                            if (moveType != MoveType.PROMOTE) {
+                                handleMove(move);
                             }else {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                                move.handleSpecialMove(board, chessImage);
                             }
 
                             Thread thread = new Thread(() -> {
                                 board.clearColor();
-                                if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer) {
-                                    Move aiMove = ((ChessAIPlayer) chessGameManager.getCurrentPlayer()).findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
+                                if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer chessAIPlayer) {
+                                    Move aiMove = chessAIPlayer.findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
                                     String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager);
-                                    board.handleMoveColorAndSound(board.getSpot(aiMove.getStart().getX(), aiMove.getStart().getY()), board.getSpot(aiMove.getEnd().getX(), aiMove.getEnd().getY()), aiMove, chessSound, chessGameManager);
+                                    board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
                                     Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
                                     chessGameManager.switchPlayer(board);
                                 }
@@ -339,21 +293,10 @@ public class ChessScreen extends InputAdapter implements Screen {
                             });
                             thread.start();
                         }else {
-                            board.warnIllegalMove(selectedSpot.getPiece().isWhite());
-                            selectedSpot.setShowColor(true);
-                            chessSound.playIllegalSound();
+                            handleWhenPerformIllegalMove();
                         }
                     }else {
-                        if(secondSpot.getPiece() != null) {
-                            selectedSpot.setShowColor(false);
-                            selectedSpot = secondSpot;
-                            board.clearGuidePoint();
-                            selectedSpot.setShowColor(true);
-                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
-                        }else {
-                            selectedSpot = null;
-                            board.clearGuidePoint();
-                        }
+                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
                     }
                 }
             }
@@ -363,20 +306,18 @@ public class ChessScreen extends InputAdapter implements Screen {
     private void handlePlayerClickWhenPlayOnline(int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
-        if(setting.isRotate()) {
-            boardX = 7 - boardX;
-            boardY = 7 - boardY;
-        }
+
         if (board.isWithinBoard(boardX, boardY)) {
             if(board.isPromoting()) {
-                board.handlePawnPromotion(boardX, boardY, setting);
+                handlePawnPromotion(boardX, boardY);
             }else {
+                if(setting.isRotate()) {
+                    boardX = 7 - boardX;
+                    boardY = 7 - boardY;
+                }
                 if (selectedSpot == null) {
                     selectedSpot = board.getSpot(boardY, boardX);
                     selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() instanceof Pawn pawn) {
-                        pawn.setTurn(chessGameManager.getCurrentTurn());
-                    }
                     if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
                         if(!selectedSpot.isIdentificationColor()) {
                             selectedSpot.setShowColor(false);
@@ -394,43 +335,70 @@ public class ChessScreen extends InputAdapter implements Screen {
                         board.clearColorAndPoint();
                         move.makeMove(testBoard);
                         if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            main.socketClient.makeMove(selectedSpot.getX() + "" + selectedSpot.getY(), secondSpot.getX() + "" + secondSpot.getY());
-                            scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
-                            board.handleMoveColorAndSound(selectedSpot, secondSpot, move, chessSound, chessGameManager);
-                            selectedSpot = null;
-                            chessGameManager.switchPlayer(board);
-                            if(move.isCheck()) {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                            if (moveType != MoveType.PROMOTE) {
+                                handleMove(move);
                             }else {
-                                if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                                    EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                                    stage.addActor(popup.getPopup());
-                                    multiplexer.removeProcessor(0);
-                                }
+                                move.handleSpecialMove(board, chessImage);
                             }
                         }else {
-                            board.warnIllegalMove(selectedSpot.getPiece().isWhite());
-                            selectedSpot.setShowColor(true);
-                            chessSound.playIllegalSound();
+                            handleWhenPerformIllegalMove();
                         }
                     }else {
-                        if(secondSpot.getPiece() != null) {
-                            selectedSpot.setShowColor(false);
-                            selectedSpot = secondSpot;
-                            board.clearGuidePoint();
-                            selectedSpot.setShowColor(true);
-                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
-                        }else {
-                            selectedSpot = null;
-                            board.clearGuidePoint();
-                        }
+                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
                     }
                 }
             }
+        }
+    }
+
+    private void handlePawnPromotion(int boardX, int boardY) {
+        board.handlePawnPromotion(boardX, boardY, setting);
+        Move move = board.getPromotingMove();
+        if(move != null) {
+            handleMove(move);
+        }
+    }
+
+    private void handleMove(Move move) {
+        chessGameHistoryManager.increaseIndex();
+        scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
+        board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
+        chessGameManager.switchPlayer(board);
+        checkForEndGame(move);
+    }
+
+    private void handleWhenPerformIllegalMove() {
+        board.warnIllegalMove(selectedSpot.getPiece().isWhite());
+        selectedSpot.setShowColor(true);
+        chessSound.playIllegalSound();
+    }
+
+    private void checkForEndGame(Move move) {
+        if(move.isCheck()) {
+            if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                stage.addActor(popup.getPopup());
+                multiplexer.removeProcessor(0);
+            }
+        }else {
+            if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                stage.addActor(popup.getPopup());
+                multiplexer.removeProcessor(0);
+            }
+        }
+    }
+
+    private void handleWhenClickAnotherSpotCanNotMoveTo(Spot anotherSpot) {
+        if(anotherSpot.getPiece() != null) {
+            selectedSpot.setShowColor(false);
+            selectedSpot = anotherSpot;
+            board.clearGuidePoint();
+            selectedSpot.setShowColor(true);
+            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+        }else {
+            selectedSpot = null;
+            board.clearGuidePoint();
         }
     }
 

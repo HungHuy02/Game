@@ -10,7 +10,6 @@ public abstract class Piece {
 
     private boolean isWhite;
     private Texture texture;
-    private boolean isAICalculate;
     private PieceType type;
 
     public Piece(boolean isWhite, Texture texture) {
@@ -32,14 +31,6 @@ public abstract class Piece {
 
     public Texture getTexture() {
         return texture;
-    }
-
-    public boolean isAICalculate() {
-        return isAICalculate;
-    }
-
-    public void setAICalculate(boolean AICalculate) {
-        isAICalculate = AICalculate;
     }
 
     public void setType(PieceType type) {

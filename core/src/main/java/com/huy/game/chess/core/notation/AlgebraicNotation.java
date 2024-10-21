@@ -20,7 +20,7 @@ public class AlgebraicNotation {
         }
         Spot[][] spots = new Spot[8][8];
         StringBuilder builder = new StringBuilder();
-        switch (start.getPiece().getType()) {
+        switch (move.getStartPiece().getType()) {
             case PAWN -> history.resetHalfmoveClock();
             case KNIGHT -> {
                 builder.append('N');

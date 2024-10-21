@@ -86,7 +86,6 @@ public class Knight extends Piece {
     @Override
     public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
-        setAICalculate(true);
         for (int[] move: knightMoves()) {
             int x = move[0] + checkSpot.getX();
             int y = move[1] + checkSpot.getY();
@@ -96,7 +95,6 @@ public class Knight extends Piece {
                 }
             }
         }
-        setAICalculate(false);
         return list;
     }
 }

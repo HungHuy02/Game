@@ -11,8 +11,8 @@ public class King extends Piece {
 
     private boolean hasMove = false;
     private boolean isSafe = true;
-    private boolean isCastling = false;
-    private boolean isCalculate = false;
+    private boolean canCastlingKingSide = true;
+    private boolean canCastlingQueenSide = true;
 
     public boolean isHasMove() {
         return hasMove;
@@ -26,24 +26,33 @@ public class King extends Piece {
         this.isSafe = isSafe;
     }
 
-    public void setCastling(boolean castling) {
-        isCastling = castling;
-    }
-
-    public boolean isCastling() {
-        return isCastling;
-    }
-
     public King(boolean isWhite, Texture texture) {
         super(isWhite, texture);
         setType(PieceType.KING);
+    }
+
+    public boolean isCanCastlingKingSide() {
+        return canCastlingKingSide;
+    }
+
+    public void setCanCastlingKingSide(boolean canCastlingKingSide) {
+        this.canCastlingKingSide = canCastlingKingSide;
+    }
+
+    public boolean isCanCastlingQueenSide() {
+        return canCastlingQueenSide;
+    }
+
+    public void setCanCastlingQueenSide(boolean canCastlingQueenSide) {
+        this.canCastlingQueenSide = canCastlingQueenSide;
     }
 
     public King(King king) {
         super(king.isWhite());
         hasMove = king.hasMove;
         isSafe = king.isSafe;
-        isCastling = king.isCastling;
+        canCastlingKingSide = king.canCastlingKingSide;
+        canCastlingQueenSide = king.canCastlingQueenSide;
         setType(PieceType.KING);
     }
 
@@ -57,37 +66,37 @@ public class King extends Piece {
         if(x == 0 && y == 2) {
             if(this.isSafe && !this.hasMove) {
                 int directionY = Integer.signum(end.getY() - start.getY());
-                Piece rookPiece;
                 if(directionY > 0) {
-                    rookPiece = board.getSpot(start.getX(), 7).getPiece();
-                }else {
-                    rookPiece = board.getSpot(start.getX(), 0).getPiece();
-                }
-                if(rookPiece !=null && rookPiece.isWhite() == this.isWhite() && rookPiece instanceof Rook rook) {
-                    if (rook.isHasMove()) {
-                        return MoveType.CAN_NOT_MOVE;
-                    }
-                    for(int i = 1; i <= 2; i++) {
-                        Piece checkPiece = spots[start.getX()][start.getY() + directionY * i].getPiece();
-                        if(checkPiece != null) {
-                            return MoveType.CAN_NOT_MOVE;
-                        }else {
-                            if(!board.isPositionSafe(start.getX(), start.getY() + directionY * i, this.isWhite())) {
+                    if (canCastlingKingSide) {
+                        for(int i = 1; i <= 2; i++) {
+                            Piece checkPiece = spots[start.getX()][start.getY() + directionY * i].getPiece();
+                            if(checkPiece != null) {
                                 return MoveType.CAN_NOT_MOVE;
+                            }else {
+                                if(!board.isPositionSafe(start.getX(), start.getY() + directionY * i, this.isWhite())) {
+                                    return MoveType.CAN_NOT_MOVE;
+                                }
                             }
                         }
-                    }
-                    if(directionY > 0) {
                         return MoveType.CASTLING_KING_SIDE;
-                    }else {
-                        return MoveType.CASTLING_QUEEN_SIDE;
                     }
                 }else {
-                    return MoveType.CAN_NOT_MOVE;
+                    if (canCastlingQueenSide) {
+                        for(int i = 1; i <= 2; i++) {
+                            Piece checkPiece = spots[start.getX()][start.getY() + directionY * i].getPiece();
+                            if(checkPiece != null) {
+                                return MoveType.CAN_NOT_MOVE;
+                            }else {
+                                if(!board.isPositionSafe(start.getX(), start.getY() + directionY * i, this.isWhite())) {
+                                    return MoveType.CAN_NOT_MOVE;
+                                }
+                            }
+                        }
+                        return MoveType.CASTLING_QUEEN_SIDE;
+                    }
                 }
-            }else {
-                return MoveType.CAN_NOT_MOVE;
             }
+            return MoveType.CAN_NOT_MOVE;
         }else if (x <= 1 && y <= 1) {
             if(end.getPiece()!= null) {
                 board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
@@ -141,14 +150,12 @@ public class King extends Piece {
                 }
             }
         }
-        isCalculate = true;
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
             calculateForOnePoint(board, testBoard,spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2);
         }
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() - 2)){
             calculateForOnePoint(board, testBoard,spots,checkSpot, checkSpot.getX(), checkSpot.getY() - 2);
         }
-        isCalculate = false;
     }
 
     @Override
@@ -191,7 +198,6 @@ public class King extends Piece {
     @Override
     public List<Move> getValidMoves(Board board, Spot[][] spots, Spot checkSpot) {
         List<Move> list = new ArrayList<>();
-        setAICalculate(true);
         for(int i = -1; i <= 1; i++) {
             int x = checkSpot.getX() + i;
             for(int j = -1; j <= 1; j++) {
@@ -206,7 +212,6 @@ public class King extends Piece {
                 }
             }
         }
-        isCalculate = true;
         if(board.isWithinBoard(checkSpot.getX(), checkSpot.getY() + 2)){
             if(calculateOneMove(board, spots,checkSpot, checkSpot.getX(), checkSpot.getY() + 2)) {
                 list.add(new Move(checkSpot, spots[checkSpot.getX()][checkSpot.getY() + 2]));
@@ -217,8 +222,6 @@ public class King extends Piece {
                 list.add(new Move(checkSpot, spots[checkSpot.getX()][checkSpot.getY() - 2]));
             }
         }
-        isCalculate = false;
-        setAICalculate(false);
         return list;
     }
 }

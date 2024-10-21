@@ -19,6 +19,7 @@ public class Board {
     private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
     private boolean isEnd = false;
+    private int turn = 1;
 
     public void setSpots(Spot[][] spots) {
         this.spots = spots;
@@ -54,6 +55,7 @@ public class Board {
         if (possibleEnPassantTargetsSpot != null) {
             testBoard.setPossibleEnPassantTargetsSpot(testBoard.getSpots()[possibleEnPassantTargetsSpot.getX()][possibleEnPassantTargetsSpot.getY()]);
         }
+        testBoard.turn=turn;
         return testBoard;
     }
 
@@ -85,6 +87,22 @@ public class Board {
         this.possibleEnPassantTargetsSpot = possibleEnPassantTargetsSpot;
     }
 
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void increaseTurn() {
+        turn++;
+    }
+
+    public void decreaseTurn() {
+        turn--;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
     public void setEnd(){
         isEnd = true;
     }
@@ -108,27 +126,12 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public void handleMoveColorAndSound(Spot selectedSpot, Spot secondSpot, Move move, ChessSound chessSound, ChessGameManager chessGameManager) {
-        if(secondSpot.getPiece().isCheckOpponentKing(this, spots, secondSpot)) {
-            move.setCheck(true);
-        }else {
-            if (isIndirectCheck(selectedSpot, secondSpot.getPiece().isWhite())) {
-                move.setCheck(true);
-            }
-        }
-        possibleEnPassantTargetsSpot = null;
+    public void handleSoundAfterMove(Piece endPiece, Move move, ChessSound chessSound, ChessGameManager chessGameManager) {
         switch (move.getMoveType()) {
-            case NORMAL -> chessSound.playMoveSound();
-            case DOUBLE_STEP_PAWN ->  {
-                chessSound.playMoveSound();
-                if(secondSpot.getPiece() instanceof Pawn pawn) {
-                    pawn.setTurn(chessGameManager.getCurrentTurn());
-                    possibleEnPassantTargetsSpot = secondSpot;
-                }
-            }
+            case NORMAL, DOUBLE_STEP_PAWN -> chessSound.playMoveSound();
             case CAPTURE -> {
                 chessSound.playCaptureSound();
-                chessGameManager.putValue(secondSpot.getPiece().getType());
+                chessGameManager.putValue(endPiece.getType());
             }
             case EN_PASSANT -> {
                 chessSound.playCaptureSound();
@@ -527,9 +530,8 @@ public class Board {
         if(setting.isRotate()) {
             promoteY = 7 - promoteY;
         }
-        boolean isWhite = promotingMove.getEnd().getPiece().isWhite();
+        boolean isWhite = promotingMove.getStart().getPiece().isWhite();
         if(boardX != promoteY) {
-            promotingMove.unMove(this);
             promotingMove = null;
             clearColor();
         }else {
@@ -541,7 +543,6 @@ public class Board {
                     case 7 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_QUEEN);
                     default -> {
                         promotingMove.setMoveType(MoveType.PROMOTE);
-                        promotingMove.unMove(this);
                         clearColor();
                     }
                 };
@@ -553,7 +554,6 @@ public class Board {
                     case 3 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_QUEEN);
                     default -> {
                         promotingMove.setMoveType(MoveType.PROMOTE);
-                        promotingMove.unMove(this);
                         clearColor();
                     }
                 };
@@ -586,7 +586,7 @@ public class Board {
         shapeRenderer.rect(x, y, chessImage.getSpotSize(), chessImage.getSpotSize() * 4);
         shapeRenderer.end();
         batch.begin();
-        if (promotingMove.getEnd().getPiece().isWhite()) {
+        if (promotingMove.getStart().getPiece().isWhite()) {
             batch.draw(chessImage.getwRock(), x + padding, y + padding , scaledSide, scaledSide);
             batch.draw(chessImage.getwBishop(), x + padding, y + padding + chessImage.getSpotSize() , scaledSide, scaledSide);
             batch.draw(chessImage.getwKnight(), x + padding, y + padding + chessImage.getSpotSize() * 2, scaledSide, scaledSide);

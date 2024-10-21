@@ -21,9 +21,9 @@ public class FEN {
         piecePosition(spots, builder);
         moveNext(builder, isWhite);
         castlingRights(board, builder);
-        possibleEnPassantTargets(builder, board);
+        possibleEnPassantTargets(builder, board, isWhite);
         halfmoveClock(builder, history);
-        fullMoveNumber(builder, manager);
+        fullMoveNumber(builder, board);
         return builder.toString();
     }
 
@@ -77,29 +77,26 @@ public class FEN {
     private static void checkCastlingRights(Board board, StringBuilder builder, boolean isWhite, char kingSide, char queenSide) {
         Spot kingSpot = board.getKingSpot(isWhite);
         Piece kingPiece = kingSpot.getPiece();
-        if (kingPiece instanceof King && !((King) kingPiece).isHasMove()) {
-            if (canCastle(board, kingSpot, 7)) {
-                builder.append(kingSide);
-            }
-            if (canCastle(board, kingSpot, 0)) {
-                builder.append(queenSide);
+        if (kingPiece instanceof King king) {
+            if (!king.isHasMove()) {
+                if (king.isCanCastlingKingSide()) {
+                    builder.append(kingSide);
+                }
+                if (king.isCanCastlingQueenSide()) {
+                    builder.append(queenSide);
+                }
             }
         }
     }
 
-    private static boolean canCastle(Board board, Spot kingSpot, int rookFile) {
-        Piece rook = board.getSpot(kingSpot.getX(), rookFile).getPiece();
-        return (rook instanceof Rook) && !((Rook) rook).isHasMove();
-    }
-
-    private static void possibleEnPassantTargets(StringBuilder builder, Board board) {
+    private static void possibleEnPassantTargets(StringBuilder builder, Board board, boolean isWhite) {
         builder.append(' ');
         Spot spot = board.getPossibleEnPassantTargetsSpot();
         if(spot == null) {
             builder.append('-');
-        }else {
+        } else {
             builder.append((char) ('a' + spot.getY()));
-            builder.append(spot.getX() + 1);
+            builder.append(isWhite ? spot.getX() : spot.getX() + 2);
         }
     }
 
@@ -108,9 +105,9 @@ public class FEN {
         builder.append(history.getHalfmoveClock());
     }
 
-    private static void fullMoveNumber(StringBuilder builder, ChessGameManager manager) {
+    private static void fullMoveNumber(StringBuilder builder, Board board) {
         builder.append(' ');
-        builder.append(manager.getCurrentPlayer().getTurn());
+        builder.append(board.getTurn());
     }
 
     public static Board fenToBoard(String fen, ChessImage chessImage) {
@@ -118,10 +115,10 @@ public class FEN {
         String[] parts = fen.split(" ");
         board.setSpots(positionToSpots(parts[0], chessImage, board));
         handleMoveNext(parts[1]);
-        handleCastlingRights(parts[2], board, board.getSpots());
+        handleCastlingRights(parts[2], board);
         handlePossibleEnPassantTargets(board, board.getSpots(), parts[3]);
         handleHalfmoveClock(parts[4]);
-        handleFullMoveNumber(parts[5]);
+        handleFullMoveNumber(parts[5], board);
         return board;
     }
 
@@ -216,9 +213,34 @@ public class FEN {
         return moveNext.equals("w");
     }
 
-    private static void handleCastlingRights(String castlingRights, Board board, Spot[][] spots) {
-        if(castlingRights.equals("-")) {
-
+    private static void handleCastlingRights(String castlingRights, Board board) {
+        if(castlingRights.length() != 4) {
+            if(castlingRights.equals("-")) {
+                if(board.getKingSpot(true).getPiece() instanceof King king) {
+                    king.setHasMove();
+                }
+                if(board.getKingSpot(false).getPiece() instanceof King king) {
+                    king.setHasMove();
+                }
+            }else {
+                boolean K = false, Q = false, k = false, q = false;
+                for(int i = 0; i < castlingRights.length(); i++) {
+                    switch (castlingRights.charAt(i)) {
+                        case 'K' -> K = true;
+                        case 'Q' -> Q = true;
+                        case 'k' -> k = true;
+                        case 'q' -> q = true;
+                    }
+                }
+                if(board.getKingSpot(true).getPiece() instanceof King king) {
+                    king.setCanCastlingKingSide(K);
+                    king.setCanCastlingQueenSide(Q);
+                }
+                if (board.getKingSpot(false).getPiece() instanceof King king) {
+                    king.setCanCastlingKingSide(k);
+                    king.setCanCastlingQueenSide(q);
+                }
+            }
         }
     }
 
@@ -237,8 +259,8 @@ public class FEN {
         return Integer.parseInt(halfmoveClock);
     }
 
-    private static int handleFullMoveNumber(String fullMoveNumber) {
-        return Integer.parseInt(fullMoveNumber);
+    private static void handleFullMoveNumber(String fullMoveNumber, Board board) {
+        board.setTurn(Integer.parseInt(fullMoveNumber));
     }
 
 }

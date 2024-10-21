@@ -11,6 +11,7 @@ public class Move {
     private final Piece endPiece;
     private MoveType moveType;
     private boolean isCheck = false;
+    private Spot possibleEnPassantTargetsSpot = null;
 
     public Move(Spot start, Spot end) {
         this.start = start;
@@ -31,8 +32,16 @@ public class Move {
         return start;
     }
 
+    public Piece getStartPiece() {
+        return startPiece;
+    }
+
     public Spot getEnd() {
         return end;
+    }
+
+    public Piece getEndPiece() {
+        return endPiece;
     }
 
     public boolean isCheck() {
@@ -43,42 +52,64 @@ public class Move {
         isCheck = check;
     }
 
-    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager, ChessImage chessImage){
+    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager, ChessImage chessImage) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
-        String text = history.addMove(start, end, this);
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
         handleSpecialMove(board, chessImage);
+        handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite(), manager);
-        start.setShowColor(true);
-        end.setShowColor(true);
-        return text;
+        handleSpotColorAfterMove(start, end);
+        board.increaseTurn();
+        return history.addMove(start, end, this);
     }
 
     public void makeMove(Board board) {
         board.setSpot(end.getX(), end.getY(), new Spot(start).getPiece());
         board.setSpot(start.getX(), start.getY(), null);
         handleSpecialMove(board);
+        board.increaseTurn();
     }
 
     public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
-        String text = history.addMove(startSpot, board.getSpot(end.getX(), end.getY()), this);
+        Spot endSpot = board.getSpot(end.getX(), end.getY());
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
-        startSpot.setShowColor(true);
         board.setSpot(start.getX(), start.getY(), null);
+        handleSpotColorAfterMove(startSpot, endSpot);
+        handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite(), manager);
-        return text;
+        board.increaseTurn();
+        return history.addMove(startSpot, board.getSpot(end.getX(), end.getY()), this);
+    }
+
+    private void handleSpotColorAfterMove(Spot start, Spot end) {
+        start.setShowColor(true);
+        end.setShowColor(true);
+    }
+
+    private void handleCheck(Board board) {
+        if(end.getPiece().isCheckOpponentKing(board, board.getSpots(), end)) {
+            isCheck = true;
+        }else {
+            if (board.isIndirectCheck(start, end.getPiece().isWhite())) {
+                isCheck = true;
+            }
+        }
     }
 
     public void unMove(Board board) {
         board.setSpot(start.getX(), start.getY(), startPiece);
         board.setSpot(end.getX(), end.getY(), endPiece);
         unMoveSpecialMove(board);
+        board.decreaseTurn();
     }
 
     private void unMoveSpecialMove(Board board) {
+        if (possibleEnPassantTargetsSpot != null) {
+            board.setPossibleEnPassantTargetsSpot(possibleEnPassantTargetsSpot);
+        }
         switch (moveType) {
             case CASTLING_KING_SIDE -> {
                 board.getSpot(start.getX(), 7).setPiece(board.getSpot(start.getX(), start.getY() + 1).getPiece());
@@ -89,14 +120,45 @@ public class Move {
                 board.getSpot(start.getX(), start.getY() - 1).setPiece(null);
             }
             case EN_PASSANT -> {
-                board.getPossibleEnPassantTargetsSpot().setPiece(null);
-                board.setPossibleEnPassantTargetsSpot(null);
+                board.setSpot(possibleEnPassantTargetsSpot.getX(), possibleEnPassantTargetsSpot.getY(), possibleEnPassantTargetsSpot.getPiece());
             }
         }
     }
 
     private void handleSpecialMove(Board board) {
+        if (board.getPossibleEnPassantTargetsSpot() != null) {
+            possibleEnPassantTargetsSpot = board.getPossibleEnPassantTargetsSpot();
+            board.setPossibleEnPassantTargetsSpot(null);
+        }
         switch (moveType) {
+            case NORMAL -> {
+                switch (startPiece.getType()) {
+                    case ROOK -> {
+                        if(start.getY() == 7) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingKingSide(false);
+                            }
+                        }
+                        if (start.getY() == 0) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingQueenSide(false);
+                            }
+                        }
+                    }
+                    case KING -> {
+                        if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                            king.setHasMove();
+                        }
+                    }
+                }
+            }
+            case DOUBLE_STEP_PAWN -> {
+                Spot pawnSpot = board.getSpot(end.getX(), end.getY());
+                if(pawnSpot.getPiece() instanceof Pawn pawn) {
+                    pawn.setTurn(board.getTurn());
+                    board.setPossibleEnPassantTargetsSpot(pawnSpot);
+                }
+            }
             case CASTLING_KING_SIDE -> {
                 board.getSpot(start.getX(), start.getY() + 1).setPiece(board.getSpot(start.getX(), 7).getPiece());
                 board.getSpot(start.getX(), 7).setPiece(null);
@@ -106,7 +168,7 @@ public class Move {
                 board.getSpot(start.getX(), 0).setPiece(null);
             }
             case EN_PASSANT -> {
-                board.getPossibleEnPassantTargetsSpot().setPiece(null);
+                possibleEnPassantTargetsSpot.setPiece(null);
                 board.setPossibleEnPassantTargetsSpot(null);
             }
             case PROMOTE -> {
@@ -133,7 +195,39 @@ public class Move {
     }
 
     public void handleSpecialMove(Board board, ChessImage chessImage) {
+        if (board.getPossibleEnPassantTargetsSpot() != null) {
+            possibleEnPassantTargetsSpot = board.getPossibleEnPassantTargetsSpot();
+            board.setPossibleEnPassantTargetsSpot(null);
+        }
         switch (moveType) {
+            case NORMAL -> {
+                switch (startPiece.getType()) {
+                    case ROOK -> {
+                        if(start.getY() == 7) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingKingSide(false);
+                            }
+                        }
+                        if (start.getY() == 0) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingQueenSide(false);
+                            }
+                        }
+                    }
+                    case KING -> {
+                        if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                            king.setHasMove();
+                        }
+                    }
+                }
+            }
+            case DOUBLE_STEP_PAWN -> {
+                Spot pawnSpot = board.getSpot(end.getX(), end.getY());
+                if(pawnSpot.getPiece() instanceof Pawn pawn) {
+                    pawn.setTurn(board.getTurn());
+                    board.setPossibleEnPassantTargetsSpot(pawnSpot);
+                }
+            }
             case CASTLING_KING_SIDE -> {
                 board.getSpot(start.getX(), start.getY() + 1).setPiece(board.getSpot(start.getX(), 7).getPiece());
                 board.getSpot(start.getX(), 7).setPiece(null);
@@ -143,7 +237,7 @@ public class Move {
                 board.getSpot(start.getX(), 0).setPiece(null);
             }
             case EN_PASSANT -> {
-                board.getPossibleEnPassantTargetsSpot().setPiece(null);
+                possibleEnPassantTargetsSpot.setPiece(null);
                 board.setPossibleEnPassantTargetsSpot(null);
             }
             case PROMOTE -> {
