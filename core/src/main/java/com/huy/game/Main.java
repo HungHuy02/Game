@@ -56,9 +56,6 @@ public class Main extends Game {
     public void create() {
         component = DaggerChessGameComponent.create();
         component.inject(this);
-        new Thread(() -> {
-            stockfish.init();
-        }).start();
         manager.loadAll();
         setSetting();
         switch (mode) {

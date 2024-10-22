@@ -1,5 +1,7 @@
 package com.huy.game.chess.events;
 
+import com.huy.game.chess.enums.MoveType;
+
 public class ChessGameOnlineEvent {
 
     private static ChessGameOnlineEvent Instance;
@@ -17,10 +19,10 @@ public class ChessGameOnlineEvent {
 
     public interface MatchListener {
         void onSuccessfulMatch(String name, boolean isWhite);
-    };
+    }
 
     public interface PlayerMoveListener {
-        void onPlayerMove(String from, String to);
+        void onPlayerMove(String from, String to, MoveType type);
     }
 
     private MatchListener listener;
@@ -39,7 +41,7 @@ public class ChessGameOnlineEvent {
         listener.onSuccessfulMatch(name, isWhite);
     }
 
-    public void notifyPlayerMove(String from, String to) {
-        playerMoveListener.onPlayerMove(from, to);
+    public void notifyPlayerMove(String from, String to, MoveType type) {
+        playerMoveListener.onPlayerMove(from, to, type);
     }
 }

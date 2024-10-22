@@ -37,7 +37,7 @@ public class Bishop extends Piece {
             int directionY = Integer.signum(end.getY() - start.getY());
             int currentX = start.getX() + directionX;
             int currentY = start.getY() + directionY;
-            while(currentX != end.getX() || currentY != end.getY()) {
+            while(currentX != end.getX() && currentY != end.getY()) {
                 if(spots[currentX][currentY].getPiece() != null) {
                     return MoveType.CAN_NOT_MOVE;
                 }
@@ -63,7 +63,7 @@ public class Bishop extends Piece {
             int directionY = Integer.signum(king.getY() - spot.getY());
             int currentX = spot.getX() + directionX;
             int currentY = spot.getY() + directionY;
-            while(currentX != king.getX() || currentY != king.getY()) {
+            while(currentX != king.getX() && currentY != king.getY()) {
                 if(spots[currentX][currentY].getPiece() != null) {
                     return false;
                 }

@@ -1,5 +1,6 @@
 package com.huy.game.shared.network;
 
+import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.interfaces.SocketClient;
 
@@ -29,8 +30,8 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void requestToPlay() {
-        requestToPlay("HUY");
+    public void requestToPlayGame(String playerName) {
+        requestToPlay(playerName);
         opponentFound();
     }
 
@@ -44,8 +45,7 @@ public class SocketIOClient implements SocketClient {
 
     private void opponentFound() {
         on("opponentFound", args -> {
-            if (args.length > 0 && args[0] instanceof JSONObject) {
-                JSONObject data = (JSONObject) args[0];
+            if (args.length > 0 && args[0] instanceof JSONObject data) {
                 try {
                     String name = data.getString("opponentName");
                     boolean isWhite = data.getBoolean("isWhite");
@@ -58,9 +58,9 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void makeMove(String from, String to) {
+    public void makeMove(String from, String to, MoveType type) {
         try {
-            emit("playerMove", new JSONObject().put("from", from).put("to", to));
+            emit("playerMove", new JSONObject().put("from", from).put("to", to).put("moveType", type.toString()));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -69,12 +69,12 @@ public class SocketIOClient implements SocketClient {
     @Override
     public void getMoveFromOpponent() {
         on("opponentMove", args -> {
-            if (args.length > 0 && args[0] instanceof JSONObject) {
-                JSONObject data = (JSONObject) args[0];
+            if (args.length > 0 && args[0] instanceof JSONObject data) {
                 try {
                     String from = data.getString("from");
                     String to = data.getString("to");
-                    ChessGameOnlineEvent.getInstance().notifyPlayerMove(from, to);
+                    MoveType type = MoveType.valueOf(data.getString("moveType"));
+                    ChessGameOnlineEvent.getInstance().notifyPlayerMove(from, to, type);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }

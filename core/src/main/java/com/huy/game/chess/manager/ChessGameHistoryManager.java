@@ -52,6 +52,10 @@ public class ChessGameHistoryManager {
         this.index = index;
     }
 
+    public void returnOriginIndex() {
+        index = history.getNumberBoardSaved() - 1;
+    }
+
     public void increaseIndex() {
         index++;
     }

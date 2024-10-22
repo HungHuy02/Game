@@ -16,6 +16,7 @@ public class StockfishAndroid implements Stockfish {
 
     public StockfishAndroid(Context context) {
         this.context = context;
+        init();
     }
 
     @Override

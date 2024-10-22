@@ -107,10 +107,15 @@ public class ChessScreen extends InputAdapter implements Screen {
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
         if(main.getMode() == ChessMode.ONLINE) {
-            ChessGameOnlineEvent.getInstance().setPlayerMoveListener((from, to) -> {
+            ChessGameOnlineEvent.getInstance().setPlayerMoveListener((from, to, type) -> {
+                if(chessGameHistoryManager.isRePlay()) {
+                    chessGameHistoryManager.setRePlay(false);
+                    chessGameHistoryManager.returnOriginIndex();
+                }
                 Spot start = board.getSpot(from.charAt(0) - '0', from.charAt(1) - '0');
                 Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
                 Move move = new Move(start,end);
+                move.setMoveType(type);
                 scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                 board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
                 chessGameManager.switchPlayer(board);
@@ -181,13 +186,13 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleClickWhenPlayWithAI(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer)) {
-            handlePlayerClickWhenPlayWithAI(screenX, screenY);
+            handleClick(screenX, screenY);
         }
     }
 
     private void handleClickWhenPlayOnline(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessOnlinePlayer)) {
-            handlePlayerClickWhenPlayOnline(screenX, screenY);
+            handleClick(screenX, screenY);
         }
     }
 
@@ -215,139 +220,34 @@ public class ChessScreen extends InputAdapter implements Screen {
                         selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
                     }
                 } else {
-                    Spot secondSpot = board.getSpot(boardY, boardX);
-                    Move move = new Move(selectedSpot, secondSpot);
-                    Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
-                        move.setMoveType(moveType);
-                        board.clearColorAndPoint();
-                        move.makeMove(testBoard);
-                        if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            if (moveType != MoveType.PROMOTE) {
-                                handleMove(move);
-                            }else {
-                                move.handleSpecialMove(board, chessImage);
-                            }
-                            selectedSpot = null;
-                        }else {
-                            handleWhenPerformIllegalMove();
-                        }
-                    }else {
-                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
-                    }
+                    checkAndHandleMove(boardX, boardY);
                 }
             }
         }
     }
 
-    private void handlePlayerClickWhenPlayWithAI(int screenX, int screenY) {
-        int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
-        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
-
-        if (board.isWithinBoard(boardX, boardY)) {
-            if(board.isPromoting()) {
-                handlePawnPromotion(boardX, boardY);
+    private void checkAndHandleMove(int boardX, int boardY) {
+        Spot secondSpot = board.getSpot(boardY, boardX);
+        Move move = new Move(selectedSpot, secondSpot);
+        Board testBoard = board.cloneBoard();
+        MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
+        if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
+            move.setMoveType(moveType);
+            board.clearColorAndPoint();
+            move.makeMove(testBoard);
+            if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
+                if (moveType != MoveType.PROMOTE) {
+                    handleMove(move);
+                    handleMoveWithOtherMode(move);
+                }else {
+                    move.handleSpecialMove(board, chessImage);
+                }
+                selectedSpot = null;
             }else {
-                if(setting.isRotate()) {
-                    boardX = 7 - boardX;
-                    boardY = 7 - boardY;
-                }
-                if (selectedSpot == null) {
-                    selectedSpot = board.getSpot(boardY, boardX);
-                    selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
-                        if(!selectedSpot.isIdentificationColor()) {
-                            selectedSpot.setShowColor(false);
-                        }
-                        selectedSpot = null;
-                    }else {
-                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
-                    }
-                } else {
-                    Spot secondSpot = board.getSpot(boardY, boardX);
-                    Move move = new Move(selectedSpot, secondSpot);
-                    Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
-                        move.setMoveType(moveType);
-                        board.clearColorAndPoint();
-                        move.makeMove(testBoard);
-                        if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            if (moveType != MoveType.PROMOTE) {
-                                handleMove(move);
-                            }else {
-                                move.handleSpecialMove(board, chessImage);
-                            }
-
-                            Thread thread = new Thread(() -> {
-                                board.clearColor();
-                                if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer chessAIPlayer) {
-                                    Move aiMove = chessAIPlayer.findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
-                                    String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager);
-                                    board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
-                                    Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
-                                    chessGameManager.switchPlayer(board);
-                                }
-
-                            });
-                            thread.start();
-                        }else {
-                            handleWhenPerformIllegalMove();
-                        }
-                    }else {
-                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
-                    }
-                }
+                handleWhenPerformIllegalMove();
             }
-        }
-    }
-
-    private void handlePlayerClickWhenPlayOnline(int screenX, int screenY) {
-        int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
-        int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
-
-        if (board.isWithinBoard(boardX, boardY)) {
-            if(board.isPromoting()) {
-                handlePawnPromotion(boardX, boardY);
-            }else {
-                if(setting.isRotate()) {
-                    boardX = 7 - boardX;
-                    boardY = 7 - boardY;
-                }
-                if (selectedSpot == null) {
-                    selectedSpot = board.getSpot(boardY, boardX);
-                    selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
-                        if(!selectedSpot.isIdentificationColor()) {
-                            selectedSpot.setShowColor(false);
-                        }
-                        selectedSpot = null;
-                    }else {
-                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
-                    }
-                } else {
-                    Spot secondSpot = board.getSpot(boardY, boardX);
-                    Move move = new Move(selectedSpot, secondSpot);
-                    Board testBoard = board.cloneBoard();
-                    MoveType moveType = selectedSpot.getPiece().canMove(testBoard, testBoard.getSpots(),selectedSpot, secondSpot);
-                    if(moveType != MoveType.CAN_NOT_MOVE && selectedSpot.getPiece().isWhite() == chessGameManager.getCurrentPlayer().isWhite()) {
-                        board.clearColorAndPoint();
-                        move.makeMove(testBoard);
-                        if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
-                            if (moveType != MoveType.PROMOTE) {
-                                handleMove(move);
-                            }else {
-                                move.handleSpecialMove(board, chessImage);
-                            }
-                        }else {
-                            handleWhenPerformIllegalMove();
-                        }
-                    }else {
-                        handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
-                    }
-                }
-            }
+        }else {
+            handleWhenClickAnotherSpotCanNotMoveTo(secondSpot);
         }
     }
 
@@ -357,6 +257,33 @@ public class ChessScreen extends InputAdapter implements Screen {
         if(move != null) {
             handleMove(move);
         }
+        handleMoveWithOtherMode(move);
+    }
+
+    private void handleMoveWithOtherMode(Move move) {
+        switch (main.getMode()) {
+            case ONLINE -> main.socketClient.makeMove(move.getStart().getX() + "" + move.getStart().getY(), move.getEnd().getX() + "" + move.getEnd().getY(), move.getMoveType());
+            case AI -> handleAIMove();
+        }
+    }
+
+    private void handleAIMove() {
+        Thread thread = new Thread(() -> {
+            board.clearColor();
+            if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer chessAIPlayer) {
+                Move aiMove = chessAIPlayer.findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
+                if(chessGameHistoryManager.isRePlay()) {
+                    chessGameHistoryManager.setRePlay(false);
+                    chessGameHistoryManager.returnOriginIndex();
+                }
+                String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager);
+                board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
+                Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
+                chessGameManager.switchPlayer(board);
+                checkForEndGame(aiMove);
+            }
+        });
+        thread.start();
     }
 
     private void handleMove(Move move) {
@@ -425,5 +352,8 @@ public class ChessScreen extends InputAdapter implements Screen {
     @Override
     public void dispose() {
         shapeRenderer.dispose();
+        if (main.getMode() == ChessMode.ONLINE) {
+            main.socketClient.disconnect();
+        }
     }
 }

@@ -360,7 +360,7 @@ public class Board {
                                     directionY = -directionY;
                                     currentX = spot.getX() + directionX;
                                     currentY = spot.getY() + directionY;
-                                    while (currentX != king.getX() && currentY != king.getY()) {
+                                    while (currentX != king.getX() || currentY != king.getY()) {
                                         if(spots[currentX][currentY] != null) {
                                             break loop;
                                         }
