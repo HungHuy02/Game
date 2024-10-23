@@ -59,7 +59,7 @@ public class ChessHardAIPlayer extends ChessAIPlayer{
                 int y = Math.abs(end.getY() - start.getY());
                 switch (start.getPiece().getType()) {
                     case PAWN -> {
-                        if (x == 2) {
+                       if (x == 2) {
                             moveType = MoveType.DOUBLE_STEP_PAWN;
                         }else if (x == 1 && y == 1) {
                             moveType = MoveType.EN_PASSANT;

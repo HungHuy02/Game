@@ -8,6 +8,7 @@ public class Constants {
     public static final String BUNDLE_PLAYER1_COLOR = "color";
     public static final String BUNDLE_PLAYER1_NAME = "player1";
     public static final String BUNDLE_PLAYER2_NAME = "player2";
+    public static final String BUNDLE_ROTATE_BOARD = "rotate";
 
     public static final String DATASTORE_POSITION = "position";
     public static final String DATASTORE_POSITION_2P = "position-2p";

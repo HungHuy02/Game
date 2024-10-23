@@ -2,6 +2,7 @@ package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.Board;
+import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.enums.TimeType;
@@ -82,7 +83,7 @@ public class ChessGameManager {
         handleTimer("1");
     }
 
-    public void switchPlayer(Board board) {
+    public void switchPlayer(BoardSetting setting) {
         cancelTimer();
         int timeRemain = currentPlayer.getTimeRemain() + plusTime;
         if(currentPlayer == player1) {
@@ -95,6 +96,9 @@ public class ChessGameManager {
             currentPlayer.setTimeRemain(timeRemain);
             currentPlayer = player1;
             handleTimer("1");
+        }
+        if (setting.isAutoRotate()) {
+            setting.setRotate(!setting.isRotate());
         }
     }
 

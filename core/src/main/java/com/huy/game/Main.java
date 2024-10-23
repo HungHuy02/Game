@@ -9,6 +9,7 @@ import com.huy.game.chess.component.DaggerChessGameComponent;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.interfaces.SocketClient;
@@ -32,19 +33,25 @@ public class Main extends Game {
     SpriteBatch batch;
 
     private ChessMode mode;
+    private boolean isRotateBoard;
+    public TimeType timeType;
 
-    public Main(ChessMode mode) {
+    public Main(ChessMode mode, TimeType timeType, boolean isRotateBoard) {
         this.mode = mode;
+        this.timeType = timeType;
+        this.isRotateBoard = isRotateBoard;
     }
 
-    public Main(ChessMode mode, SocketClient client) {
+    public Main(ChessMode mode, TimeType timeType, SocketClient client) {
         this.mode = mode;
+        this.timeType = timeType;
         this.socketClient = client;
         client.connect();
     }
 
-    public Main(ChessMode mode, Stockfish stockfish) {
+    public Main(ChessMode mode, TimeType timeType, Stockfish stockfish) {
         this.mode = mode;
+        this.timeType = timeType;
         this.stockfish = stockfish;
     }
 
@@ -74,7 +81,11 @@ public class Main extends Game {
                 setting.setShowGuidePoint(false);
                 break;
             case TWO_PERSONS:
-                setting.setRotate(true);
+                if (isRotateBoard) {
+                    setting.setAutoRotate(true);
+                }else {
+                    setting.setReverseOneSide(true);
+                }
                 break;
         }
     }

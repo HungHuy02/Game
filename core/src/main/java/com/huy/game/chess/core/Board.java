@@ -222,6 +222,48 @@ public class Board {
         }
     }
 
+    public void renderBoardReverseOneSide(SpriteBatch batch, float spotSize, float originPieceSize , float pieceSize, float centerX, float centerY, ChessImage chessImage) {
+        float padding = spotSize / 10f;
+        float x = centerX + padding;
+        float y = centerY + padding;
+        batch.draw(chessImage.getPosition(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
+        for(int i = 0; i <= 7; i++) {
+            float distanceY = spotSize * i + y;
+            for (int j = 0;j <= 7; j++) {
+                float distance = spotSize * j;
+                Piece piece = spots[i][j].getPiece();
+                if(piece != null) {
+                    if(piece.isWhite()) {
+                        batch.draw(piece.getTexture(), x + distance, distanceY, pieceSize, pieceSize);
+                    }else {
+                        batch.draw(piece.getTexture(), x + distance, distanceY, pieceSize, pieceSize, 0, 0, (int) originPieceSize, (int) originPieceSize, false, true);
+                    }
+                }
+            }
+        }
+    }
+
+    public void renderRotateBoardReverseOneSide(SpriteBatch batch, float spotSize, float originPieceSize , float pieceSize, float centerX, float centerY, ChessImage chessImage) {
+        float padding = spotSize / 10f;
+        float x = centerX + padding;
+        float y = centerY + padding;
+        batch.draw(chessImage.getRotate_position(), centerX, centerY, chessImage.getScaledBoardWidth(), chessImage.getScaledBoardHeight());
+        for(int i = 0; i <= 7; i++) {
+            float distanceY = spotSize * i + y;
+            for (int j = 0;j <= 7; j++) {
+                float distance = spotSize * j;
+                Piece piece = spots[7 - i][7 - j].getPiece();
+                if(piece != null) {
+                    if(!piece.isWhite()) {
+                        batch.draw(piece.getTexture(), x + distance, distanceY, pieceSize, pieceSize);
+                    }else {
+                        batch.draw(piece.getTexture(), x + distance, distanceY, pieceSize, pieceSize, 0, 0, (int) originPieceSize, (int) originPieceSize, false, true);
+                    }
+                }
+            }
+        }
+    }
+
     public void renderColorAndPoint(ShapeRenderer shapeRenderer, float circlePointRadius, float pieceSide, float spotSize, float centerX, float centerY) {
         float padding = spotSize / 10f;
         float scale = (spotSize - (2 * padding)) / pieceSide;
@@ -341,7 +383,7 @@ public class Board {
                                     currentX = spot.getX() + directionX;
                                     currentY = spot.getY() + directionY;
                                     while (currentX != king.getX() && currentY != king.getY()) {
-                                        if(spots[currentX][currentY] != null) {
+                                        if(spots[currentX][currentY].getPiece() != null) {
                                             break loop;
                                         }
                                         currentX += directionX;
@@ -361,7 +403,7 @@ public class Board {
                                     currentX = spot.getX() + directionX;
                                     currentY = spot.getY() + directionY;
                                     while (currentX != king.getX() || currentY != king.getY()) {
-                                        if(spots[currentX][currentY] != null) {
+                                        if(spots[currentX][currentY].getPiece() != null) {
                                             break loop;
                                         }
                                         currentX += directionX;
@@ -545,7 +587,7 @@ public class Board {
                         promotingMove.setMoveType(MoveType.PROMOTE);
                         clearColor();
                     }
-                };
+                }
             }else {
                 switch (boardY) {
                     case 0 -> promotingMove.setMoveType(MoveType.PROMOTE_TO_ROOK);
@@ -556,7 +598,7 @@ public class Board {
                         promotingMove.setMoveType(MoveType.PROMOTE);
                         clearColor();
                     }
-                };
+                }
             }
 
         }

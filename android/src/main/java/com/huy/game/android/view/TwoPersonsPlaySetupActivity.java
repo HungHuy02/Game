@@ -41,6 +41,7 @@ public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.On
         controlTimeButton();
         swapButton();
         playButton();
+        rotateSwitch();
     }
 
     private void setupViewModel() {
@@ -152,9 +153,14 @@ public class TwoPersonsPlaySetupActivity extends BaseActivity implements View.On
             intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, PieceColor.WHITE.toString());
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, Objects.requireNonNull(binding.tfWhite.getText()).toString());
             intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Objects.requireNonNull(binding.tfBlack.getText()).toString());
+            intent.putExtra(Constants.BUNDLE_ROTATE_BOARD, binding.switchRotate.isChecked());
             startActivity(intent);
             finish();
         });
+    }
+
+    private void rotateSwitch() {
+        binding.btnSwitch.setOnClickListener((v) -> binding.switchRotate.setChecked(!binding.switchRotate.isChecked()));
     }
 
     @Override

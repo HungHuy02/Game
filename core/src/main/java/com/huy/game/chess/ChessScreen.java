@@ -83,7 +83,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameHistoryManager = new ChessGameHistoryManager(gameHistory);
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
-        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), TimeType.FIFTEEN_MINUTE_PLUS_TEN, main.stockfish);
+        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), main.timeType, main.stockfish);
         PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getCapturedPieceMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList());
         PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList());
         board = new Board();
@@ -118,7 +118,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 move.setMoveType(type);
                 scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
                 board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
-                chessGameManager.switchPlayer(board);
+                chessGameManager.switchPlayer(setting);
             });
             main.socketClient.getMoveFromOpponent();
         }
@@ -145,26 +145,50 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void renderBoard(Board board) {
-        if(setting.isRotate()) {
-            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
-            shapeRenderer.end();
-            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+        if (setting.isReverseOneSide()) {
+            if(setting.isRotate()) {
+                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+                shapeRenderer.end();
+                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
-            batch.begin();
-            board.renderRotateBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-            batch.end();
+                batch.begin();
+                board.renderRotateBoardReverseOneSide(batch, chessImage.getSpotSize(), chessImage.getPieceSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+                batch.end();
+            }else {
+                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+                shapeRenderer.end();
+                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+
+                batch.begin();
+                board.renderBoardReverseOneSide(batch, chessImage.getSpotSize(), chessImage.getPieceSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+                batch.end();
+            }
         }else {
-            Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
-            shapeRenderer.end();
-            Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+            if(setting.isRotate()) {
+                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                board.renderRotateColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+                shapeRenderer.end();
+                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 
-            batch.begin();
-            board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
-            batch.end();
+                batch.begin();
+                board.renderRotateBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+                batch.end();
+            }else {
+                Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                board.renderColorAndPoint(shapeRenderer, chessImage.getCircleRadius(), chessImage.getPieceSize(),chessImage.getSpotSize(), centerX, centerY);
+                shapeRenderer.end();
+                Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+
+                batch.begin();
+                board.renderBoard(batch, chessImage.getSpotSize(), chessImage.getScaledPieceSize(), centerX, centerY, chessImage);
+                batch.end();
+            }
         }
     }
 
@@ -279,7 +303,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager);
                 board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
                 Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
-                chessGameManager.switchPlayer(board);
+                chessGameManager.switchPlayer(setting);
                 checkForEndGame(aiMove);
             }
         });
@@ -290,7 +314,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameHistoryManager.increaseIndex();
         scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessGameManager, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
         board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
-        chessGameManager.switchPlayer(board);
+        chessGameManager.switchPlayer(setting);
         checkForEndGame(move);
     }
 
@@ -301,18 +325,17 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void checkForEndGame(Move move) {
-        if(move.isCheck()) {
-            if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+        if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
+            if(move.isCheck()) {
+                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
+                stage.addActor(popup.getPopup());
+                multiplexer.removeProcessor(0);
+            }else {
                 EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
                 stage.addActor(popup.getPopup());
                 multiplexer.removeProcessor(0);
             }
-        }else {
-            if(!board.isHaveAvailableMove(chessGameManager.getCurrentPlayer().isWhite())) {
-                EndGamePopup popup = new EndGamePopup(bitmapFont, manager.getBundle(GameSetting.getInstance().getLanguage()), manager, !chessGameManager.getCurrentPlayer().isWhite());
-                stage.addActor(popup.getPopup());
-                multiplexer.removeProcessor(0);
-            }
+            chessSound.playGameEndSound();
         }
     }
 

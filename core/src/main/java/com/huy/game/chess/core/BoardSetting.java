@@ -4,6 +4,7 @@ public class BoardSetting {
     private boolean isRotate = false;
     private boolean isShowGuidePoint = true;
     private boolean isAutoRotate = false;
+    private boolean isReverseOneSide = false;
 
     public BoardSetting() {
 
@@ -31,5 +32,13 @@ public class BoardSetting {
 
     public void setAutoRotate(boolean autoRotate) {
         isAutoRotate = autoRotate;
+    }
+
+    public boolean isReverseOneSide() {
+        return isReverseOneSide;
+    }
+
+    public void setReverseOneSide(boolean reverseOneSide) {
+        isReverseOneSide = reverseOneSide;
     }
 }

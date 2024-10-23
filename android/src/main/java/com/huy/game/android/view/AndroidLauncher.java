@@ -30,18 +30,19 @@ public class AndroidLauncher extends AndroidApplication {
                 PieceColor player1Color = PieceColor.valueOf(intent.getStringExtra(Constants.BUNDLE_PLAYER1_COLOR));
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 String player2Name = intent.getStringExtra(Constants.BUNDLE_PLAYER2_NAME);
+                boolean isRotateBoard = intent.getBooleanExtra(Constants.BUNDLE_ROTATE_BOARD, false);
                 Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE);
                 OpponentPlayer.getInstance().setData(player2Name, !(player1Color == PieceColor.WHITE));
                 if(mode == ChessMode.AI) {
-                    initialize(new Main(mode, new StockfishAndroid(getApplicationContext())), configuration);
+                    initialize(new Main(mode, type, new StockfishAndroid(getApplicationContext())), configuration);
                 }else {
-                    initialize(new Main(mode), configuration);
+                    initialize(new Main(mode, type, isRotateBoard), configuration);
                 }
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 Player.getInstance().setName(player1Name);
-                initialize(new Main(mode, new SocketIOClient()), configuration);
+                initialize(new Main(mode, type, new SocketIOClient()), configuration);
             }
         }
     }
