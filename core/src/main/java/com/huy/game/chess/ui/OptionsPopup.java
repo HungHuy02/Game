@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.huy.game.chess.core.BoardSetting;
+import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessImage;
 
@@ -19,11 +20,11 @@ public class OptionsPopup {
 
     private Window optionsPopup;
 
-    public OptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage) {
-        setOptionsPopup(setting ,font, bundle, manager, check, chessImage, stage);
+    public OptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history) {
+        setOptionsPopup(setting ,font, bundle, manager, check, chessImage, stage, history);
     }
 
-    private void setOptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage) {
+    private void setOptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history) {
         Skin skin = manager.getSkin();
         TextButton.TextButtonStyle style = skin.get(TextButton.TextButtonStyle.class);
         style.font = font;
@@ -33,7 +34,7 @@ public class OptionsPopup {
             (Gdx.graphics.getHeight() - optionsPopup.getHeight()) / 2);
         optionsPopup.add(rotateBoardButton(setting, skin, bundle.get("rotateBoard"), stage)).fillX().expandX().height(100);
         optionsPopup.row();
-        optionsPopup.add(printButton(skin, bundle.get("copyPGN"))).fillX().expandX().height(100);
+        optionsPopup.add(printButton(skin, bundle.get("copyPGN"), history)).fillX().expandX().height(100);
         optionsPopup.row();
         optionsPopup.add(newGameButton(skin, bundle.get("newBoard"), check, chessImage, stage)).fillX().expandX().height(100);
     }
@@ -54,7 +55,7 @@ public class OptionsPopup {
         return button;
     }
 
-    private TextButton printButton(Skin skin, String name) {
+    private TextButton printButton(Skin skin, String name, GameHistory history) {
         TextButton button = new TextButton(name, skin);
         button.pad(32f);
         button.getLabel().setAlignment(Align.left);
@@ -62,7 +63,7 @@ public class OptionsPopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-
+                Gdx.app.getClipboard().setContents(history.getPGN());
             }
         });
         return button;

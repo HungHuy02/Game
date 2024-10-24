@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.OpponentPlayer;
 import com.huy.game.chess.manager.Player;
@@ -22,8 +23,8 @@ public class PlayerInfo {
 
     private HorizontalGroup info;
 
-    public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList) {
-        horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, timeList);
+    public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList, TimeType timeType) {
+        horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, timeList, timeType);
     }
 
     public PlayerInfo() {}
@@ -32,7 +33,7 @@ public class PlayerInfo {
         return info;
     }
 
-    private void horizontalGroup(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList) {
+    private void horizontalGroup(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font, Map<String, Integer> timeList, TimeType type) {
         info = new HorizontalGroup();
         info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
         info.padRight(16);
@@ -44,7 +45,9 @@ public class PlayerInfo {
             info.addActor(image(image, chessImage, OpponentPlayer.getInstance().getImageUrl()));
         }
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
-        info.addActor(new Timer(timeList, font, isPlayer1, chessImage));
+        if (type != TimeType.NO_TIME) {
+            info.addActor(new Timer(timeList, font, isPlayer1, chessImage));
+        }
     }
 
     public void horizontalGroupForChessMatchScreen(String name,Container<Image> image, ChessImage chessImage, BitmapFont font) {

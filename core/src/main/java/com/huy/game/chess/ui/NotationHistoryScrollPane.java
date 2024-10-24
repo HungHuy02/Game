@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.StringBuilder;
+import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameHistoryManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -40,12 +42,13 @@ public class NotationHistoryScrollPane {
 
     public void addValue(String value, BitmapFont font, ChessGameAssesManager manager, ChessGameHistoryManager historyManager, ChessImage chessImage) {
         handleClearColor();
-        addSequenceNumber(font);
+        addSequenceNumber(font, historyManager.getHistory());
         Skin skin = manager.getSkin();
         index++;
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
         style.up = skin.getDrawable("button-normal");
+        historyManager.getHistory().appendString(value);
         TextButton button = new TextButton(value, style);
         button.padLeft(20);
         button.padRight(20);
@@ -67,17 +70,22 @@ public class NotationHistoryScrollPane {
         scrollPane.setScrollX(horizontalGroup.getWidth());
     }
 
-    private void addSequenceNumber(BitmapFont font) {
+    private void addSequenceNumber(BitmapFont font, GameHistory history) {
         if(index % 3 == 2 || index == -1) {
+            index++;
             Label.LabelStyle style = new Label.LabelStyle();
             style.font = font;
             style.fontColor = Colors.GREY_600;
-            Label label = new Label((index / 2 + 1) + ".", style);
+            StringBuilder builder = new StringBuilder();
+            builder.append(index / 3 + 1);
+            builder.append('.');
+            String text = builder.toString();
+            history.appendString(text);
+            Label label = new Label(text, style);
             Container<Label> labelContainer = new Container<>(label);
             labelContainer.padLeft(16);
             labelContainer.padRight(16);
             horizontalGroup.addActor(labelContainer);
-            index++;
         }
     }
 

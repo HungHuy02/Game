@@ -61,7 +61,7 @@ public class Move {
         history.addFEN(board, end.getPiece().isWhite(), manager);
         handleSpotColorAfterMove(start, end);
         board.increaseTurn();
-        return history.addMove(start, end, this);
+        return history.addMove(board , start, end, this);
     }
 
     public void makeMove(Board board) {
@@ -81,7 +81,7 @@ public class Move {
         handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite(), manager);
         board.increaseTurn();
-        return history.addMove(startSpot, board.getSpot(end.getX(), end.getY()), this);
+        return history.addMove(board, startSpot, board.getSpot(end.getX(), end.getY()), this);
     }
 
     private void handleSpotColorAfterMove(Spot start, Spot end) {

@@ -17,7 +17,7 @@ public class GameHistory {
     private final List<Long> stateHashList = new ArrayList<>();
     private final List<String> fenList = new ArrayList<>();
     private final Map<Integer, int[]> timeMap = new HashMap<>();
-    private final List<Board> boardList = new ArrayList<>();
+    private final StringBuilder pgn = new StringBuilder();
     private int halfmoveClock = 0;
 
     public GameHistory() {
@@ -60,14 +60,14 @@ public class GameHistory {
         }
     }
 
-    public String addMove(Spot start, Spot end, Move move) {
+    public String addMove(Board board, Spot start, Spot end, Move move) {
         halfmoveClock++;
         String beforeMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(start);
         String afterMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(end);
         StringBuilder builder = new StringBuilder(beforeMove);
         builder.append(afterMove);
         movedList.add(builder.toString());
-        return AlgebraicNotation.changeToFullAlgebraicNotation(start, end, move, this);
+        return AlgebraicNotation.changeToFullAlgebraicNotation(board, start, end, move, this);
     }
 
     public void handleMoveColor(Board board, int index) {
@@ -92,10 +92,6 @@ public class GameHistory {
         return movedList.get(index);
     }
 
-    public void addBoard(Board board) {
-        boardList.add(board.cloneBoard());
-    }
-
     public String getNewestFEN() {
         return fenList.get(fenList.size() - 1);
     }
@@ -110,5 +106,14 @@ public class GameHistory {
 
     public int getNumberBoardSaved() {
         return movedList.size();
+    }
+
+    public void appendString(String string) {
+        pgn.append(string);
+        pgn.append(' ');
+    }
+
+    public String getPGN(){
+        return pgn.toString();
     }
 }

@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Piece {
 
@@ -86,4 +88,8 @@ public abstract class Piece {
     public abstract void calculateForPoint(Board board, Spot checkSpot);
 
     public abstract List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot);
+
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
+        return new AbstractMap.SimpleEntry<>(0, true);
+    }
 }

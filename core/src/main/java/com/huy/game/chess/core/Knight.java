@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Knight extends Piece {
 
@@ -96,5 +98,33 @@ public class Knight extends Piece {
             }
         }
         return list;
+    }
+
+    @Override
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
+        int count = 0;
+        boolean row = true;
+        for (int[] move: knightMoves()) {
+            int x = move[0] + checkSpot.getX();
+            int y = move[1] + checkSpot.getY();
+            if (board.isWithinBoard(x, y)) {
+                if (x != start.getX() || y != start.getY()) {
+                    Piece piece = spots[x][y].getPiece();
+                    if(piece != null) {
+                        if (piece.getType() == PieceType.KNIGHT && piece.isWhite() == isWhite()) {
+                            if (y == start.getY()) {
+                                row = false;
+                            }
+                            count++;
+                            if (count == 2) {
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(count, row);
     }
 }
