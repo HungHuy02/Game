@@ -42,10 +42,6 @@ public class ChessPlayer {
         return capturedPieceMap;
     }
 
-    public Map<PieceType, Integer> getPieceMap() {
-        return pieceNumberMap;
-    }
-
     public boolean isWhite() {
         return isWhite;
     }
@@ -93,6 +89,14 @@ public class ChessPlayer {
 
     public void increasePieceNumber(PieceType type) {
         pieceNumberMap.put(type, pieceNumberMap.get(type) + 1);
+    }
+
+    public void setPieceNumber(PieceType type, int number) {
+        pieceNumberMap.put(type, number);
+    }
+
+    public int getPieceNumber(PieceType type) {
+        return pieceNumberMap.get(type);
     }
 
     public void setTimeRemain(int timeRemain) {

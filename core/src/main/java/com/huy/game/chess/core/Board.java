@@ -18,8 +18,7 @@ public class Board {
     private Move promotingMove;
     private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
-    private boolean isEnd = false;
-    private int turn = 1;
+    private int turn = 0;
 
     public void setSpots(Spot[][] spots) {
         this.spots = spots;
@@ -103,14 +102,6 @@ public class Board {
         return turn;
     }
 
-    public void setEnd(){
-        isEnd = true;
-    }
-
-    public boolean isEnd() {
-        return isEnd;
-    }
-
     public void setSpot(int x, int y, Piece piece) {
         spots[x][y].setPiece(piece);
         if(piece instanceof King) {
@@ -140,7 +131,7 @@ public class Board {
             case CASTLING_KING_SIDE, CASTLING_QUEEN_SIDE -> chessSound.playCastleSound();
             case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP -> {
                 chessSound.playPromoteSound();
-                chessGameManager.putValue(switch (move.getMoveType()) {
+                chessGameManager.putValueForPromote(switch (move.getMoveType()) {
                     case PROMOTE_TO_QUEEN -> PieceType.QUEEN;
                     case PROMOTE_TO_KNIGHT -> PieceType.KNIGHT;
                     case PROMOTE_TO_ROOK -> PieceType.ROOK;

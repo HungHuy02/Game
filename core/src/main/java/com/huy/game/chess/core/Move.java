@@ -52,13 +52,13 @@ public class Move {
         isCheck = check;
     }
 
-    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager, ChessImage chessImage) {
+    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
         handleSpecialMove(board, chessImage);
         handleCheck(board);
-        history.addFEN(board, end.getPiece().isWhite(), manager);
+        history.addFEN(board, end.getPiece().isWhite());
         handleSpotColorAfterMove(start, end);
         board.increaseTurn();
         return history.addMove(board , start, end, this);
@@ -71,7 +71,7 @@ public class Move {
         board.increaseTurn();
     }
 
-    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessGameManager manager) {
+    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
         Spot endSpot = board.getSpot(end.getX(), end.getY());
@@ -79,7 +79,7 @@ public class Move {
         board.setSpot(start.getX(), start.getY(), null);
         handleSpotColorAfterMove(startSpot, endSpot);
         handleCheck(board);
-        history.addFEN(board, end.getPiece().isWhite(), manager);
+        history.addFEN(board, end.getPiece().isWhite());
         board.increaseTurn();
         return history.addMove(board, startSpot, board.getSpot(end.getX(), end.getY()), this);
     }

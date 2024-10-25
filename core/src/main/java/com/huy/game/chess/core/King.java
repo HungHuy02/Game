@@ -99,7 +99,6 @@ public class King extends Piece {
             return MoveType.CAN_NOT_MOVE;
         }else if (x <= 1 && y <= 1) {
             if(end.getPiece()!= null) {
-                board.getSpot(end.getX(), end.getY()).setCanBeCaptured(true);
                 return MoveType.CAPTURE;
             }
             return MoveType.NORMAL;

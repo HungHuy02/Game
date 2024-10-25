@@ -16,7 +16,7 @@ import com.huy.game.chess.manager.ChessImage;
 
 public class FEN {
 
-    public static String generateFEN(Board board , Spot[][] spots, boolean isWhite, GameHistory history, ChessGameManager manager) {
+    public static String generateFEN(Board board , Spot[][] spots, boolean isWhite, GameHistory history) {
         StringBuilder builder = new StringBuilder();
         piecePosition(spots, builder);
         moveNext(builder, isWhite);

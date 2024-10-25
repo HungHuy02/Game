@@ -10,9 +10,10 @@ public class ZobristHashing {
     private final long[][][] zobristArray = new long[8][8][12];
     private long hashValue = 0L;
 
-    public ZobristHashing(Spot[][] spots) {
+    public ZobristHashing(Spot[][] spots, GameHistory history) {
         initialization();
         calculateInitValue(spots);
+        history.addStateHash(hashValue);
     }
 
     public void initialization() {

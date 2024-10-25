@@ -1,7 +1,6 @@
 package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
-import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceType;
@@ -108,10 +107,26 @@ public class ChessGameManager {
         if(value > 0) {
             player1.addCapturedPiece(value);
             player2.addCapturedPiece(0);
-            player2.decreasePieceNumber(type);
         }else {
             player1.addCapturedPiece(0);
+            player2.addCapturedPiece(Math.abs(value));
+        }
+        if (currentPlayer.isWhite() == player1.isWhite()) {
+            player2.decreasePieceNumber(type);
+        }else {
             player1.decreasePieceNumber(type);
+        }
+    }
+
+    public void putValueForPromote(PieceType type) {
+        currentPlayer.addCapturedPiece(type);
+        currentPlayer.increasePieceNumber(type);
+        int value = player1.getValue() - player2.getValue();
+        if(value > 0) {
+            player1.addCapturedPiece(value);
+            player2.addCapturedPiece(0);
+        }else {
+            player1.addCapturedPiece(0);
             player2.addCapturedPiece(Math.abs(value));
         }
     }
@@ -157,4 +172,26 @@ public class ChessGameManager {
     public ChessPlayer getCurrentPlayer() {
         return currentPlayer;
     }
+
+    public void finish() {
+        timer.clear();
+    }
+
+    public boolean isDrawByInsufficientPiece() {
+        if (player1.getPieceNumber(PieceType.QUEEN) == 0
+            && player1.getPieceNumber(PieceType.ROOK) == 0
+            && player2.getPieceNumber(PieceType.QUEEN) == 0
+            && player2.getPieceNumber(PieceType.ROOK) == 0
+            && player1.getPieceNumber(PieceType.PAWN) == 0
+            && player2.getPieceNumber(PieceType.PAWN) == 0) {
+            int bishopQuantity1 = player1.getPieceNumber(PieceType.BISHOP);
+            int bishopQuantity2 = player2.getPieceNumber(PieceType.BISHOP);
+            int knightQuantity1 = player1.getPieceNumber(PieceType.KNIGHT);
+            int knightQuantity2 = player2.getPieceNumber(PieceType.KNIGHT);
+            return (knightQuantity1 + knightQuantity2 == 1 && bishopQuantity1 + bishopQuantity2 == 0)
+                || (bishopQuantity1 + bishopQuantity2 == 1 && knightQuantity1 + knightQuantity2 == 0);
+        }
+        return false;
+    }
+
 }

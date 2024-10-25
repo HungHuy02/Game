@@ -5,6 +5,7 @@ public class BoardSetting {
     private boolean isShowGuidePoint = true;
     private boolean isAutoRotate = false;
     private boolean isReverseOneSide = false;
+    private boolean canBack = false;
 
     public BoardSetting() {
 
@@ -40,5 +41,13 @@ public class BoardSetting {
 
     public void setReverseOneSide(boolean reverseOneSide) {
         isReverseOneSide = reverseOneSide;
+    }
+
+    public boolean isCanBack() {
+        return canBack;
+    }
+
+    public void setCanBack(boolean canBack) {
+        this.canBack = canBack;
     }
 }

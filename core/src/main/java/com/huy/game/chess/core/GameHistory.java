@@ -19,6 +19,7 @@ public class GameHistory {
     private final Map<Integer, int[]> timeMap = new HashMap<>();
     private final StringBuilder pgn = new StringBuilder();
     private int halfmoveClock = 0;
+    private boolean isThreefoldRepetition = false;
 
     public GameHistory() {
 
@@ -34,18 +35,23 @@ public class GameHistory {
         stateHashList.add(hashValue);
     }
 
-    public void addFEN(Board board, boolean isWhite, ChessGameManager manager) {
-        fenList.add(FEN.generateFEN(board, board.getSpots(), isWhite, this, manager));
+    public void addFEN(Board board, boolean isWhite) {
+        fenList.add(FEN.generateFEN(board, board.getSpots(), isWhite, this));
     }
 
     public void addTimeRemain(int index, int player1RemainTime, int player2RemainTime) {
         timeMap.put(index, new int[] {player1RemainTime, player2RemainTime});
     }
 
-    private void check50MovesRule() {
+    public boolean check50MovesRule() {
         if (halfmoveClock == 100) {
-
+            return true;
         }
+        return false;
+    }
+
+    public boolean checkThreefoldRepetition() {
+        return isThreefoldRepetition;
     }
 
     private void checkThreefoldRepetition(long newValue) {
@@ -54,6 +60,7 @@ public class GameHistory {
             if(newValue == value) {
                 count++;
                 if(count == 3) {
+                    isThreefoldRepetition = true;
                     break;
                 }
             }
@@ -83,7 +90,7 @@ public class GameHistory {
     }
 
     public Board changeFENToBoard(int index, ChessImage chessImage) {
-        Board board = FEN.fenToBoard(getFEN(index), chessImage);
+        Board board = FEN.fenToBoard(getFEN(index + 1), chessImage);
         handleMoveColor(board, index);
         return board;
     }

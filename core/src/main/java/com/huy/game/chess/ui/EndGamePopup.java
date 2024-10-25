@@ -14,21 +14,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 
 public class EndGamePopup {
 
     private Window endGamePopup;
 
-    public EndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, boolean isWhite) {
-        setEndGamePopup(font, bundle, manager, isWhite);
+    public EndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result) {
+        setEndGamePopup(font, bundle, manager, result);
     }
 
     public Window getPopup() {
         return endGamePopup;
     }
 
-    private void setEndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, boolean isWhite) {
+    private void setEndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result) {
         Skin skin = manager.getSkin();
         TextButton.TextButtonStyle style = skin.get(TextButton.TextButtonStyle.class);
         style.font = font;
@@ -40,7 +41,7 @@ public class EndGamePopup {
             (Gdx.graphics.getHeight() - endGamePopup.getHeight()) / 2);
         endGamePopup.add(stack(manager, labelStyle,bundle)).fillX().expandX().height(100).padTop(32);
         endGamePopup.row();
-        endGamePopup.add(winText(labelStyle, bundle, isWhite)).center().height(100);
+        endGamePopup.add(winText(labelStyle, bundle, result)).center().height(100);
         endGamePopup.row();
         Table buttonTable = new Table();
         buttonTable.add(rePlayButton(style, bundle)).expandX().fillX().padLeft(32).padRight(16).height(100);
@@ -71,8 +72,13 @@ public class EndGamePopup {
         return stack;
     }
 
-    private Label winText(Label.LabelStyle style, I18NBundle bundle,boolean isWhite) {
-        return new Label(isWhite ? bundle.get("whiteWin") : bundle.get("blackWin"), style);
+    private Label winText(Label.LabelStyle style, I18NBundle bundle, GameResult result) {
+        String text = switch (result) {
+            case WHITE_WIN -> bundle.get("whiteWin");
+            case BLACK_WIN -> bundle.get("blackWin");
+            case DRAW -> bundle.get("draw");
+        };
+        return new Label( text, style);
     }
 
     private TextButton newGameButton(TextButton.TextButtonStyle style, I18NBundle bundle) {
