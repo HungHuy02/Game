@@ -6,6 +6,7 @@ public class BoardSetting {
     private boolean isAutoRotate = false;
     private boolean isReverseOneSide = false;
     private boolean canBack = false;
+    private boolean suggestMove = true;
 
     public BoardSetting() {
 
@@ -49,5 +50,13 @@ public class BoardSetting {
 
     public void setCanBack(boolean canBack) {
         this.canBack = canBack;
+    }
+
+    public boolean canGenerateSuggestMove() {
+        return suggestMove;
+    }
+
+    public void setSuggestMove(boolean suggestMove) {
+        this.suggestMove = suggestMove;
     }
 }

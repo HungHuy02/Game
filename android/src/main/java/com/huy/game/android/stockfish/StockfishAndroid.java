@@ -1,6 +1,7 @@
 package com.huy.game.android.stockfish;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.huy.game.chess.interfaces.Stockfish;
 
@@ -46,28 +47,35 @@ public class StockfishAndroid implements Stockfish {
     }
 
     public void getResponse(Consumer<String> consumer) {
-        new Thread(() -> {
-            Process processOut = process;
-            if(processOut == null){
-                return;
-            }
-            BufferedReader out = new BufferedReader(new InputStreamReader(processOut.getInputStream()), 16384);
-            String data;
-            try{
+        Process processOut = process;
+        if(processOut == null){
+            return;
+        }
+        BufferedReader out = new BufferedReader(new InputStreamReader(processOut.getInputStream()), 16384);
+        String data;
+        try{
+            loop:
+            while(true) {
+                long lastReceivedTime = System.currentTimeMillis();
                 while( (data = out.readLine()) != null){
+                    Log.e("test", data);
                     if(data.startsWith("bestmove")) {
                         String[] strings = data.split(" ");
                         if(strings[0].equals("bestmove"))
                         {
                             consumer.accept(strings[1]);
-                            break;
+                            break loop;
                         }
                     }
                 }
-            } catch(IOException e){
-                throw new RuntimeException(e);
+                if (System.currentTimeMillis() - lastReceivedTime > 5000) {
+                    Log.e("error" ,"error");
+                    break;
+                }
             }
-        }).start();
+        } catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,6 +19,7 @@ import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.core.Move;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
+import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
@@ -39,6 +41,9 @@ import com.huy.game.chess.ui.NotationHistoryScrollPane;
 import com.huy.game.chess.ui.OptionsPopup;
 import com.huy.game.chess.ui.PlayerInfo;
 import com.huy.game.chess.ui.TopAppBar;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
@@ -67,6 +72,8 @@ public class ChessScreen extends InputAdapter implements Screen {
     private Spot selectedSpot;
     private ChessGameManager chessGameManager;
     private NotationHistoryScrollPane scrollPane;
+    private ExecutorService executorService;
+    private PolygonSpriteBatch polygonSpriteBatch;
 
     private ChessGameHistoryManager chessGameHistoryManager;
     private ZobristHashing hashing;
@@ -78,6 +85,8 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public void show() {
+        polygonSpriteBatch = new PolygonSpriteBatch();
+        executorService = Executors.newSingleThreadExecutor();
         GameHistory gameHistory = new GameHistory();
         chessGameHistoryManager = new ChessGameHistoryManager(gameHistory);
         shapeRenderer = new ShapeRenderer();
@@ -129,6 +138,10 @@ public class ChessScreen extends InputAdapter implements Screen {
                 if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer) {
                     setting.setRotate(true);
                     handleAIMove();
+                }else {
+                    if (setting.canGenerateSuggestMove()) {
+                        handleSuggestMove(gameHistory);
+                    }
                 }
             }
         }
@@ -167,6 +180,9 @@ public class ChessScreen extends InputAdapter implements Screen {
             }
         }
 
+        if (setting.canGenerateSuggestMove()) {
+            board.renderSuggestiveMove(polygonSpriteBatch, centerX, centerY, chessImage.getSpotSize());
+        }
         stage.act(delta);
         stage.draw();
     }
@@ -319,7 +335,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void handleAIMove() {
-        Thread thread = new Thread(() -> {
+        executorService.submit(() -> {
             board.clearColor();
             if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer chessAIPlayer) {
                 Move aiMove = chessAIPlayer.findBestMove(board, chessGameHistoryManager.getHistory().getNewestFEN());
@@ -335,7 +351,21 @@ public class ChessScreen extends InputAdapter implements Screen {
                 checkForEndGame(aiMove);
             }
         });
-        thread.start();
+        if (setting.canGenerateSuggestMove()) {
+            handleSuggestMove(chessGameHistoryManager.getHistory());
+        }
+    }
+
+    private void handleSuggestMove(GameHistory history) {
+        executorService.submit(() -> main.stockfish.sendCommandAndGetResponse(history.getNewestFEN(), chessGameManager.getCurrentPlayer().getTimeRemain(), data -> {
+            Spot start =  board.getSpot(
+                AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(data.charAt(1)),
+                AlgebraicNotation.changeColAlgebraicNotationToColPosition(data.charAt(0)));
+            Spot end = board.getSpot(
+                AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(data.charAt(3)),
+                AlgebraicNotation.changeColAlgebraicNotationToColPosition(data.charAt(2)));
+            board.setSuggestMove(new Move(start, end));
+        }));
     }
 
     private void handleMove(Move move) {
@@ -343,6 +373,8 @@ public class ChessScreen extends InputAdapter implements Screen {
         scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
         board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
         chessGameManager.switchPlayer(setting);
+        board.setSuggestMove(null);
+        board.setPolygonSprite(null);
         checkForEndGame(move);
     }
 
@@ -412,6 +444,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     @Override
     public void dispose() {
+        polygonSpriteBatch.dispose();
         shapeRenderer.dispose();
         if (main.getMode() == ChessMode.ONLINE) {
             main.socketClient.disconnect();

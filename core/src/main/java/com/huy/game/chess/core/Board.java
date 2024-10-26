@@ -1,6 +1,8 @@
 package com.huy.game.chess.core;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
@@ -10,12 +12,15 @@ import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.ui.Colors;
+import com.huy.game.chess.ui.SuggestiveArrow;
 
 public class Board {
     private Spot[][] spots = new Spot[8][8];
     private Spot wKingSpot;
     private Spot bKingSpot;
     private Move promotingMove;
+    private Move suggestMove = null;
+    private PolygonSprite polygonSprite = null;
     private Spot possibleEnPassantTargetsSpot;
     private boolean isPromoting = false;
     private int turn = 0;
@@ -84,6 +89,14 @@ public class Board {
 
     public void setPossibleEnPassantTargetsSpot(Spot possibleEnPassantTargetsSpot) {
         this.possibleEnPassantTargetsSpot = possibleEnPassantTargetsSpot;
+    }
+
+    public void setSuggestMove(Move suggestMove) {
+        this.suggestMove = suggestMove;
+    }
+
+    public void setPolygonSprite(PolygonSprite polygonSprite) {
+        this.polygonSprite = polygonSprite;
     }
 
     public void setTurn(int turn) {
@@ -631,5 +644,78 @@ public class Board {
             batch.draw(chessImage.getbQueen(), x + padding, y + padding + chessImage.getSpotSize() * 3, scaledSide, scaledSide);
         }
         batch.end();
+    }
+
+    public void renderSuggestiveMove(PolygonSpriteBatch batch, float centerX, float centerY, float spotSide ) {
+        if (suggestMove != null) {
+            batch.begin();
+            if (polygonSprite == null) {
+                int radian;
+                float height;
+                Spot start = suggestMove.getStart();
+                Spot end = suggestMove.getEnd();
+                float distance = spotSide / 2;
+                if(suggestMove.getStartPiece().getType() != PieceType.KNIGHT) {
+                    int x = Math.abs(end.getX() - start.getX());
+                    int y = Math.abs(end.getY() - start.getY());
+                    if (x == y) {
+                        int directionX = Integer.signum(end.getX() - start.getX());
+                        int directionY = Integer.signum(end.getY() - start.getY());
+                        if (directionX == 1 && directionY == 1) {
+                            radian = -45;
+                        }else if (directionX == 1 && directionY == -1) {
+                            radian = 45;
+                        }else if (directionX == -1 && directionY == -1) {
+                            radian = 135;
+                        }else {
+                            radian = -135;
+                        }
+                        height = (float) (x * Math.sqrt(2));
+                    }else if (x == 0 && y != 0) {
+                        int directionY = Integer.signum(end.getY() - start.getY());
+                        radian = directionY > 0 ? - 90 : 90;
+                        height = y;
+                    }else {
+                        int directionX = Integer.signum(end.getX() - start.getX());
+                        radian = directionX > 0 ? 0 : -180;
+                        height = x;
+                    }
+                    polygonSprite = SuggestiveArrow.createArrow(height * spotSide, radian, spotSide, centerX + distance + start.getY() * spotSide - 25, centerY + distance + start.getX() * spotSide);
+                }else {
+                    boolean isReserve = false;
+                    int x = end.getX() - start.getX();
+                    int y = end.getY() - start.getY();
+                    if (x == 1 && y == -2) {
+                        radian = 0;
+                    }else if (x == -1 && y == -2) {
+                        radian = 180;
+                        isReserve = true;
+                    }else if (x == -2 && y == -1) {
+                        radian = 90;
+                    }else if (x == -2 && y == 1) {
+                        radian = -90;
+                        isReserve = true;
+                    }else if (x == -1 && y == 2) {
+                        radian = 180;
+                    }else if (x == 1 && y == 2) {
+                        radian = 0;
+                        isReserve = true;
+                    }else if (x == 2 && y == 1) {
+                        radian = -90;
+                    }else {
+                        radian = 90;
+                        isReserve = true;
+                    }
+                    if(isReserve) {
+                        polygonSprite = SuggestiveArrow.createArrowForKnightReverse(radian, spotSide, centerX + distance + start.getY() * spotSide - 15, centerY + distance + start.getX() * spotSide);
+                    }else {
+                        polygonSprite = SuggestiveArrow.createArrowForKnight(radian, spotSide, centerX + distance + start.getY() * spotSide - 15, centerY + distance + start.getX() * spotSide);
+                    }
+
+                }
+            }
+            polygonSprite.draw(batch);
+            batch.end();
+        }
     }
 }
