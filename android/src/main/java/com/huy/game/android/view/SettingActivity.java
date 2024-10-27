@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.huy.game.R;
 import com.huy.game.android.base.BaseActivity;
-import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.SettingActivityViewModel;
@@ -45,7 +44,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void setupLanguageImage() {
-        binding.languageImage.setImageResource(GameSetting.getInstance().getLanguage().equals("vi") ? R.drawable.icons8_vietnam_48 : R.drawable.icons8_usa_48);
+        binding.languageImage.setImageResource(GameSetting.getInstance().getLanguage().equals("vi-VN") ? R.drawable.icons8_vietnam_48 : R.drawable.icons8_usa_48);
     }
 
     private void backButton() {
@@ -62,7 +61,7 @@ public class SettingActivity extends BaseActivity {
             View.OnClickListener listener = view -> {
                 String language;
                 if (view == bottomSheetLayoutBinding.btnVn) {
-                    language = "vi";
+                    language = "vi-VN";
                 }else {
                     language = "en";
                 }

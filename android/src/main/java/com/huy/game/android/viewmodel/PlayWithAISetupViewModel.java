@@ -9,6 +9,7 @@ public class PlayWithAISetupViewModel extends ViewModel {
     private MutableLiveData<Boolean> _showButtons = new MutableLiveData<>(false);
     private MutableLiveData<Integer> _position = new MutableLiveData<>();
     private MutableLiveData<Integer> _positionColor = new MutableLiveData<>(1);
+    private MutableLiveData<Integer> _level = new MutableLiveData<>();
 
     public LiveData<Boolean> showButtons() {
         return _showButtons;
@@ -22,6 +23,8 @@ public class PlayWithAISetupViewModel extends ViewModel {
         return _positionColor;
     }
 
+    public LiveData<Integer> getLevel() {return _level;}
+
     public void setShowButtons(boolean show) {
         _showButtons.setValue(show);
     }
@@ -32,5 +35,9 @@ public class PlayWithAISetupViewModel extends ViewModel {
 
     public void setPositionColor(int positionColor) {
         _positionColor.setValue(positionColor);
+    }
+
+    public void setLevel(int level) {
+        _level.setValue(level);
     }
 }

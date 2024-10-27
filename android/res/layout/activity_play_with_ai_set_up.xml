@@ -48,6 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -108,161 +109,343 @@
 
     </LinearLayout>
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/btn_control_time"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choose_piece_color">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/materialTextView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/control_time_text"
-            android:textColor="@color/grey_400"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <LinearLayout
-        android:id="@+id/btns"
+        android:id="@+id/choose_level"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/choose_piece_color"
         android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@+id/btn_control_time"
-        app:layout_constraintTop_toBottomOf="@+id/btn_control_time">
+        android:gravity="center_horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/level_text"
+            android:textColor="@color/grey_400" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:gravity="center_horizontal"
+            android:layout_marginVertical="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_30m"
-                android:layout_width="0dp"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_one"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/thirty_minute"
-                app:cornerRadius="4dp" />
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/one_number_text"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_15mp10"
-                android:layout_width="0dp"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_two"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/fifteen_minute_plus_ten"
-                app:cornerRadius="4dp" />
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/two_number_text"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_10m"
-                android:layout_width="0dp"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_three"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/ten_minute_text"
-                app:cornerRadius="4dp" />
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/three_number_text"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_four"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/four_number_text"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_five"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/five_number_text"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_six"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/six_number_text"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_seven"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/seven_number_text"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btn_lv_eight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginHorizontal="4dp"
+                android:textColor="@color/white"
+                android:background="@color/black"
+                android:text="@string/eight_number_text"/>
+
 
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/choose_level"
+        android:orientation="vertical">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            app:dividerColor="@color/black"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_control_time"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/materialTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/control_time_text"
+                android:textColor="@color/grey_400"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="16dp"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="16dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/btns"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginHorizontal="16dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@+id/btn_control_time"
+            app:layout_constraintTop_toBottomOf="@+id/btn_control_time">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_30m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/thirty_minute"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_15mp10"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/fifteen_minute_plus_ten"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_10m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/ten_minute_text"
+                    app:cornerRadius="4dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_5mp5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/five_minute_plus_five_text"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_3mp2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/three_minute_plus_two_text"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_2mp1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/two_minute_plus_one_text"
+                    app:cornerRadius="4dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_5m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/five_minute_text"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_3m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/three_minute_text"
+                    app:cornerRadius="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_1m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/grey_800"
+                    android:text="@string/one_minute_text"
+                    app:cornerRadius="4dp" />
+
+            </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_5mp5"
-                android:layout_width="0dp"
+                android:id="@+id/btn_none"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
                 android:backgroundTint="@color/grey_800"
-                android:text="@string/five_minute_plus_five_text"
-                app:cornerRadius="4dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_3mp2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/three_minute_plus_two_text"
-                app:cornerRadius="4dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_2mp1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/two_minute_plus_one_text"
+                android:text="@string/none_text"
                 app:cornerRadius="4dp" />
 
         </LinearLayout>
 
-        <LinearLayout
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="0.5dp"
+            app:dividerColor="@color/black"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_5m"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/five_minute_text"
-                app:cornerRadius="4dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_3m"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/three_minute_text"
-                app:cornerRadius="4dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_1m"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/grey_800"
-                android:text="@string/one_minute_text"
-                app:cornerRadius="4dp" />
-
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_none"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_tackback"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/grey_800"
-            android:text="@string/none_text"
-            app:cornerRadius="4dp" />
+            android:layout_height="50dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="16dp"
+                android:text="@string/suggest_text"
+                android:textColor="@color/grey_400"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_enable_suggest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
+                app:trackTint="@color/white"
+                app:thumbTint="@color/white"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            app:dividerColor="@color/black"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_suggest"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="16dp"
+                android:text="@string/takeback_text"
+                android:textColor="@color/grey_400"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_enable_tackback"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
+                app:trackTint="@color/white"
+                app:thumbTint="@color/white"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            app:dividerColor="@color/black"/>
 
     </LinearLayout>
 

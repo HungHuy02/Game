@@ -27,7 +27,7 @@ public class SuggestiveArrow {
         });
 
         PolygonSprite arrow = new PolygonSprite(arrowRegion);
-        arrow.setOrigin(originX + 15, originY);
+        arrow.setOrigin(originX + 25, originY);
         arrow.setRotation(angle);
         return arrow;
     }

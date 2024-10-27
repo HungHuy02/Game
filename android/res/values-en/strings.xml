@@ -49,4 +49,6 @@
     <string name="change_text">Change</string>
     <string name="volume_up_text">Turn on sound</string>
     <string name="volume_off_text">Sound off</string>
+    <string name="suggest_text">Suggest</string>
+    <string name="level_text">Level</string>
 </resources>

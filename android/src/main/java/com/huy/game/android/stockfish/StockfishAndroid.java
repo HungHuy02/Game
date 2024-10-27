@@ -14,10 +14,18 @@ public class StockfishAndroid implements Stockfish {
 
     private Process process;
     private Context context;
+    private int depth;
+    private int time;
 
     public StockfishAndroid(Context context) {
         this.context = context;
         init();
+    }
+
+    public StockfishAndroid(Context context, int level) {
+        this.context = context;
+        init();
+        setupStockfish(level);
     }
 
     @Override
@@ -25,10 +33,59 @@ public class StockfishAndroid implements Stockfish {
          try {
             process = Runtime.getRuntime().exec(context.getApplicationInfo().nativeLibraryDir+"/lib_stockfish.so");
             sendCommand("uci");
-            sendCommand("setoption name Skill Level value 10");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setupStockfish(int level) {
+        int skillLevel = switch (level) {
+            case 1 -> {
+                depth = 5;
+                time = 50;
+                yield  -9;
+            }
+            case 2 -> {
+                depth = 5;
+                time = 100;
+                yield  -5;
+            }
+            case 3 -> {
+                depth = 5;
+                time = 150;
+                yield  -1;
+            }
+            case 4 -> {
+                depth = 5;
+                time = 200;
+                yield  3;
+            }
+            case 5 -> {
+                depth = 5;
+                time = 300;
+                yield 7;
+            }
+            case 6 -> {
+                depth = 8;
+                time = 400;
+                yield 11;
+            }
+            case 7 -> {
+                depth = 13;
+                time = 500;
+                yield 16;
+            }
+            case 8 -> {
+                depth = 22;
+                time = 1000;
+                yield 20;
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + level);
+        };
+        StringBuilder builder = new StringBuilder();
+        builder.append("setoption name Skill Level value ");
+        builder.append(skillLevel);
+        sendCommand(builder.toString());
     }
 
     @Override
@@ -46,6 +103,19 @@ public class StockfishAndroid implements Stockfish {
         }
     }
 
+    @Override
+    public void findBestMove(String fen, Consumer<String> consumer) {
+        sendCommand(command("position fen", fen));
+        StringBuilder builder = new StringBuilder();
+        builder.append("go depth ");
+        builder.append(depth);
+        builder.append(" movetime ");
+        builder.append(time);
+        sendCommand(builder.toString());
+        getResponse(consumer);
+    }
+
+
     public void getResponse(Consumer<String> consumer) {
         Process processOut = process;
         if(processOut == null){
@@ -54,9 +124,9 @@ public class StockfishAndroid implements Stockfish {
         BufferedReader out = new BufferedReader(new InputStreamReader(processOut.getInputStream()), 16384);
         String data;
         try{
+            long lastReceivedTime = System.currentTimeMillis();
             loop:
             while(true) {
-                long lastReceivedTime = System.currentTimeMillis();
                 while( (data = out.readLine()) != null){
                     Log.e("test", data);
                     if(data.startsWith("bestmove")) {
@@ -67,22 +137,15 @@ public class StockfishAndroid implements Stockfish {
                             break loop;
                         }
                     }
+                    lastReceivedTime = System.currentTimeMillis();
                 }
-                if (System.currentTimeMillis() - lastReceivedTime > 5000) {
-                    Log.e("error" ,"error");
+                if (System.currentTimeMillis() - lastReceivedTime > 2000) {
                     break;
                 }
             }
         } catch(IOException e){
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void sendCommandAndGetResponse(String fen, int time, Consumer<String> consumer) {
-        sendCommand(command("position fen", fen));
-        sendCommand(command("go movetime", time));
-        getResponse(consumer);
     }
 
     private String command(String startPart, Object endPart) {

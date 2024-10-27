@@ -23,7 +23,7 @@ public class ChessHardAIPlayer extends ChessAIPlayer{
     @Override
     public Move findBestMove(Board board, String fen) {
         BlockingQueue<Move> queue = new ArrayBlockingQueue<>(1);
-        stockfish.sendCommandAndGetResponse(fen, this.getTimeRemain(), data -> {
+        stockfish.findBestMove(fen, data -> {
             Spot start =  board.getSpot(
                 AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(data.charAt(1)),
                 AlgebraicNotation.changeColAlgebraicNotationToColPosition(data.charAt(0)));

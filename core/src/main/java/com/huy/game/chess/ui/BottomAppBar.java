@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Scaling;
+import com.huy.game.chess.core.Board;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameHistoryManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -25,20 +26,20 @@ public class BottomAppBar {
 
     public BottomAppBar() {}
 
-    public BottomAppBar(ChessImage chessImage, BitmapFont font, Window option, Window check, Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
-        setStack(chessImage, font, option, check, stage, bundle, manager, scrollPane, assesManager);
+    public BottomAppBar(Board board,ChessImage chessImage, BitmapFont font, Window option, Window check, Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
+        setStack(board, chessImage, font, option, check, stage, bundle, manager, scrollPane, assesManager);
     }
 
     public Stack getStack() {
         return stack;
     }
 
-    private void setStack(ChessImage chessImage, BitmapFont font, Window option, Window check,Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
+    private void setStack(Board board, ChessImage chessImage, BitmapFont font, Window option, Window check, Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
         stack = new Stack();
         stack.setSize(Gdx.graphics.getWidth(), 150f);
         stack.setPosition(0, 0);
         stack.add(backgroundContainer(chessImage));
-        stack.add(horizontalGroup(chessImage, font, option, check ,stage, bundle, manager, scrollPane, assesManager));
+        stack.add(horizontalGroup(board, chessImage, font, option, check ,stage, bundle, manager, scrollPane, assesManager));
     }
 
     public void setStack(ChessImage chessImage,BitmapFont font, I18NBundle bundle) {
@@ -72,18 +73,18 @@ public class BottomAppBar {
         return backgroundContainer;
     }
 
-     private HorizontalGroup horizontalGroup(ChessImage chessImage, BitmapFont font, Window option, Window check,Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
+     private HorizontalGroup horizontalGroup(Board board, ChessImage chessImage, BitmapFont font, Window option, Window check,Stage stage, I18NBundle bundle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager) {
          Label.LabelStyle labelStyle = new Label.LabelStyle();
          labelStyle.font = font;
          HorizontalGroup horizontalGroup = new HorizontalGroup();
          horizontalGroup.addActor(optionsButton(chessImage , chessImage.getOptions(), bundle.get("options"), labelStyle, option, stage));
          horizontalGroup.addActor(newButton(chessImage ,chessImage.getPlus(), bundle.get("new"), labelStyle, check, stage));
-         horizontalGroup.addActor(backButton(chessImage.getBack(), bundle.get("back"), labelStyle, manager, scrollPane, assesManager, chessImage));
-         horizontalGroup.addActor(forwardsButton(chessImage.getForwards(), bundle.get("forwards"), labelStyle, manager, scrollPane, assesManager, chessImage));
+         horizontalGroup.addActor(backButton(board, chessImage.getBack(), bundle.get("back"), labelStyle, manager, scrollPane, assesManager, chessImage));
+         horizontalGroup.addActor(forwardsButton(board, chessImage.getForwards(), bundle.get("forwards"), labelStyle, manager, scrollPane, assesManager, chessImage));
          return horizontalGroup;
      }
 
-    private VerticalGroup backButton(Image image, String name, Label.LabelStyle labelStyle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager, ChessImage chessImage) {
+    private VerticalGroup backButton(Board board, Image image, String name, Label.LabelStyle labelStyle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager, ChessImage chessImage) {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.addActor(image(image));
         verticalGroup.addActor(name(name, labelStyle));
@@ -104,7 +105,7 @@ public class BottomAppBar {
         return verticalGroup;
     }
 
-    private VerticalGroup forwardsButton(Image image, String name, Label.LabelStyle labelStyle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager, ChessImage chessImage) {
+    private VerticalGroup forwardsButton(Board board, Image image, String name, Label.LabelStyle labelStyle, ChessGameHistoryManager manager, NotationHistoryScrollPane scrollPane, ChessGameAssesManager assesManager, ChessImage chessImage) {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.addActor(image(image));
         verticalGroup.addActor(name(name, labelStyle));

@@ -226,7 +226,7 @@ public class ChessGameAssesManager {
     }
 
     public I18NBundle getBundle(String languageCode) {
-        Locale locale = new Locale(languageCode);
+        Locale locale = Locale.forLanguageTag(languageCode);
         FileHandle baseFileHandle = Gdx.files.internal("i18N/bundle");
         return I18NBundle.createBundle(baseFileHandle, locale, "UTF-8");
     }

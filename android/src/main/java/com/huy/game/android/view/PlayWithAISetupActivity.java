@@ -11,13 +11,13 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textview.MaterialTextView;
 import com.huy.game.R;
 import com.huy.game.android.base.BaseActivity;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayWithAISetupViewModel;
-import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.Difficulty;
 import com.huy.game.chess.enums.PieceColor;
@@ -38,9 +38,13 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
         binding = ActivityPlayWithAiSetUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setupViewModel();
+        setupLevel();
+        setupLevelButtons();
         setupButtons();
         backButton();
         controlTimeButton();
+        suggestButton();
+        takebackButton();
         playButton();
     }
 
@@ -114,6 +118,73 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
         viewModel.showButtons().observe(this, showButtons -> binding.btns.setVisibility(showButtons ? View.VISIBLE : View.GONE));
     }
 
+    private void setupLevel() {
+        viewModel.getLevel().observe(this, level -> {
+            switch (level) {
+                case 1 -> changeColor(binding.btnLvOne);
+                case 2 -> changeColor(binding.btnLvTwo);
+                case 3 -> changeColor(binding.btnLvThree);
+                case 4 -> changeColor(binding.btnLvFour);
+                case 5 -> changeColor(binding.btnLvFive);
+                case 6 -> changeColor(binding.btnLvSix);
+                case 7 -> changeColor(binding.btnLvSeven);
+                case 8 -> changeColor(binding.btnLvEight);
+            }
+        });
+        int level = StorageUtils.getInstance(this).getIntValue(Constants.DATASTORE_AI_LEVEL);
+        viewModel.setLevel(level == -1 ? 1 : level);
+    }
+
+    private void changeColor(MaterialTextView tv) {
+        binding.btnLvOne.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvTwo.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvThree.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvFour.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvFive.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvSix.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvSeven.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        binding.btnLvEight.setBackgroundTintList(getResources().getColorStateList(R.color.black, getTheme()));
+        tv.setBackgroundTintList(getResources().getColorStateList(R.color.light_green_700, getTheme()));
+    }
+
+    private void setupLevelButtons() {
+        binding.btnLvOne.setOnClickListener(levelButtonClickListener);
+        binding.btnLvTwo.setOnClickListener(levelButtonClickListener);
+        binding.btnLvThree.setOnClickListener(levelButtonClickListener);
+        binding.btnLvFour.setOnClickListener(levelButtonClickListener);
+        binding.btnLvFive.setOnClickListener(levelButtonClickListener);
+        binding.btnLvSix.setOnClickListener(levelButtonClickListener);
+        binding.btnLvSeven.setOnClickListener(levelButtonClickListener);
+        binding.btnLvEight.setOnClickListener(levelButtonClickListener);
+    }
+
+    private final View.OnClickListener levelButtonClickListener = (v) -> {
+        StorageUtils utils = StorageUtils.getInstance(v.getContext());
+        int id = v.getId();
+        if (id == R.id.btn_lv_one) {
+            handleChangeLevel(utils, 1);
+        }else if (id == R.id.btn_lv_two) {
+            handleChangeLevel(utils, 2);
+        }else if (id == R.id.btn_lv_three) {
+            handleChangeLevel(utils, 3);
+        }else if (id == R.id.btn_lv_four) {
+            handleChangeLevel(utils, 4);
+        }else if (id == R.id.btn_lv_five) {
+            handleChangeLevel(utils, 5);
+        }else if (id == R.id.btn_lv_six) {
+            handleChangeLevel(utils, 6);
+        }else if (id == R.id.btn_lv_seven) {
+            handleChangeLevel(utils, 7);
+        }else {
+            handleChangeLevel(utils, 8);
+        }
+    };
+
+    private void handleChangeLevel(StorageUtils utils, int level) {
+        utils.setIntValue(Constants.DATASTORE_AI_LEVEL, level);
+        viewModel.setLevel(level);
+    }
+
     private void setupButtons() {
         binding.btnNone.setOnClickListener(this);
         binding.btn1m.setOnClickListener(this);
@@ -136,6 +207,14 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
 
     private void controlTimeButton() {
         binding.btnControlTime.setOnClickListener((v) -> viewModel.setShowButtons(Boolean.FALSE.equals(viewModel.showButtons().getValue())));
+    }
+
+    private void suggestButton() {
+        binding.btnSuggest.setOnClickListener((v) -> binding.switchEnableSuggest.setChecked(!binding.switchEnableSuggest.isChecked()));
+    }
+
+    private void takebackButton() {
+        binding.btnTackback.setOnClickListener((v) -> binding.switchEnableTackback.setChecked(!binding.switchEnableTackback.isChecked()));
     }
 
     private void playButton() {
@@ -175,6 +254,9 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
             intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, pieceColor.toString());
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
             intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Constants.AI_NAME);
+            intent.putExtra(Constants.BUNDLE_AI_LEVEL, viewModel.getLevel().getValue());
+            intent.putExtra(Constants.BUNDLE_ENABLE_SUGGEST, binding.switchEnableSuggest.isChecked());
+            intent.putExtra(Constants.BUNDLE_ENABLE_TAKEBACK, binding.switchEnableTackback.isChecked());
             startActivity(intent);
             finish();
         });

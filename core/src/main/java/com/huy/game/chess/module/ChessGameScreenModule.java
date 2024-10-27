@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.ChessSound;
+import com.huy.game.chess.manager.GameSetting;
 import com.huy.game.chess.module.scope.Screen;
 
 import javax.inject.Singleton;
@@ -20,7 +21,7 @@ public class ChessGameScreenModule {
     @Screen
     @Provides
     public I18NBundle getI18NBundle(ChessGameAssesManager manager) {
-        return  manager.getBundle("");
+        return  manager.getBundle(GameSetting.getInstance().getLanguage());
     }
 
     @Screen

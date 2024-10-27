@@ -71,12 +71,13 @@ public class Move {
         board.increaseTurn();
     }
 
-    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history) {
+    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
         Spot endSpot = board.getSpot(end.getX(), end.getY());
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
+        handleSpecialMove(board, chessImage);
         handleSpotColorAfterMove(startSpot, endSpot);
         handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite());

@@ -35,8 +35,10 @@ public class Main extends Game {
     private ChessMode mode;
     private boolean isRotateBoard;
     public TimeType timeType;
+    private boolean enableSuggesting = false;
+    private boolean enableTakeback = false;
 
-    public Main(ChessMode mode, TimeType timeType, boolean isRotateBoard) {
+    public Main(ChessMode mode, TimeType timeType,boolean isRotateBoard) {
         this.mode = mode;
         this.timeType = timeType;
         this.isRotateBoard = isRotateBoard;
@@ -49,10 +51,12 @@ public class Main extends Game {
         client.connect();
     }
 
-    public Main(ChessMode mode, TimeType timeType, Stockfish stockfish) {
+    public Main(ChessMode mode, boolean enableSuggesting, boolean enableTakeback, TimeType timeType, Stockfish stockfish) {
         this.mode = mode;
         this.timeType = timeType;
         this.stockfish = stockfish;
+        this.enableSuggesting = enableSuggesting;
+        this.enableTakeback = enableTakeback;
     }
 
     public ChessMode getMode() {
@@ -66,27 +70,26 @@ public class Main extends Game {
         manager.loadAll();
         setSetting();
         switch (mode) {
-            case AI, TWO_PERSONS:
-                toChessScreen();
-                break;
-            case ONLINE:
-                toChessMatchScreen();
-                break;
+            case AI, TWO_PERSONS -> toChessScreen();
+            case ONLINE -> toChessMatchScreen();
         }
     }
 
     private void setSetting() {
         switch (mode) {
-            case AI, ONLINE:
+            case ONLINE ->
                 setting.setShowGuidePoint(false);
-                break;
-            case TWO_PERSONS:
+            case AI -> {
+                setting.setSuggestMove(enableSuggesting);
+                setting.setCanBack(enableTakeback);
+            }
+            case TWO_PERSONS -> {
                 if (isRotateBoard) {
                     setting.setAutoRotate(true);
                 }else {
                     setting.setReverseOneSide(true);
                 }
-                break;
+            }
         }
     }
 

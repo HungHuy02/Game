@@ -99,14 +99,14 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void setupUI(GameHistory gameHistory) {
+        stage = new Stage();
         PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getCapturedPieceMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList(), main.timeType);
         PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList(), main.timeType);
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
         CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage);
         OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage, gameHistory);
-        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
-        stage = new Stage();
+        BottomAppBar bottomAppBar = new BottomAppBar(board, chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
         stage.addActor(player1Info.getInfo());
@@ -343,7 +343,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                     chessGameHistoryManager.setRePlay(false);
                     chessGameHistoryManager.returnOriginIndex();
                 }
-                String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory());
+                String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage);
                 board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
                 Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
                 chessGameHistoryManager.increaseIndex();
@@ -357,7 +357,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void handleSuggestMove(GameHistory history) {
-        executorService.submit(() -> main.stockfish.sendCommandAndGetResponse(history.getNewestFEN(), chessGameManager.getCurrentPlayer().getTimeRemain(), data -> {
+        executorService.submit(() -> main.stockfish.findBestMove(history.getNewestFEN(), data -> {
             Spot start =  board.getSpot(
                 AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(data.charAt(1)),
                 AlgebraicNotation.changeColAlgebraicNotationToColPosition(data.charAt(0)));

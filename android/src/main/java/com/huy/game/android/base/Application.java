@@ -17,7 +17,7 @@ public class Application extends android.app.Application {
     private void handleSetting() {
         StorageUtils storageUtils = StorageUtils.getInstance(this);
         String language = storageUtils.getStringValue(Constants.DATASTORE_LANGUAGE);
-        language = language.equals("null") ? "vi" : language;
+        language = language.equals("null") ? "vi-VN" : language;
         boolean mute = storageUtils.getBooleanValue(Constants.DATASTORE_MUTE);
         GameSetting.getInstance().setSetting(language, mute);
     }

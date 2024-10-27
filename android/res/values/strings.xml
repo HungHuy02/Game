@@ -58,4 +58,15 @@
     <string name="volume_off_text">Tắt âm thanh</string>
     <string name="ranking_text" translatable="false">%1$d.</string>
     <string name="elo_text" translatable="false">%1$d</string>
+    <string name="suggest_text">Gợi ý</string>
+    <string name="takeback_text" translatable="false">Takeback</string>
+    <string name="level_text">Độ khó</string>
+    <string name="one_number_text" translatable="false">1</string>
+    <string name="two_number_text" translatable="false">2</string>
+    <string name="three_number_text" translatable="false">3</string>
+    <string name="four_number_text" translatable="false">4</string>
+    <string name="five_number_text" translatable="false">5</string>
+    <string name="six_number_text" translatable="false">6</string>
+    <string name="seven_number_text" translatable="false">7</string>
+    <string name="eight_number_text" translatable="false">8</string>
 </resources>

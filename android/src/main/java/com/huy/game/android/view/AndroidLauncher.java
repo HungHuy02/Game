@@ -34,7 +34,10 @@ public class AndroidLauncher extends AndroidApplication {
                 Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE);
                 OpponentPlayer.getInstance().setData(player2Name, !(player1Color == PieceColor.WHITE));
                 if(mode == ChessMode.AI) {
-                    initialize(new Main(mode, type, new StockfishAndroid(getApplicationContext())), configuration);
+                    boolean enableSuggesting = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_SUGGEST, false);
+                    boolean enableTakeback = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_TAKEBACK, false);
+                    int level = intent.getIntExtra(Constants.BUNDLE_AI_LEVEL, 1);
+                    initialize(new Main(mode, enableSuggesting, enableTakeback, type, new StockfishAndroid(getApplicationContext(), level)), configuration);
                 }else {
                     initialize(new Main(mode, type, isRotateBoard), configuration);
                 }

@@ -677,7 +677,7 @@ public class Board {
                         height = y;
                     }else {
                         int directionX = Integer.signum(end.getX() - start.getX());
-                        radian = directionX > 0 ? 0 : -180;
+                        radian = directionX > 0 ? 0 : 180;
                         height = x;
                     }
                     polygonSprite = SuggestiveArrow.createArrow(height * spotSide, radian, spotSide, centerX + distance + start.getY() * spotSide - 25, centerY + distance + start.getX() * spotSide);

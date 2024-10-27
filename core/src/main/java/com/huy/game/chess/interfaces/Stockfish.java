@@ -6,6 +6,6 @@ public interface Stockfish {
 
     void init();
     void sendCommand(String command);
-    void sendCommandAndGetResponse(String fen, int time, Consumer<String> consumer);
+    void findBestMove(String fen, Consumer<String> consumer);
     void destroy();
 }

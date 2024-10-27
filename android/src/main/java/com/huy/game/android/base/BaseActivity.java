@@ -13,7 +13,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        Locale locale = new Locale(GameSetting.getInstance().getLanguage());
+        Locale locale = Locale.forLanguageTag(GameSetting.getInstance().getLanguage());
         Configuration config = newBase.getResources().getConfiguration();
         config.setLocale(locale);
         config.setLayoutDirection(locale);
