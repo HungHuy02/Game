@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 public class StockfishAndroid implements Stockfish {
 
     private Process process;
+    private Process suggestProcess;
     private Context context;
     private int depth;
     private int time;
@@ -22,10 +23,13 @@ public class StockfishAndroid implements Stockfish {
         init();
     }
 
-    public StockfishAndroid(Context context, int level) {
+    public StockfishAndroid(Context context, int level, boolean enableSuggesting) {
         this.context = context;
         init();
         setupStockfish(level);
+        if (enableSuggesting) {
+            setupSuggestProcess();
+        }
     }
 
     @Override
@@ -88,8 +92,17 @@ public class StockfishAndroid implements Stockfish {
         sendCommand(builder.toString());
     }
 
-    @Override
-    public void sendCommand(String command) {
+    private void setupSuggestProcess() {
+        try {
+            suggestProcess = Runtime.getRuntime().exec(context.getApplicationInfo().nativeLibraryDir+"/lib_stockfish.so");
+            sendCommand(suggestProcess, "uci");
+            sendCommand(suggestProcess, "setoption name Skill Level value 20");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendCommand(Process process, String command) {
         try {
             StringBuilder builder = new StringBuilder(command);
             builder.append("\n");
@@ -104,7 +117,13 @@ public class StockfishAndroid implements Stockfish {
     }
 
     @Override
+    public void sendCommand(String command) {
+        sendCommand(process, command);
+    }
+
+    @Override
     public void findBestMove(String fen, Consumer<String> consumer) {
+        Log.e("fen", fen);
         sendCommand(command("position fen", fen));
         StringBuilder builder = new StringBuilder();
         builder.append("go depth ");
@@ -112,11 +131,18 @@ public class StockfishAndroid implements Stockfish {
         builder.append(" movetime ");
         builder.append(time);
         sendCommand(builder.toString());
-        getResponse(consumer);
+        getResponse(process, consumer);
     }
 
+    @Override
+    public void suggestiveMove(String fen, Consumer<String> consumer) {
+        Log.e("fen", fen);
+        sendCommand(suggestProcess ,command("position fen", fen));
+        sendCommand(suggestProcess ,"go depth 25 movetime 1500");
+        getResponse(suggestProcess , consumer);
+    }
 
-    public void getResponse(Consumer<String> consumer) {
+    public void getResponse(Process process , Consumer<String> consumer) {
         Process processOut = process;
         if(processOut == null){
             return;
@@ -157,7 +183,11 @@ public class StockfishAndroid implements Stockfish {
 
     @Override
     public void destroy() {
-        sendCommand("quit");
+        sendCommand(process,"quit");
         process.destroy();
+        if (suggestProcess != null) {
+            sendCommand(suggestProcess, "quit");
+            suggestProcess.destroy();
+        }
     }
 }

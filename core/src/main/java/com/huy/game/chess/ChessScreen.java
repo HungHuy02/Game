@@ -239,7 +239,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         switch (main.getMode()) {
             case TWO_PERSONS:
-                handleClick(screenX, screenY);
+                handleClick(board, screenX, screenY);
                 break;
             case AI:
                 handleClickWhenPlayWithAI(screenX, screenY);
@@ -253,47 +253,52 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleClickWhenPlayWithAI(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer)) {
-            handleClick(screenX, screenY);
+            handleClick(board, screenX, screenY);
         }
     }
 
     private void handleClickWhenPlayOnline(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessOnlinePlayer)) {
-            handleClick(screenX, screenY);
+            handleClick(board, screenX, screenY);
         }
     }
 
-    private void handleClick(int screenX, int screenY) {
+    private void handleClick(Board board, int screenX, int screenY) {
         int boardX = (int) Math.floor((screenX - centerX) / chessImage.getSpotSize());
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
 
         if (board.isWithinBoard(boardX, boardY)) {
-            if(board.isPromoting()) {
-                handlePawnPromotion(boardX, boardY);
+            if (chessGameHistoryManager.isRePlay() && !chessGameHistoryManager.isTakeBack()) {
+                chessGameHistoryManager.setTakeBack(true);
+                handleClick(chessGameHistoryManager.getBoard(), screenX, screenY);
             }else {
-                if(setting.isRotate()) {
-                    boardX = 7 - boardX;
-                    boardY = 7 - boardY;
-                }
-                if (selectedSpot == null) {
-                    selectedSpot = board.getSpot(boardY, boardX);
-                    selectedSpot.setShowColor(true);
-                    if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
-                        if(!selectedSpot.isIdentificationColor()) {
-                            selectedSpot.setShowColor(false);
-                        }
-                        selectedSpot = null;
-                    }else {
-                        selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+                if(board.isPromoting()) {
+                    handlePawnPromotion(board, boardX, boardY);
+                }else {
+                    if(setting.isRotate()) {
+                        boardX = 7 - boardX;
+                        boardY = 7 - boardY;
                     }
-                } else {
-                    checkAndHandleMove(boardX, boardY);
+                    if (selectedSpot == null) {
+                        selectedSpot = board.getSpot(boardY, boardX);
+                        selectedSpot.setShowColor(true);
+                        if(selectedSpot.getPiece() == null || selectedSpot.getPiece().isWhite() != chessGameManager.getCurrentPlayer().isWhite()) {
+                            if(!selectedSpot.isIdentificationColor()) {
+                                selectedSpot.setShowColor(false);
+                            }
+                            selectedSpot = null;
+                        }else {
+                            selectedSpot.getPiece().calculateForPoint(board, selectedSpot);
+                        }
+                    } else {
+                        checkAndHandleMove(board, boardX, boardY);
+                    }
                 }
             }
         }
     }
 
-    private void checkAndHandleMove(int boardX, int boardY) {
+    private void checkAndHandleMove(Board board, int boardX, int boardY) {
         Spot secondSpot = board.getSpot(boardY, boardX);
         Move move = new Move(selectedSpot, secondSpot);
         Board testBoard = board.cloneBoard();
@@ -304,10 +309,12 @@ public class ChessScreen extends InputAdapter implements Screen {
             move.makeMove(testBoard);
             if(testBoard.isKingSafe(chessGameManager.getCurrentPlayer().isWhite())) {
                 if (moveType != MoveType.PROMOTE) {
+                    handleTakeBack();
                     handleMove(move);
                     handleMoveWithOtherMode(move);
                 }else {
-                    move.handleSpecialMove(board, chessImage);
+                    handleTakeBack();
+                    move.handleSpecialMove(this.board, chessImage);
                 }
                 selectedSpot = null;
             }else {
@@ -318,13 +325,20 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
     }
 
-    private void handlePawnPromotion(int boardX, int boardY) {
+    private void handlePawnPromotion(Board board, int boardX, int boardY) {
         board.handlePawnPromotion(boardX, boardY, setting);
         Move move = board.getPromotingMove();
         if(move != null) {
             handleMove(move);
         }
         handleMoveWithOtherMode(move);
+    }
+
+    private void handleTakeBack() {
+        if (chessGameHistoryManager.isTakeBack()) {
+            chessGameHistoryManager.deleteOldSaved();
+            board = chessGameHistoryManager.getBoard();
+        }
     }
 
     private void handleMoveWithOtherMode(Move move) {
@@ -357,7 +371,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void handleSuggestMove(GameHistory history) {
-        executorService.submit(() -> main.stockfish.findBestMove(history.getNewestFEN(), data -> {
+        executorService.submit(() -> main.stockfish.suggestiveMove(history.getNewestFEN(), data -> {
             Spot start =  board.getSpot(
                 AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(data.charAt(1)),
                 AlgebraicNotation.changeColAlgebraicNotationToColPosition(data.charAt(0)));
@@ -406,6 +420,9 @@ public class ChessScreen extends InputAdapter implements Screen {
             multiplexer.removeProcessor(0);
             chessSound.playGameEndSound();
             chessGameManager.finish();
+            if (main.getMode() == ChessMode.AI) {
+                main.stockfish.destroy();
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 package com.huy.game.chess.core;
 
 import com.huy.game.chess.enums.MoveType;
-import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 
 public class Move {
@@ -91,11 +90,14 @@ public class Move {
     }
 
     private void handleCheck(Board board) {
-        if(end.getPiece().isCheckOpponentKing(board, board.getSpots(), end)) {
+        if(end.getPiece().isCheckOpponentKing(board, board.getSpots(), end) || board.isIndirectCheck(start, end.getPiece().isWhite())) {
             isCheck = true;
+            if (board.getKingSpot(!startPiece.isWhite()).getPiece() instanceof King king) {
+                king.setSafe(false);
+            }
         }else {
-            if (board.isIndirectCheck(start, end.getPiece().isWhite())) {
-                isCheck = true;
+            if (board.getKingSpot(!startPiece.isWhite()).getPiece() instanceof King king) {
+                king.setSafe(true);
             }
         }
     }
@@ -120,9 +122,7 @@ public class Move {
                 board.getSpot(start.getX(), 0).setPiece(board.getSpot(start.getX(), start.getY() - 1).getPiece());
                 board.getSpot(start.getX(), start.getY() - 1).setPiece(null);
             }
-            case EN_PASSANT -> {
-                board.setSpot(possibleEnPassantTargetsSpot.getX(), possibleEnPassantTargetsSpot.getY(), possibleEnPassantTargetsSpot.getPiece());
-            }
+            case EN_PASSANT -> board.setSpot(possibleEnPassantTargetsSpot.getX(), possibleEnPassantTargetsSpot.getY(), possibleEnPassantTargetsSpot.getPiece());
         }
     }
 
@@ -232,10 +232,16 @@ public class Move {
             case CASTLING_KING_SIDE -> {
                 board.getSpot(start.getX(), start.getY() + 1).setPiece(board.getSpot(start.getX(), 7).getPiece());
                 board.getSpot(start.getX(), 7).setPiece(null);
+                if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                    king.setHasMove();
+                }
             }
             case CASTLING_QUEEN_SIDE -> {
                 board.getSpot(start.getX(), start.getY() - 1).setPiece(board.getSpot(start.getX(), 0).getPiece());
                 board.getSpot(start.getX(), 0).setPiece(null);
+                if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                    king.setHasMove();
+                }
             }
             case EN_PASSANT -> {
                 possibleEnPassantTargetsSpot.setPiece(null);

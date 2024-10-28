@@ -67,9 +67,10 @@ public class FEN {
 
     public static void castlingRights(Board board, StringBuilder builder) {
         builder.append(' ');
+        int length = builder.length;
         checkCastlingRights(board, builder, true, 'K', 'Q');
         checkCastlingRights(board, builder, false, 'k', 'q');
-        if (builder.isEmpty()) {
+        if (builder.length == length) {
             builder.append('-');
         }
     }

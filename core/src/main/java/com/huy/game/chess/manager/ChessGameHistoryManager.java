@@ -9,6 +9,7 @@ public class ChessGameHistoryManager {
     private final GameHistory history;
     private Board board;
     private int index = -1;
+    private boolean isTakeBack = false;
 
     public ChessGameHistoryManager(GameHistory history) {
         this.history = history;
@@ -20,6 +21,14 @@ public class ChessGameHistoryManager {
 
     public void setRePlay(boolean rePlay) {
         isRePlay = rePlay;
+    }
+
+    public boolean isTakeBack() {
+        return isTakeBack;
+    }
+
+    public void setTakeBack(boolean takeBack) {
+        isTakeBack = takeBack;
     }
 
     public GameHistory getHistory() {
@@ -42,6 +51,10 @@ public class ChessGameHistoryManager {
     public void setNewBoard(ChessImage chessImage) {
         board = new Board();
         board.resetBoard(chessImage);
+    }
+
+    public void deleteOldSaved() {
+        history.deleteOldSaved(index);
     }
 
     public int getIndex() {

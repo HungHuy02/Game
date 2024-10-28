@@ -123,4 +123,12 @@ public class GameHistory {
     public String getPGN(){
         return pgn.toString();
     }
+
+    public void deleteOldSaved(int index) {
+        for (;index < movedList.size(); index++) {
+            fenList.removeLast();
+            stateHashList.removeLast();
+            movedList.removeLast();
+        }
+    }
 }

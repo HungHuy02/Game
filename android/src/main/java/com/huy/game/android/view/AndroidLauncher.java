@@ -37,7 +37,7 @@ public class AndroidLauncher extends AndroidApplication {
                     boolean enableSuggesting = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_SUGGEST, false);
                     boolean enableTakeback = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_TAKEBACK, false);
                     int level = intent.getIntExtra(Constants.BUNDLE_AI_LEVEL, 1);
-                    initialize(new Main(mode, enableSuggesting, enableTakeback, type, new StockfishAndroid(getApplicationContext(), level)), configuration);
+                    initialize(new Main(mode, enableSuggesting, enableTakeback, type, new StockfishAndroid(getApplicationContext(), level, enableSuggesting)), configuration);
                 }else {
                     initialize(new Main(mode, type, isRotateBoard), configuration);
                 }
