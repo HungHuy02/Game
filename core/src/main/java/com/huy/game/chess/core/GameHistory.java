@@ -3,7 +3,6 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.core.notation.FEN;
-import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 
 import java.util.ArrayList;
@@ -44,10 +43,7 @@ public class GameHistory {
     }
 
     public boolean check50MovesRule() {
-        if (halfmoveClock == 100) {
-            return true;
-        }
-        return false;
+        return halfmoveClock == 100;
     }
 
     public boolean checkThreefoldRepetition() {
@@ -107,6 +103,10 @@ public class GameHistory {
         return fenList.get(index);
     }
 
+    public int[] getTimeRemain(int index) {
+        return timeMap.get(index);
+    }
+
     public void resetHalfmoveClock() {
         halfmoveClock = 0;
     }
@@ -126,9 +126,9 @@ public class GameHistory {
 
     public void deleteOldSaved(int index) {
         for (;index < movedList.size(); index++) {
-            fenList.removeLast();
-            stateHashList.removeLast();
-            movedList.removeLast();
+            fenList.remove(fenList.size() - 1);
+            stateHashList.remove(stateHashList.size() - 1);
+            movedList.remove(movedList.size() - 1);
         }
     }
 }

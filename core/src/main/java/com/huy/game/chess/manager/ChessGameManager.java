@@ -2,6 +2,7 @@ package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
 import com.huy.game.chess.core.BoardSetting;
+import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.enums.TimeType;
@@ -18,14 +19,16 @@ public class ChessGameManager {
     private Timer timer;
     private Map<String, Integer> timeList;
     private int plusTime;
+    private final TimeType timeType;
 
-    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish) {
-        int time = handleTime(timeType);
+    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish, GameHistory history) {
+        this.timeType = timeType;
+        int time = handleTime();
         setupPlayer(mode,isWhite, stockfish, time);
-        setupTime(time);
+        setupTime(time, history);
     }
 
-    private int handleTime(TimeType timeType) {
+    private int handleTime() {
         return switch (timeType) {
             case ONE_MINUTE -> 60;
             case ONE_MINUTE_PLUS_ONE -> {
@@ -72,30 +75,50 @@ public class ChessGameManager {
     }
 
 
-    private void setupTime(int time) {
-        timer = new Timer();
-        timeList = new HashMap<>();
-        timeList.put("play1", 0);
-        timeList.put("play2", 0);
-        timeList.put("1", time);
-        timeList.put("2", time);
-        handleTimer("1");
+    private void setupTime(int time, GameHistory history) {
+        if (timeType != TimeType.NO_TIME) {
+            timer = new Timer();
+            timeList = new HashMap<>();
+            timeList.put("play1", 0);
+            timeList.put("play2", 0);
+            timeList.put("1", time);
+            timeList.put("2", time);
+            handleTimer("1");
+            history.addTimeRemain(0, time, time);
+        }
     }
 
-    public void switchPlayer(BoardSetting setting) {
-        cancelTimer();
-        int timeRemain = currentPlayer.getTimeRemain() + plusTime;
-        if(currentPlayer == player1) {
-            timeList.put("1",timeRemain );
-            currentPlayer.setTimeRemain(timeRemain);
-            currentPlayer = player2;
-            handleTimer("2");
+    public void setTimeRemain(int[] timeRemain) {
+        player1.setTimeRemain(timeRemain[0]);
+        player2.setTimeRemain(timeRemain[1]);
+        timeList.put("1", timeRemain[0]);
+        timeList.put("2", timeRemain[1]);
+    }
+
+    public void switchPlayer(BoardSetting setting, ChessGameHistoryManager manager) {
+        if (timeType != TimeType.NO_TIME) {
+            cancelTimer();
+            manager.getHistory().addTimeRemain(manager.getIndex(), player1.getTimeRemain(), player2.getTimeRemain());
+            int timeRemain = currentPlayer.getTimeRemain() + plusTime;
+            if(currentPlayer == player1) {
+                timeList.put("1",timeRemain );
+                currentPlayer.setTimeRemain(timeRemain);
+                currentPlayer = player2;
+                handleTimer("2");
+            }else {
+                timeList.put("2", timeRemain);
+                currentPlayer.setTimeRemain(timeRemain);
+                currentPlayer = player1;
+                handleTimer("1");
+            }
         }else {
-            timeList.put("2", timeRemain);
-            currentPlayer.setTimeRemain(timeRemain);
-            currentPlayer = player1;
-            handleTimer("1");
+            if(currentPlayer == player1) {
+                currentPlayer = player2;
+            }else {
+                currentPlayer = player1;
+            }
         }
+
         if (setting.isAutoRotate()) {
             setting.setRotate(!setting.isRotate());
         }

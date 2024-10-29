@@ -119,6 +119,15 @@ public class NotationHistoryScrollPane {
         handleScroll(handleNewColor(manager));
     }
 
+    public void deleteOldSaved() {
+        int size = horizontalGroup.getChildren().size - 1;
+        while (size > index) {
+            horizontalGroup.getChild(size).remove();
+            size--;
+        }
+        horizontalGroup.layout();
+    }
+
     private int changeToTrueIndex(int index) {
         return index - index / 3 - 1;
     }

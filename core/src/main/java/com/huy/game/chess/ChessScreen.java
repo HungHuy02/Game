@@ -23,6 +23,7 @@ import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.chess.manager.ChessAIPlayer;
 import com.huy.game.chess.manager.ChessGameAssesManager;
@@ -90,7 +91,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         GameHistory gameHistory = new GameHistory();
         chessGameHistoryManager = new ChessGameHistoryManager(gameHistory);
         shapeRenderer = new ShapeRenderer();
-        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), main.timeType, main.stockfish);
+        chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), main.timeType, main.stockfish, gameHistory);
         selectedSpot = null;
         setupUI(gameHistory);
         setupBoard(gameHistory);
@@ -105,7 +106,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
         CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage);
-        OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage, gameHistory);
+        OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage, gameHistory, main.getMode());
         BottomAppBar bottomAppBar = new BottomAppBar(board, chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
@@ -159,7 +160,7 @@ public class ChessScreen extends InputAdapter implements Screen {
             move.setMoveType(type);
             scrollPane.addValue(move.makeRealMove(board, hashing, gameHistory, chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
             board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
-            chessGameManager.switchPlayer(setting);
+            chessGameManager.switchPlayer(setting, chessGameHistoryManager);
         });
         main.socketClient.getMoveFromOpponent();
     }
@@ -253,7 +254,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleClickWhenPlayWithAI(int screenX, int screenY) {
         if(!(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer)) {
-            handleClick(board, screenX, screenY);
+            handleClick(chessGameHistoryManager.isTakeBack() ? chessGameHistoryManager.getBoard() : board, screenX, screenY);
         }
     }
 
@@ -268,7 +269,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
 
         if (board.isWithinBoard(boardX, boardY)) {
-            if (chessGameHistoryManager.isRePlay() && !chessGameHistoryManager.isTakeBack()) {
+            if (main.getMode() == ChessMode.AI && chessGameHistoryManager.isRePlay() && !chessGameHistoryManager.isTakeBack()) {
                 chessGameHistoryManager.setTakeBack(true);
                 handleClick(chessGameHistoryManager.getBoard(), screenX, screenY);
             }else {
@@ -336,7 +337,13 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleTakeBack() {
         if (chessGameHistoryManager.isTakeBack()) {
+            chessGameHistoryManager.setTakeBack(false);
+            chessGameHistoryManager.setRePlay(false);
+            scrollPane.deleteOldSaved();
             chessGameHistoryManager.deleteOldSaved();
+            if (main.timeType != TimeType.NO_TIME) {
+                chessGameManager.setTimeRemain(chessGameHistoryManager.getTimeRemain());
+            }
             board = chessGameHistoryManager.getBoard();
         }
     }
@@ -361,7 +368,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
                 Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
                 chessGameHistoryManager.increaseIndex();
-                chessGameManager.switchPlayer(setting);
+                chessGameManager.switchPlayer(setting, chessGameHistoryManager);
                 checkForEndGame(aiMove);
             }
         });
@@ -386,7 +393,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameHistoryManager.increaseIndex();
         scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
         board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
-        chessGameManager.switchPlayer(setting);
+        chessGameManager.switchPlayer(setting, chessGameHistoryManager);
         board.setSuggestMove(null);
         board.setPolygonSprite(null);
         checkForEndGame(move);

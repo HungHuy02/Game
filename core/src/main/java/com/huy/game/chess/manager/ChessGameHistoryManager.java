@@ -57,6 +57,10 @@ public class ChessGameHistoryManager {
         history.deleteOldSaved(index);
     }
 
+    public int[] getTimeRemain() {
+        return history.getTimeRemain(index);
+    }
+
     public int getIndex() {
         return index;
     }
