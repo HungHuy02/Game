@@ -11,21 +11,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.huy.game.chess.ChessScreen;
+import com.huy.game.chess.core.GameHistory;
+import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 
 public class CheckPopup {
 
     private Window checkPopup;
 
-    public CheckPopup(ChessGameAssesManager manager, BitmapFont font, I18NBundle bundle, Stage stage) {
-        setCheckPopup(manager, font, bundle, stage);
+    public CheckPopup(ChessGameAssesManager manager, BitmapFont font, I18NBundle bundle, Stage stage, ChessScreen chessScreen) {
+        setCheckPopup(manager, font, bundle, stage, chessScreen);
     }
 
     public Window getCheckPopup() {
         return checkPopup;
     }
 
-    private void setCheckPopup(ChessGameAssesManager manager, BitmapFont font, I18NBundle bundle, Stage stage) {
+    private void setCheckPopup(ChessGameAssesManager manager, BitmapFont font, I18NBundle bundle, Stage stage, ChessScreen chessScreen) {
         Skin skin = manager.getSkin();
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
@@ -39,7 +42,7 @@ public class CheckPopup {
         checkPopup.row();
         Table buttonTable = new Table();
         buttonTable.add(cancelButton(style, bundle, stage)).expandX().fillX().padLeft(32).padRight(16).height(100);
-        buttonTable.add(okButton(style, bundle, stage)).expandX().fillX().padLeft(16).padRight(32).height(100);
+        buttonTable.add(okButton(style, bundle, stage, chessScreen)).expandX().fillX().padLeft(16).padRight(32).height(100);
         checkPopup.add(buttonTable).expandX().fillX().height(100).padBottom(32);
     }
 
@@ -60,7 +63,7 @@ public class CheckPopup {
         return cancelButton;
     }
 
-    private TextButton okButton(TextButton.TextButtonStyle style, I18NBundle bundle, Stage stage) {
+    private TextButton okButton(TextButton.TextButtonStyle style, I18NBundle bundle, Stage stage, ChessScreen chessScreen) {
         TextButton okButton = new TextButton(bundle.get("yes"), style);
         okButton.addListener(new ClickListener() {
             @Override
@@ -68,6 +71,7 @@ public class CheckPopup {
                 super.clicked(event, x, y);
                 checkPopup.remove();
                 stage.getActors().removeIndex(stage.getActors().size - 1);
+                chessScreen.newGame();
             }
         });
         return okButton;

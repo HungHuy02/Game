@@ -196,8 +196,23 @@ public class ChessGameManager {
         return currentPlayer;
     }
 
-    public void finish() {
+    public void reset(GameHistory history) {
+        int time = handleTime();
         timer.clear();
+        timeList.put("play1", 0);
+        timeList.put("play2", 0);
+        timeList.put("1", time);
+        timeList.put("2", time);
+        player1.setTimeRemain(time);
+        player2.setTimeRemain(time);
+        handleTimer("1");
+        history.addTimeRemain(0, time, time);
+        currentPlayer = player1.isWhite() ? player1 : player2;
+    }
+
+    public void finish() {
+        if (timeType != TimeType.NO_TIME)
+            timer.clear();
     }
 
     public boolean isDrawByInsufficientPiece() {
@@ -211,8 +226,13 @@ public class ChessGameManager {
             int bishopQuantity2 = player2.getPieceNumber(PieceType.BISHOP);
             int knightQuantity1 = player1.getPieceNumber(PieceType.KNIGHT);
             int knightQuantity2 = player2.getPieceNumber(PieceType.KNIGHT);
-            return (knightQuantity1 + knightQuantity2 == 1 && bishopQuantity1 + bishopQuantity2 == 0)
-                || (bishopQuantity1 + bishopQuantity2 == 1 && knightQuantity1 + knightQuantity2 == 0);
+            if ((knightQuantity1 + knightQuantity2 == 1 && bishopQuantity1 + bishopQuantity2 == 0)
+                || (bishopQuantity1 + bishopQuantity2 == 1 && knightQuantity1 + knightQuantity2 == 0)) {
+                return true;
+            }else {
+                return knightQuantity1 == 0 && knightQuantity2 == 0 && bishopQuantity1 == 0 && bishopQuantity2 == 0;
+            }
+
         }
         return false;
     }

@@ -135,4 +135,10 @@ public class NotationHistoryScrollPane {
     private int changeToThisIndex(int trueIndex) {
         return trueIndex + 1 + trueIndex / 2;
     }
+
+    public void reset() {
+        horizontalGroup.clear();
+        horizontalGroup.layout();
+        index = -1;
+    }
 }

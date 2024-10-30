@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.huy.game.Main;
 import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.interfaces.BackInterface;
 
 public class TopAppBar {
 
@@ -49,6 +50,7 @@ public class TopAppBar {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                main.backInterface.back();
                 main.disposeCurrentScreen();
             }
         });

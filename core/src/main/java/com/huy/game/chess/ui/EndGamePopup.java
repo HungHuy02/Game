@@ -14,6 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.huy.game.Main;
+import com.huy.game.chess.ChessScreen;
+import com.huy.game.chess.core.GameHistory;
+import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 
@@ -21,15 +25,15 @@ public class EndGamePopup {
 
     private Window endGamePopup;
 
-    public EndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result) {
-        setEndGamePopup(font, bundle, manager, result);
+    public EndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result, Main main, ChessScreen screen) {
+        setEndGamePopup(font, bundle, manager, result, main, screen);
     }
 
     public Window getPopup() {
         return endGamePopup;
     }
 
-    private void setEndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result) {
+    private void setEndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result, Main main, ChessScreen screen) {
         Skin skin = manager.getSkin();
         TextButton.TextButtonStyle style = skin.get(TextButton.TextButtonStyle.class);
         style.font = font;
@@ -44,8 +48,8 @@ public class EndGamePopup {
         endGamePopup.add(winText(labelStyle, bundle, result)).center().height(100);
         endGamePopup.row();
         Table buttonTable = new Table();
-        buttonTable.add(rePlayButton(style, bundle)).expandX().fillX().padLeft(32).padRight(16).height(100);
-        buttonTable.add(newGameButton(style, bundle)).expandX().fillX().padLeft(16).padRight(32).height(100);
+        buttonTable.add(rePlayButton(style, bundle, screen)).expandX().fillX().padLeft(32).padRight(16).height(100);
+        buttonTable.add(newGameButton(style, bundle, main)).expandX().fillX().padLeft(16).padRight(32).height(100);
         endGamePopup.add(buttonTable).expandX().fillX().height(100).padBottom(32);
     }
 
@@ -81,23 +85,27 @@ public class EndGamePopup {
         return new Label( text, style);
     }
 
-    private TextButton newGameButton(TextButton.TextButtonStyle style, I18NBundle bundle) {
+    private TextButton newGameButton(TextButton.TextButtonStyle style, I18NBundle bundle, Main main) {
         TextButton textButton = new TextButton(bundle.get("newBoard"), style);
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                main.backInterface.newGame(main.getMode());
+                endGamePopup.remove();
             }
         });
         return textButton;
     }
 
-    private TextButton rePlayButton(TextButton.TextButtonStyle style, I18NBundle bundle) {
+    private TextButton rePlayButton(TextButton.TextButtonStyle style, I18NBundle bundle, ChessScreen chessScreen) {
         TextButton textButton = new TextButton(bundle.get("rePlay"), style);
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                chessScreen.newGame();
+                endGamePopup.remove();
             }
         });
         return textButton;

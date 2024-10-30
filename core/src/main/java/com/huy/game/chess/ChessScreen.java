@@ -105,7 +105,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList(), main.timeType);
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
-        CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage);
+        CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage, this);
         OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage, gameHistory, main.getMode());
         BottomAppBar bottomAppBar = new BottomAppBar(board, chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
         stage.addActor(appBar.getStack());
@@ -117,7 +117,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
     }
 
-    private void setupBoard(GameHistory gameHistory) {
+    public void setupBoard(GameHistory gameHistory) {
         board = new Board();
         board.resetBoard(chessImage);
         gameHistory.addFEN(board, false);
@@ -125,14 +125,14 @@ public class ChessScreen extends InputAdapter implements Screen {
         hashing = new ZobristHashing(board.getSpots(), gameHistory);
     }
 
-    private void setupInputMultiplexer() {
+    public void setupInputMultiplexer() {
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(this);
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
     }
 
-    private void handleSetupWithSpecificMode(GameHistory gameHistory) {
+    public void handleSetupWithSpecificMode(GameHistory gameHistory) {
         switch (main.getMode()) {
             case ONLINE -> setupPlayOnline(gameHistory);
             case AI -> {
@@ -182,7 +182,11 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
 
         if (setting.canGenerateSuggestMove()) {
-            board.renderSuggestiveMove(polygonSpriteBatch, centerX, centerY, chessImage.getSpotSize());
+            if (setting.isRotate()) {
+                board.renderSuggestiveMoveForRotateBoard(polygonSpriteBatch, centerX, centerY, chessImage.getSpotSize());
+            }else {
+                board.renderSuggestiveMove(polygonSpriteBatch, centerX, centerY, chessImage.getSpotSize());
+            }
         }
         stage.act(delta);
         stage.draw();
@@ -269,7 +273,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         int boardY = (int) Math.floor((Gdx.graphics.getHeight() - screenY - centerY) / chessImage.getSpotSize());
 
         if (board.isWithinBoard(boardX, boardY)) {
-            if (main.getMode() == ChessMode.AI && chessGameHistoryManager.isRePlay() && !chessGameHistoryManager.isTakeBack()) {
+            if (main.getMode() == ChessMode.AI && setting.isCanBack() && chessGameHistoryManager.isRePlay() && !chessGameHistoryManager.isTakeBack()) {
                 chessGameHistoryManager.setTakeBack(true);
                 handleClick(chessGameHistoryManager.getBoard(), screenX, screenY);
             }else {
@@ -422,7 +426,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
 
         if (gameResult != null) {
-            EndGamePopup popup = new EndGamePopup(bitmapFont, bundle, manager, gameResult);
+            EndGamePopup popup = new EndGamePopup(bitmapFont, bundle, manager, gameResult, main, this);
             stage.addActor(popup.getPopup());
             multiplexer.removeProcessor(0);
             chessSound.playGameEndSound();
@@ -444,6 +448,17 @@ public class ChessScreen extends InputAdapter implements Screen {
             selectedSpot = null;
             board.clearGuidePoint();
         }
+    }
+
+    public void newGame() {
+        chessGameHistoryManager.getHistory().reset();
+        setupBoard(chessGameHistoryManager.getHistory());
+        scrollPane.reset();
+        switch (main.getMode()) {
+            case AI, ONLINE -> handleSetupWithSpecificMode(chessGameHistoryManager.getHistory());
+        }
+        setupInputMultiplexer();
+        chessGameManager.reset(chessGameHistoryManager.getHistory());
     }
 
     @Override

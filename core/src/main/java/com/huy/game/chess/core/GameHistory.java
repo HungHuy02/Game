@@ -131,4 +131,14 @@ public class GameHistory {
             movedList.remove(movedList.size() - 1);
         }
     }
+
+    public void reset() {
+        fenList.clear();
+        stateHashList.clear();
+        movedList.clear();
+        isThreefoldRepetition = false;
+        timeMap.clear();
+        halfmoveClock = 0;
+        pgn.clear();
+    }
 }

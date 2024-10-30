@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class Timer extends Actor {
 
-    private Map<String, Integer> timeList;
-    private BitmapFont font;
-    private boolean isPlayer1;
-    private ChessImage chessImage;
+    private final Map<String, Integer> timeList;
+    private final BitmapFont font;
+    private final boolean isPlayer1;
+    private final ChessImage chessImage;
 
     public Timer(Map<String, Integer> timeList, BitmapFont font, boolean isPlayer1, ChessImage chessImage) {
         this.timeList = timeList;

@@ -12,6 +12,7 @@ import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
 import com.huy.game.chess.manager.ChessGameAssesManager;
+import com.huy.game.interfaces.BackInterface;
 import com.huy.game.interfaces.SocketClient;
 
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ public class Main extends Game {
     private ChessGameComponent component;
     public SocketClient socketClient;
     public Stockfish stockfish = null;
+    public BackInterface backInterface;
 
     @Inject
     ChessGameAssesManager manager;
@@ -32,31 +34,34 @@ public class Main extends Game {
     @Inject
     SpriteBatch batch;
 
-    private ChessMode mode;
+    private final ChessMode mode;
     private boolean isRotateBoard;
     public TimeType timeType;
     private boolean enableSuggesting = false;
     private boolean enableTakeback = false;
 
-    public Main(ChessMode mode, TimeType timeType,boolean isRotateBoard) {
+    public Main(ChessMode mode, TimeType timeType,boolean isRotateBoard, BackInterface backInterface) {
         this.mode = mode;
         this.timeType = timeType;
         this.isRotateBoard = isRotateBoard;
+        this.backInterface = backInterface;
     }
 
-    public Main(ChessMode mode, TimeType timeType, SocketClient client) {
+    public Main(ChessMode mode, TimeType timeType, SocketClient client, BackInterface backInterface) {
         this.mode = mode;
         this.timeType = timeType;
         this.socketClient = client;
+        this.backInterface = backInterface;
         client.connect();
     }
 
-    public Main(ChessMode mode, boolean enableSuggesting, boolean enableTakeback, TimeType timeType, Stockfish stockfish) {
+    public Main(ChessMode mode, boolean enableSuggesting, boolean enableTakeback, TimeType timeType, Stockfish stockfish, BackInterface backInterface) {
         this.mode = mode;
         this.timeType = timeType;
         this.stockfish = stockfish;
         this.enableSuggesting = enableSuggesting;
         this.enableTakeback = enableTakeback;
+        this.backInterface = backInterface;
     }
 
     public ChessMode getMode() {
