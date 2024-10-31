@@ -47,7 +47,7 @@ public class OptionsPopup {
         }
         optionsPopup.add(rotateBoardButton(setting, skin, bundle.get("rotateBoard"), stage)).fillX().expandX().height(100);
         optionsPopup.row();
-        optionsPopup.add(printButton(skin, bundle.get("copyPGN"), history)).fillX().expandX().height(100);
+        optionsPopup.add(printButton(skin, bundle.get("copyPGN"), history, stage)).fillX().expandX().height(100);
         optionsPopup.row();
         optionsPopup.add(newGameButton(skin, bundle.get("newBoard"), check, chessImage, stage)).fillX().expandX().height(100);
     }
@@ -110,7 +110,7 @@ public class OptionsPopup {
         return button;
     }
 
-    private TextButton printButton(Skin skin, String name, GameHistory history) {
+    private TextButton printButton(Skin skin, String name, GameHistory history, Stage stage) {
         TextButton button = new TextButton(name, skin);
         button.pad(32f);
         button.getLabel().setAlignment(Align.left);
@@ -119,6 +119,8 @@ public class OptionsPopup {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 Gdx.app.getClipboard().setContents(history.getPGN());
+                optionsPopup.remove();
+                stage.getActors().removeIndex(stage.getActors().size - 1);
             }
         });
         return button;

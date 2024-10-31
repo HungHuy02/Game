@@ -14,26 +14,26 @@ public class StockfishAndroid implements Stockfish {
 
     private Process process;
     private Process suggestProcess;
-    private Context context;
+    private final Context context;
     private int depth;
     private int time;
-
-    public StockfishAndroid(Context context) {
-        this.context = context;
-        init();
-    }
+    private final boolean enableSuggesting;
+    private final int level;
 
     public StockfishAndroid(Context context, int level, boolean enableSuggesting) {
         this.context = context;
-        init();
-        setupStockfish(level);
-        if (enableSuggesting) {
-            setupSuggestProcess();
-        }
+        this.enableSuggesting = enableSuggesting;
+        this.level = level;
+        setupNewGame();
     }
 
-    @Override
-    public void init() {
+    public void setupNewGame() {
+        init();
+        setupStockfish();
+        setupSuggestProcess();
+    }
+
+    private void init() {
          try {
             process = Runtime.getRuntime().exec(context.getApplicationInfo().nativeLibraryDir+"/lib_stockfish.so");
             sendCommand("uci");
@@ -42,7 +42,7 @@ public class StockfishAndroid implements Stockfish {
         }
     }
 
-    private void setupStockfish(int level) {
+    private void setupStockfish() {
         int skillLevel = switch (level) {
             case 1 -> {
                 depth = 5;
@@ -93,12 +93,14 @@ public class StockfishAndroid implements Stockfish {
     }
 
     private void setupSuggestProcess() {
-        try {
-            suggestProcess = Runtime.getRuntime().exec(context.getApplicationInfo().nativeLibraryDir+"/lib_stockfish.so");
-            sendCommand(suggestProcess, "uci");
-            sendCommand(suggestProcess, "setoption name Skill Level value 20");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (enableSuggesting) {
+            try {
+                suggestProcess = Runtime.getRuntime().exec(context.getApplicationInfo().nativeLibraryDir+"/lib_stockfish.so");
+                sendCommand(suggestProcess, "uci");
+                sendCommand(suggestProcess, "setoption name Skill Level value 20");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -106,10 +108,9 @@ public class StockfishAndroid implements Stockfish {
         try {
             StringBuilder builder = new StringBuilder(command);
             builder.append("\n");
-            Process ep = process;
-            if(ep != null) {
-                ep.getOutputStream().write((builder.toString()).getBytes());
-                ep.getOutputStream().flush();
+            if(process != null) {
+                process.getOutputStream().write((builder.toString()).getBytes());
+                process.getOutputStream().flush();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -143,11 +144,10 @@ public class StockfishAndroid implements Stockfish {
     }
 
     public void getResponse(Process process , Consumer<String> consumer) {
-        Process processOut = process;
-        if(processOut == null){
+        if(process == null){
             return;
         }
-        BufferedReader out = new BufferedReader(new InputStreamReader(processOut.getInputStream()), 16384);
+        BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()), 16384);
         String data;
         try{
             long lastReceivedTime = System.currentTimeMillis();

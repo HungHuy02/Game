@@ -3,7 +3,9 @@ package com.huy.game.chess.core;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.core.notation.FEN;
+import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.manager.ChessImage;
+import com.huy.game.chess.ui.NotationHistoryScrollPane;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ public class GameHistory {
     private final List<Long> stateHashList = new ArrayList<>();
     private final List<String> fenList = new ArrayList<>();
     private final Map<Integer, int[]> timeMap = new HashMap<>();
-    private final StringBuilder pgn = new StringBuilder();
+    private final List<String> algebraicNotationList = new ArrayList<>();
     private int halfmoveClock = 0;
     private boolean isThreefoldRepetition = false;
 
@@ -115,13 +117,44 @@ public class GameHistory {
         return movedList.size();
     }
 
-    public void appendString(String string) {
-        pgn.append(string);
-        pgn.append(' ');
+    public void addNewAlgebraicNotation(String string) {
+        algebraicNotationList.add(string);
+    }
+
+    public void handleForEndgameNotation(GameResult result, NotationHistoryScrollPane scrollPane) {
+        int index = algebraicNotationList.size() - 1;
+        String notation = algebraicNotationList.get(index);
+        if (notation.charAt(notation.length() - 1) == '+') {
+            algebraicNotationList.remove(index);
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < notation.length() - 1; i++) {
+                builder.append(notation.charAt(i));
+            }
+            builder.append("#");
+            algebraicNotationList.add(builder.toString());
+            scrollPane.handleEndGameWithCheckMate(result, builder.toString());
+        }
+
+        switch (result) {
+            case WHITE_WIN -> algebraicNotationList.add("1-0");
+            case BLACK_WIN -> algebraicNotationList.add("0-1");
+            case DRAW -> algebraicNotationList.add("1/2-1/2");
+        }
+
     }
 
     public String getPGN(){
-        return pgn.toString();
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < algebraicNotationList.size(); i++) {
+            if (i % 2 == 0) {
+                builder.append(i / 2 + 1);
+                builder.append('.');
+                builder.append(' ');
+            }
+            builder.append(algebraicNotationList.get(i));
+            builder.append(' ');
+        }
+        return builder.toString();
     }
 
     public void deleteOldSaved(int index) {
@@ -129,6 +162,7 @@ public class GameHistory {
             fenList.remove(fenList.size() - 1);
             stateHashList.remove(stateHashList.size() - 1);
             movedList.remove(movedList.size() - 1);
+            algebraicNotationList.remove(algebraicNotationList.size() - 1);
         }
     }
 
@@ -136,9 +170,9 @@ public class GameHistory {
         fenList.clear();
         stateHashList.clear();
         movedList.clear();
+        algebraicNotationList.clear();
         isThreefoldRepetition = false;
         timeMap.clear();
         halfmoveClock = 0;
-        pgn.clear();
     }
 }

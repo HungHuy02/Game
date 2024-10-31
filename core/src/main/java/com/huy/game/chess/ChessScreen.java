@@ -107,7 +107,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         scrollPane = new NotationHistoryScrollPane();
         CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage, this);
         OptionsPopup optionsPopup = new OptionsPopup(setting, bitmapFont, bundle, manager, checkPopup.getCheckPopup(), chessImage ,stage, gameHistory, main.getMode());
-        BottomAppBar bottomAppBar = new BottomAppBar(board, chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
+        BottomAppBar bottomAppBar = new BottomAppBar(chessImage, bitmapFont, optionsPopup.getOptionsPopup(), checkPopup.getCheckPopup(), stage, bundle, chessGameHistoryManager, scrollPane, manager);
         stage.addActor(appBar.getStack());
         stage.addActor(scrollPane.getScrollPane());
         stage.addActor(player1Info.getInfo());
@@ -431,6 +431,7 @@ public class ChessScreen extends InputAdapter implements Screen {
             multiplexer.removeProcessor(0);
             chessSound.playGameEndSound();
             chessGameManager.finish();
+            chessGameHistoryManager.getHistory().handleForEndgameNotation(gameResult, scrollPane);
             if (main.getMode() == ChessMode.AI) {
                 main.stockfish.destroy();
             }
@@ -451,14 +452,17 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     public void newGame() {
-        chessGameHistoryManager.getHistory().reset();
+        chessGameHistoryManager.reset();
         setupBoard(chessGameHistoryManager.getHistory());
         scrollPane.reset();
-        switch (main.getMode()) {
-            case AI, ONLINE -> handleSetupWithSpecificMode(chessGameHistoryManager.getHistory());
-        }
         setupInputMultiplexer();
         chessGameManager.reset(chessGameHistoryManager.getHistory());
+        if (main.getMode() != ChessMode.TWO_PERSONS) {
+            if (main.getMode() == ChessMode.AI) {
+                main.stockfish.setupNewGame();
+            }
+            handleSetupWithSpecificMode(chessGameHistoryManager.getHistory());
+        }
     }
 
     @Override

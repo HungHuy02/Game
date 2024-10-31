@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.huy.game.chess.core.GameHistory;
+import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 import com.huy.game.chess.manager.ChessGameHistoryManager;
 import com.huy.game.chess.manager.ChessImage;
@@ -42,13 +42,13 @@ public class NotationHistoryScrollPane {
 
     public void addValue(String value, BitmapFont font, ChessGameAssesManager manager, ChessGameHistoryManager historyManager, ChessImage chessImage) {
         handleClearColor();
-        addSequenceNumber(font, historyManager.getHistory());
+        addSequenceNumber(font);
         Skin skin = manager.getSkin();
         index++;
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
         style.up = skin.getDrawable("button-normal");
-        historyManager.getHistory().appendString(value);
+        historyManager.getHistory().addNewAlgebraicNotation(value);
         TextButton button = new TextButton(value, style);
         button.padLeft(20);
         button.padRight(20);
@@ -70,7 +70,7 @@ public class NotationHistoryScrollPane {
         scrollPane.setScrollX(horizontalGroup.getWidth());
     }
 
-    private void addSequenceNumber(BitmapFont font, GameHistory history) {
+    private void addSequenceNumber(BitmapFont font) {
         if(index % 3 == 2 || index == -1) {
             index++;
             Label.LabelStyle style = new Label.LabelStyle();
@@ -80,7 +80,6 @@ public class NotationHistoryScrollPane {
             builder.append(index / 3 + 1);
             builder.append('.');
             String text = builder.toString();
-            history.appendString(text);
             Label label = new Label(text, style);
             Container<Label> labelContainer = new Container<>(label);
             labelContainer.padLeft(16);
@@ -140,5 +139,15 @@ public class NotationHistoryScrollPane {
         horizontalGroup.clear();
         horizontalGroup.layout();
         index = -1;
+    }
+
+    public void handleEndGameWithCheckMate(GameResult result, String text) {
+        if (result != GameResult.DRAW) {
+            Actor child = horizontalGroup.getChild(horizontalGroup.getChildren().size - 1);
+            if(child instanceof TextButton button) {
+                button.setText(text);
+            }
+            scrollPane.layout();
+        }
     }
 }

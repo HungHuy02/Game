@@ -215,7 +215,7 @@ public class ChessGameAssesManager {
         FreetypeFontLoader.FreeTypeFontLoaderParameter font = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
         font.fontFileName = "ui/Montserrat-SemiBold.ttf";
         font.fontParameters.size = 32;
-        font.fontParameters.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,!?\"'()[]:;+-*/=%éèàùâêîôûçđăĩũơưÁÉÈÀÙÂÊÎÔÛÇĐĂĨŨƠƯ" +
+        font.fontParameters.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,!?\"'()[]#:;+-*/=%éèàùâêîôûçđăĩũơưÁÉÈÀÙÂÊÎÔÛÇĐĂĨŨƠƯ" +
             "àáảãạăắằẵẳặâầấậẩẫđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ";
         font.fontParameters.characters += "ăâêôươ";
         manager.load("ui/Montserrat-SemiBold.ttf", BitmapFont.class, font);

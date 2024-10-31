@@ -80,4 +80,11 @@ public class ChessGameHistoryManager {
     public void decreaseIndex() {
         index--;
     }
+
+    public void reset() {
+        history.reset();
+        index = -1;
+        isRePlay = false;
+        isTakeBack = false;
+    }
 }

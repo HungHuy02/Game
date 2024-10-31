@@ -146,7 +146,7 @@ public class Rook extends Piece {
         int directionY = Integer.signum(checkSpot.getY() - start.getY());
         loop:
         for (int[] move: rookMoves()) {
-            if (move[0] != directionX || move[1] != directionY) {
+            if (move[0] == directionX && move[1] == directionY) {
                 int x = move[0] + checkSpot.getX();
                 int y = move[1] + checkSpot.getY();
                 while (board.isWithinBoard(x, y)) {

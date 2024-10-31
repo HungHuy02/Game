@@ -70,7 +70,7 @@ public class ChessMatchScreen implements Screen {
         stage.act(Gdx.graphics.getDeltaTime());
         TopAppBar topAppBar = new TopAppBar(chessImage, font, main, bundle);
         BottomAppBar bottomAppBar = new BottomAppBar();
-        bottomAppBar.setStack(chessImage, font, bundle);
+        bottomAppBar.setStack( main, chessImage, font, bundle);
         centerX = (Gdx.graphics.getWidth() - chessImage.getScaledBoardWidth()) / 2;
         centerY = (Gdx.graphics.getHeight() - chessImage.getScaledBoardHeight()) / 2;
         stateTime = 0f;
