@@ -1,3 +1,5 @@
+const eloUtil = require('../../utils/eloUtil');
+
 module.exports = function(io) {
     const allUsers = {};
     const allRooms = [];
@@ -11,6 +13,8 @@ module.exports = function(io) {
         socket.on("request_to_play", (data) => {
             const currentUser = allUsers[socket.id];
             currentUser.playerName = data.playerName;
+            currentUser.imageUrl = data.imageUrl;
+            currentUser.elo = data.elo;
             currentUser.online = true;
             currentUser.playing = false;
             
@@ -34,11 +38,13 @@ module.exports = function(io) {
 
                 currentUser.socket.emit("opponentFound", {
                     opponentName: opponentPlayer.playerName,
+                    imageUrl: opponentPlayer.imageUrl,
                     isWhite: pieceColor,
                 });
 
                 opponentPlayer.socket.emit("opponentFound", {
                     opponentName: currentUser.playerName,
+                    imageUrl: currentUser.imageUrl,
                     isWhite: !pieceColor,
                 });
 
@@ -51,6 +57,34 @@ module.exports = function(io) {
                 opponentPlayer.socket.on("playerMove", (data) => {
                     currentUser.socket.emit("opponentMove", {
                         ...data,
+                    });
+                });
+
+                currentUser.socket.on("canDraw", () => {
+                    opponentPlayer.socket.emit("opponentWantToDraw");
+                });
+
+                opponentPlayer.socket.on("canDraw", () => {
+                    currentUser.socket.emit("opponentWantToDraw");
+                });
+
+                currentUser.socket.on("gameEnd", (data) => {
+                    const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayer.elo, data.result, pieceColor);
+                    currentUser.socket.emit("newScore", {
+                        newScore: newEloA,
+                    });
+                    opponentPlayer.socket.emit("newScore", {
+                        newScore: newEloB,
+                    });
+                });
+
+                opponentPlayer.socket.on("gameEnd", (data) => {
+                    const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayer.elo, data.result, !pieceColor);
+                    currentUser.socket.emit("newScore", {
+                        newScore: newEloA,
+                    });
+                    opponentPlayer.socket.emit("newScore", {
+                        newScore: newEloB,
                     });
                 });
             }else {
