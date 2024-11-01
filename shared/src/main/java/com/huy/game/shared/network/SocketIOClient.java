@@ -1,5 +1,6 @@
 package com.huy.game.shared.network;
 
+import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.interfaces.SocketClient;
@@ -30,14 +31,17 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void requestToPlayGame(String playerName) {
-        requestToPlay(playerName);
+    public void requestToPlayGame(String playerName, String imageUrl,int elo) {
+        requestToPlay(playerName, imageUrl, elo);
         opponentFound();
     }
 
-    private void requestToPlay(String playerName) {
+    private void requestToPlay(String playerName, String imageUrl, int elo) {
         try {
-            socket.emit("request_to_play", new JSONObject().put("playerName", playerName));
+            socket.emit("request_to_play",
+                new JSONObject().put("playerName", playerName)
+                    .put("imageUrl", imageUrl)
+                    .put("elo", elo));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +53,11 @@ public class SocketIOClient implements SocketClient {
                 try {
                     String name = data.getString("opponentName");
                     boolean isWhite = data.getBoolean("isWhite");
-                    ChessGameOnlineEvent.getInstance().notifySuccessfulMatch(name, isWhite);
+                    String imageUrl = null;
+                    if (data.has("imageUrl")) {
+                        imageUrl = data.getString("imageUrl");
+                    }
+                    ChessGameOnlineEvent.getInstance().notifySuccessfulMatch(name, isWhite, imageUrl);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -81,6 +89,46 @@ public class SocketIOClient implements SocketClient {
             }
         });
     }
+
+    @Override
+    public void requestToDraw() {
+        emit("canDraw", null);
+    }
+
+    @Override
+    public void opponentWantToDraw() {
+        on("opponentWantToDraw", args -> ChessGameOnlineEvent.getInstance().notifyPlayerWantToDraw());
+    }
+
+    @Override
+    public void gameEnd(GameResult gameResult) {
+        String result = switch (gameResult) {
+            case DRAW -> "draw";
+            case WHITE_WIN -> "white";
+            case BLACK_WIN -> "black";
+        };
+
+        try {
+            emit("gameEnd", new JSONObject().put("result", result));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void newScoreAfterGameEnd() {
+        on("newScore", args -> {
+            if (args.length > 0 && args[0] instanceof JSONObject data) {
+                try {
+                    int newScore = data.getInt("newScore");
+                    ChessGameOnlineEvent.getInstance().notifyNewScore(newScore);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
 
     private void emit(String event, JSONObject object) {
         socket.emit(event, object);

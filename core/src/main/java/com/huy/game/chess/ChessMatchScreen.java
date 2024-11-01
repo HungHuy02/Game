@@ -78,8 +78,8 @@ public class ChessMatchScreen implements Screen {
         stage.addActor(info.getInfo());
         stage.addActor(bottomAppBar.getStack());
 
-        ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite) -> {
-            OpponentPlayer.getInstance().setData(name, isWhite);
+        ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite, imageUrl) -> {
+            OpponentPlayer.getInstance().setData(name, isWhite, imageUrl);
             if(isWhite) {
                 setting.setRotate(true);
             }
@@ -87,7 +87,7 @@ public class ChessMatchScreen implements Screen {
             Gdx.app.postRunnable(main::toChessScreen);
         });
 
-        main.socketClient.requestToPlayGame(Player.getInstance().getName());
+        main.socketClient.requestToPlayGame(Player.getInstance().getName(), Player.getInstance().getImageUrl(), Player.getInstance().getElo());
     }
 
     @Override

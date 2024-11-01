@@ -18,30 +18,40 @@ public class ChessGameOnlineEvent {
     }
 
     public interface MatchListener {
-        void onSuccessfulMatch(String name, boolean isWhite);
+        void onSuccessfulMatch(String name, boolean isWhite, String imageUrl);
     }
 
-    public interface PlayerMoveListener {
+    public interface PlayerActionListener {
         void onPlayerMove(String from, String to, MoveType type);
+        void onPlayerWantToDraw();
+        void onNewScore(int newScore);
     }
 
     private MatchListener listener;
 
-    private PlayerMoveListener playerMoveListener;
+    private PlayerActionListener playerActionListener;
 
     public void setMatchListener(MatchListener listener) {
         this.listener = listener;
     }
 
-    public void setPlayerMoveListener(PlayerMoveListener listener) {
-        this.playerMoveListener = listener;
+    public void setPlayerMoveListener(PlayerActionListener listener) {
+        this.playerActionListener = listener;
     }
 
-    public void notifySuccessfulMatch(String name, boolean isWhite) {
-        listener.onSuccessfulMatch(name, isWhite);
+    public void notifySuccessfulMatch(String name, boolean isWhite, String imageUrl) {
+        listener.onSuccessfulMatch(name, isWhite, imageUrl);
     }
 
     public void notifyPlayerMove(String from, String to, MoveType type) {
-        playerMoveListener.onPlayerMove(from, to, type);
+        playerActionListener.onPlayerMove(from, to, type);
+    }
+
+    public void notifyPlayerWantToDraw() {
+        playerActionListener.onPlayerWantToDraw();
+    }
+
+    public void notifyNewScore(int newScore) {
+        playerActionListener.onNewScore(newScore);
     }
 }

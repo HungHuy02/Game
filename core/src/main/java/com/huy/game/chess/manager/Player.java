@@ -6,6 +6,7 @@ public class Player {
     private String name;
     private boolean isWhite;
     private String imageUrl;
+    private int elo;
 
     private Player() {
 
@@ -18,9 +19,17 @@ public class Player {
         return Instance;
     }
 
-    public void setData(String name, boolean isWhite) {
+    public void setData(String name, boolean isWhite, String imageUrl, int elo) {
         this.name = name;
         this.isWhite = isWhite;
+        this.imageUrl = imageUrl;
+        this.elo = elo;
+    }
+
+    public void setData(String name, String imageUrl, int elo) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.elo = elo;
     }
 
     public void setName(String name) {
@@ -41,5 +50,9 @@ public class Player {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public int getElo() {
+        return elo;
     }
 }

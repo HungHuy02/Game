@@ -68,6 +68,7 @@ public class ChessGameAssesManager {
         manager.load("chess/images/timer_20dp.png", Texture.class);
         manager.load("chess/images/overlay.png", Texture.class);
         manager.load("chess/images/close_24dp.png", Texture.class);
+        manager.load("chess/images/check_24dp.png", Texture.class);
     }
 
     public Texture getChessBoard() {
@@ -160,6 +161,10 @@ public class ChessGameAssesManager {
 
     public Texture getForwardsButton() {
         return manager.get("chess/images/icons8-forward-100.png", Texture.class);
+    }
+
+    public Texture getCheckButton() {
+        return manager.get("chess/images/check_24dp.png", Texture.class);
     }
 
     public void loadSounds() {

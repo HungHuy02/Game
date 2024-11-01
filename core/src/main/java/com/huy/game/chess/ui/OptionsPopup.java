@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.huy.game.Main;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.enums.ChessMode;
@@ -21,11 +22,11 @@ public class OptionsPopup {
 
     private Window optionsPopup;
 
-    public OptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history, ChessMode mode) {
-        setOptionsPopup(setting ,font, bundle, manager, check, chessImage, stage, history, mode);
+    public OptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history, ChessMode mode, Main main) {
+        setOptionsPopup(setting ,font, bundle, manager, check, chessImage, stage, history, mode, main);
     }
 
-    private void setOptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history, ChessMode mode) {
+    private void setOptionsPopup(BoardSetting setting, BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, Window check, ChessImage chessImage, Stage stage, GameHistory history, ChessMode mode, Main main) {
         Skin skin = manager.getSkin();
         TextButton.TextButtonStyle style = skin.get(TextButton.TextButtonStyle.class);
         style.font = font;
@@ -36,7 +37,7 @@ public class OptionsPopup {
         switch (mode) {
             case ONLINE -> {
                 optionsPopup.setSize(Gdx.graphics.getWidth() - 100, 400);
-                optionsPopup.add(drawButton(bundle.get("draw"), skin, stage)).fillX().expandX().height(100);
+                optionsPopup.add(drawButton(bundle.get("draw"), skin, stage, main)).fillX().expandX().height(100);
                 optionsPopup.row();
             }
             case TWO_PERSONS -> {
@@ -79,7 +80,7 @@ public class OptionsPopup {
         return button;
     }
 
-    private TextButton drawButton(String name, Skin skin, Stage stage) {
+    private TextButton drawButton(String name, Skin skin, Stage stage, Main main) {
         TextButton button = new TextButton(name, skin);
         button.pad(32f);
         button.getLabel().setAlignment(Align.left);
@@ -87,6 +88,7 @@ public class OptionsPopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                main.socketClient.requestToDraw();
                 optionsPopup.remove();
                 stage.getActors().removeIndex(stage.getActors().size - 1);
             }

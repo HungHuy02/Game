@@ -141,6 +141,10 @@ public class ChessImage {
 
     public Image getCancer() { return new Image(manager.getClose());}
 
+    public Texture getCheck() {
+        return manager.getCheckButton();
+    }
+
     public Texture getTimer() {
         return manager.getTimer();
     }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.Main;
 import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.core.GameHistory;
@@ -24,6 +25,7 @@ import com.huy.game.chess.manager.ChessGameAssesManager;
 public class EndGamePopup {
 
     private Window endGamePopup;
+    private Label newScoreLabel;
 
     public EndGamePopup(BitmapFont font, I18NBundle bundle, ChessGameAssesManager manager, GameResult result, Main main, ChessScreen screen) {
         setEndGamePopup(font, bundle, manager, result, main, screen);
@@ -40,12 +42,15 @@ public class EndGamePopup {
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         endGamePopup = new Window("", skin);
-        endGamePopup.setSize(Gdx.graphics.getWidth() - 100, 364);
+        endGamePopup.setSize(Gdx.graphics.getWidth() - 100, 396);
         endGamePopup.setPosition((Gdx.graphics.getWidth() - endGamePopup.getWidth()) / 2,
             (Gdx.graphics.getHeight() - endGamePopup.getHeight()) / 2);
         endGamePopup.add(stack(manager, labelStyle,bundle)).fillX().expandX().height(100).padTop(32);
         endGamePopup.row();
         endGamePopup.add(winText(labelStyle, bundle, result)).center().height(100);
+        endGamePopup.row();
+        newScore(labelStyle, "");
+        endGamePopup.add(newScoreLabel).padBottom(32);
         endGamePopup.row();
         Table buttonTable = new Table();
         buttonTable.add(rePlayButton(style, bundle, screen)).expandX().fillX().padLeft(32).padRight(16).height(100);
@@ -85,6 +90,10 @@ public class EndGamePopup {
         return new Label( text, style);
     }
 
+    private void newScore(Label.LabelStyle style, String text) {
+        newScoreLabel = new Label(text, style);
+    }
+
     private TextButton newGameButton(TextButton.TextButtonStyle style, I18NBundle bundle, Main main) {
         TextButton textButton = new TextButton(bundle.get("newBoard"), style);
         textButton.addListener(new ClickListener() {
@@ -109,5 +118,16 @@ public class EndGamePopup {
             }
         });
         return textButton;
+    }
+
+    public void setNewScore(int oldElo, int newElo) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Elo: ");
+        builder.append(newElo);
+        builder.append(" (");
+        int change = newElo - oldElo;
+        builder.append(change > 0 ? "+" + change : change);
+        builder.append(')');
+        newScoreLabel.setText(builder.toString());
     }
 }

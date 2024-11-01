@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.huy.game.Main;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.stockfish.StockfishAndroid;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
@@ -32,7 +33,7 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 String player2Name = intent.getStringExtra(Constants.BUNDLE_PLAYER2_NAME);
                 boolean isRotateBoard = intent.getBooleanExtra(Constants.BUNDLE_ROTATE_BOARD, false);
-                Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE);
+                Player.getInstance().setData(player1Name, player1Color == PieceColor.WHITE, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
                 OpponentPlayer.getInstance().setData(player2Name, !(player1Color == PieceColor.WHITE));
                 if(mode == ChessMode.AI) {
                     boolean enableSuggesting = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_SUGGEST, false);
@@ -45,7 +46,7 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
-                Player.getInstance().setName(player1Name);
+                Player.getInstance().setData(player1Name, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
                 initialize(new Main(mode, type, new SocketIOClient(), this), configuration);
             }
         }

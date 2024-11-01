@@ -23,6 +23,12 @@ public class OpponentPlayer {
         this.isWhite = isWhite;
     }
 
+    public void setData(String name, boolean isWhite, String imageUrl) {
+        this.name = name;
+        this.isWhite = isWhite;
+        this.imageUrl = imageUrl;
+    }
+
     public String getName() {
         return name;
     }

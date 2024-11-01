@@ -123,16 +123,18 @@ public class GameHistory {
 
     public void handleForEndgameNotation(GameResult result, NotationHistoryScrollPane scrollPane) {
         int index = algebraicNotationList.size() - 1;
-        String notation = algebraicNotationList.get(index);
-        if (notation.charAt(notation.length() - 1) == '+') {
-            algebraicNotationList.remove(index);
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < notation.length() - 1; i++) {
-                builder.append(notation.charAt(i));
+        if (index >= 0) {
+            String notation = algebraicNotationList.get(index);
+            if (notation.charAt(notation.length() - 1) == '+') {
+                algebraicNotationList.remove(index);
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < notation.length() - 1; i++) {
+                    builder.append(notation.charAt(i));
+                }
+                builder.append("#");
+                algebraicNotationList.add(builder.toString());
+                scrollPane.handleEndGameWithCheckMate(result, builder.toString());
             }
-            builder.append("#");
-            algebraicNotationList.add(builder.toString());
-            scrollPane.handleEndGameWithCheckMate(result, builder.toString());
         }
 
         switch (result) {
