@@ -9,6 +9,10 @@ const updateUserScore = async (userId, score, userName) => {
     await redisClient.hSetNX(REDIS_DATA_KEY, `${userId}`, userName);
 };
 
+const updateUserName = async (userId, userName) => {
+    await redisClient.hSet(REDIS_DATA_KEY, `${userId}`, userName);
+}
+
 const getUserRanking = async (userId) => {
     const userRank = await redisClient.zRevRank(REDIS_KEY, `${userId}`);
     return userRank + 1;
@@ -45,6 +49,7 @@ const getRank = async (limit) => {
 
 module.exports = {
     updateUserScore,
+    updateUserName,
     getUserRanking,
     getRank
 }

@@ -1,16 +1,35 @@
 const eloUtil = require('../../utils/eloUtil');
+const redisClient = require('../../config/redisConfig');
+const jwt = require("jsonwebtoken");
+
+const REDIS_REQUEST_PLAY_KEY = "request_to_play";
+const REDIS_PLAYING_KEY = "playing";
 
 module.exports = function(io) {
     const allUsers = {};
     const allRooms = [];
 
-    io.on("connection", (socket) => {
+    io.use((socket, next) => {
+        const token = socket.handshake.auth.token;
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+                if (err) return next(new Error('Authentication error'));
+                socket.user = decode;
+                next();     
+            });
+        }else {
+            next(new Error('Authentication error'));
+        }
+    }).on("connection", (socket) => {
         allUsers[socket.id] = {
             socket: socket,
             onine: true,
         };
 
         socket.on("request_to_play", (data) => {
+
+            redisClient.SADD(REDIS_REQUEST_PLAY_KEY, socket.user.id + "");
+
             const currentUser = allUsers[socket.id];
             currentUser.playerName = data.playerName;
             currentUser.imageUrl = data.imageUrl;
@@ -25,16 +44,16 @@ module.exports = function(io) {
                 if(user.online && !user.playing && socket.id !== key) {
                     opponentPlayer = user;
                     break;
-                }    
+                }
             }
-            
+
             if(opponentPlayer) {
                 allRooms.push({
                     player1: opponentPlayer,
                     player2: currentUser,
                 });
 
-                const pieceColor = Math.random() === 0 ? true : false;
+                const pieceColor = Math.random() === 0;
 
                 currentUser.socket.emit("opponentFound", {
                     opponentName: opponentPlayer.playerName,

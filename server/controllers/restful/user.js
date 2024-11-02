@@ -51,9 +51,12 @@ const updateUser = asyncHandler(async (req, res) => {
     const { name, email, imageUrl, elo} = req.body;
     const { id } = req.user;
     const updateData = {};
-    if(name) updateData.name = name;
+    if(name) {
+        updateData.name = name;
+        await redis.updateUserName(id, name);
+    }
     if(email) updateData.email = email;
-    if(imageUrl) updateData.image_url = imageUrl; 
+    if(imageUrl) updateData.image_url = imageUrl;
     if(elo) {
         updateData.elo = elo;
         await redis.updateUserScore(id, elo, name);
@@ -69,7 +72,7 @@ const updateUser = asyncHandler(async (req, res) => {
         data: updateData
     });
     return res.status(200).json({
-        success: user ? true: false,
+        success: !!user,
         message: user ? "Update successful" : "Something went wrong",
     });
 });
