@@ -9,6 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import Local.Local;
 import io.socket.client.IO;
@@ -18,16 +20,38 @@ import io.socket.emitter.Emitter;
 public class SocketIOClient implements SocketClient {
 
     private Socket socket;
+    private final AuthToken authToken;
+
+    public SocketIOClient(AuthToken authToken) {
+        this.authToken = authToken;
+    }
 
     @Override
     public void connect() {
         try {
-            socket = IO.socket(Local.SocketIOUrl);
+            Map<String, String> map = new HashMap<>();
+            map.put("token", authToken.getCurrentAccessToken());
+            IO.Options options = IO.Options.builder()
+                .setAuth(map)
+                .build();
+            socket = IO.socket(Local.SocketIOUrl, options);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         socket.connect();
+        onConnect_error();
+    }
 
+    private void onConnect_error() {
+        on(Socket.EVENT_CONNECT_ERROR, args -> {
+            if (args.length > 0 && args[0] instanceof JSONObject) {
+                Exception e = (Exception) args[0];
+                if (e.getMessage().startsWith("Authentication")) {
+                    authToken.getNewAccessToken();
+                    connect();
+                }
+            }
+        });
     }
 
     @Override

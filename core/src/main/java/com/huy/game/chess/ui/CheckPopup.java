@@ -12,8 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.huy.game.chess.ChessScreen;
-import com.huy.game.chess.core.GameHistory;
-import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 
 public class CheckPopup {

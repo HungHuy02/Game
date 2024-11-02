@@ -28,18 +28,18 @@ public class Timer extends Actor {
         int timeRemaining;
         if(isPlayer1) {
             if (timeList.get("play1") == 1) {
-                batch.draw(chessImage.getTimer(), Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 4 - chessImage.getTimer().getWidth() / 2, 0);
+                batch.draw(chessImage.getTimer(), Gdx.graphics.getWidth() - (float) Gdx.graphics.getWidth() / 4 - (float) chessImage.getTimer().getWidth() / 2, 0);
             }
             timeRemaining = timeList.get("1");
 
         }else {
             if (timeList.get("play2") == 1) {
-                batch.draw(chessImage.getTimer(), Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 4 - chessImage.getTimer().getWidth() / 2, 0);
+                batch.draw(chessImage.getTimer(), Gdx.graphics.getWidth() - (float) Gdx.graphics.getWidth() / 4 - (float) chessImage.getTimer().getWidth() / 2, 0);
             }
             timeRemaining = timeList.get("2");
         }
         int minutes = timeRemaining / 60;
         int remainSeconds = timeRemaining % 60;
-        font.draw(batch, String.format(String.format("%d:%02d", minutes, remainSeconds)), Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 4 + chessImage.getTimer().getWidth() / 2, 50);
+        font.draw(batch, String.format("%d:%02d", minutes, remainSeconds), Gdx.graphics.getWidth() - (float) Gdx.graphics.getWidth() / 4 + (float) chessImage.getTimer().getWidth() / 2, 50);
     }
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.huy.game.Main;
 import com.huy.game.android.globalstate.UserState;
+import com.huy.game.android.network.socketio.AuthToken;
 import com.huy.game.android.stockfish.StockfishAndroid;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
@@ -47,7 +48,7 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
                 Player.getInstance().setData(player1Name, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
-                initialize(new Main(mode, type, new SocketIOClient(), this), configuration);
+                initialize(new Main(mode, type, new SocketIOClient(new AuthToken(getApplicationContext())), this), configuration);
             }
         }
     }

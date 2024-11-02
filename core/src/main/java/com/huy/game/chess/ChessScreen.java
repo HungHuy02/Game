@@ -136,7 +136,7 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     public void handleSetupWithSpecificMode(GameHistory gameHistory) {
         switch (main.getMode()) {
-            case ONLINE -> setupPlayOnline(gameHistory);
+            case ONLINE -> setupPlayOnline();
             case AI -> {
                 if(chessGameManager.getCurrentPlayer() instanceof ChessAIPlayer) {
                     setting.setRotate(true);
@@ -150,7 +150,7 @@ public class ChessScreen extends InputAdapter implements Screen {
         }
     }
 
-    private void setupPlayOnline(GameHistory gameHistory) {
+    private void setupPlayOnline() {
         ChessGameOnlineEvent.getInstance().setPlayerMoveListener(new ChessGameOnlineEvent.PlayerActionListener() {
             @Override
             public void onPlayerMove(String from, String to, MoveType type) {

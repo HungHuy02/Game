@@ -5,7 +5,6 @@ import com.huy.game.chess.core.Move;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.enums.MoveType;
-import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.interfaces.Stockfish;
 
 import java.util.concurrent.ArrayBlockingQueue;

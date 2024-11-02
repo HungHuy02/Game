@@ -17,8 +17,6 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.Main;
 import com.huy.game.chess.ChessScreen;
-import com.huy.game.chess.core.GameHistory;
-import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.manager.ChessGameAssesManager;
 
@@ -49,7 +47,7 @@ public class EndGamePopup {
         endGamePopup.row();
         endGamePopup.add(winText(labelStyle, bundle, result)).center().height(100);
         endGamePopup.row();
-        newScore(labelStyle, "");
+        newScore(labelStyle);
         endGamePopup.add(newScoreLabel).padBottom(32);
         endGamePopup.row();
         Table buttonTable = new Table();
@@ -90,8 +88,8 @@ public class EndGamePopup {
         return new Label( text, style);
     }
 
-    private void newScore(Label.LabelStyle style, String text) {
-        newScoreLabel = new Label(text, style);
+    private void newScore(Label.LabelStyle style) {
+        newScoreLabel = new Label("", style);
     }
 
     private TextButton newGameButton(TextButton.TextButtonStyle style, I18NBundle bundle, Main main) {

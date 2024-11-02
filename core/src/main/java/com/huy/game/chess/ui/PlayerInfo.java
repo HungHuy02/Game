@@ -2,9 +2,12 @@ package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -12,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.OpponentPlayer;
@@ -38,10 +42,10 @@ public class PlayerInfo {
         info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
         info.padRight(16);
         if(isPlayer1) {
-            info.setPosition(0, (Gdx.graphics.getHeight() / 5) - chessImage.getScaledPieceSize());
+            info.setPosition(0, ((float) Gdx.graphics.getHeight() / 5) - chessImage.getScaledPieceSize());
             info.addActor(image(image, chessImage, Player.getInstance().getImageUrl()));
         }else {
-            info.setPosition(0, Gdx.graphics.getHeight() * 4 / 5);
+            info.setPosition(0, (float) (Gdx.graphics.getHeight() * 4) / 5);
             info.addActor(image(image, chessImage, OpponentPlayer.getInstance().getImageUrl()));
         }
         info.addActor(verticalGroup(name, map, chessImage,isWhite, font));
@@ -54,7 +58,7 @@ public class PlayerInfo {
         info = new HorizontalGroup();
         info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
         info.padRight(16);
-        info.setPosition(0, Gdx.graphics.getHeight() * 4 / 5);
+        info.setPosition(0, (float) (Gdx.graphics.getHeight() * 4) / 5);
         info.addActor(image);
         info.addActor(name(name, font));
     }
@@ -66,8 +70,7 @@ public class PlayerInfo {
         textures[2] = chessImage.getbPawn();
         textures[3] = chessImage.getwBishop();
         textures[4] = chessImage.getwKing();
-        Animation<Texture> animation = new Animation<>(0.5f, textures);
-        return animation;
+        return new Animation<>(0.5f, textures);
     }
 
     public Container<Image> imageForChessMatchScreen(Texture image, ChessImage chessImage) {
@@ -78,7 +81,8 @@ public class PlayerInfo {
         return avatar;
     }
 
-    private Image image(Texture image, ChessImage chessImage, String imageUrl) {
+    private Container<Image> image(Texture image, ChessImage chessImage, String imageUrl) {
+        Container<Image> container = new Container<>();
         Image avatar = new Image(image);
         float scale = chessImage.getScaledPieceSize() / image.getWidth();
         avatar.setOrigin(Align.center);
@@ -89,6 +93,8 @@ public class PlayerInfo {
                 public void downloadComplete(Pixmap pixmap) {
                     Texture texture = new Texture(pixmap);
                     avatar.setDrawable(new TextureRegionDrawable(texture));
+                    avatar.setScaling(Scaling.contain);
+                    container.prefSize(chessImage.getSpotSize(), chessImage.getSpotSize());
                 }
 
                 @Override
@@ -97,7 +103,8 @@ public class PlayerInfo {
                 }
             });
         }
-        return avatar;
+        container.setActor(avatar);
+        return container;
     }
 
     private VerticalGroup verticalGroup(String name, Map<String, Integer> map, ChessImage chessImage,boolean isWhite, BitmapFont font) {

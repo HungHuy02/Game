@@ -7,19 +7,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class ChessImage {
 
-    private Texture chessBoard;
-    private Texture position;
-    private Texture rotate_position;
+    private final Texture chessBoard;
+    private final Texture position;
+    private final Texture rotate_position;
 
-    private float spotSize;
-    private float pieceSize;
-    private float scaledPieceSize;
-    private float scaledBoardWidth;
-    private float scaledBoardHeight;
-    private float circleRadius;
-    private float capturedPieceSize;
+    private final float spotSize;
+    private final float pieceSize;
+    private final float scaledPieceSize;
+    private final float scaledBoardWidth;
+    private final float scaledBoardHeight;
+    private final float circleRadius;
+    private final float capturedPieceSize;
 
-    private ChessGameAssesManager manager;
+    private final ChessGameAssesManager manager;
 
     public ChessImage(ChessGameAssesManager manager) {
         this.manager = manager;

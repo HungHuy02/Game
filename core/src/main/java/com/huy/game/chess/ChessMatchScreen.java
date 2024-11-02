@@ -1,6 +1,9 @@
 package com.huy.game.chess;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -27,7 +30,7 @@ import com.huy.game.chess.ui.TopAppBar;
 import javax.inject.Inject;
 
 
-public class ChessMatchScreen implements Screen {
+public class ChessMatchScreen extends InputAdapter implements Screen {
 
     private final Main main;
     private Stage stage;
@@ -77,6 +80,11 @@ public class ChessMatchScreen implements Screen {
         stage.addActor(topAppBar.getStack());
         stage.addActor(info.getInfo());
         stage.addActor(bottomAppBar.getStack());
+        Gdx.input.setCatchKey(Input.Keys.BACK, true);
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
         ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite, imageUrl) -> {
             OpponentPlayer.getInstance().setData(name, isWhite, imageUrl);
@@ -86,8 +94,16 @@ public class ChessMatchScreen implements Screen {
             Player.getInstance().setWhite(!isWhite);
             Gdx.app.postRunnable(main::toChessScreen);
         });
-
         main.socketClient.requestToPlayGame(Player.getInstance().getName(), Player.getInstance().getImageUrl(), Player.getInstance().getElo());
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if(keycode == Input.Keys.BACK){
+            main.socketClient.disconnect();
+            return true;
+        }
+        return false;
     }
 
     @Override

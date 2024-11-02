@@ -8,10 +8,10 @@ import com.huy.game.chess.manager.ChessImage;
 import java.util.Map;
 
 public class CapturedPiecesActor extends Actor {
-    private Map<String, Integer> map;
-    private ChessImage chessImage;
-    private boolean isWhite;
-    private BitmapFont font;
+    private final Map<String, Integer> map;
+    private final ChessImage chessImage;
+    private final boolean isWhite;
+    private final BitmapFont font;
 
     public CapturedPiecesActor(Map<String, Integer> map,ChessImage chessImage, boolean isWhite, BitmapFont font) {
         this.chessImage = chessImage;
