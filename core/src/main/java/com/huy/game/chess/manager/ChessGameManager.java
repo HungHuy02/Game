@@ -1,9 +1,11 @@
 package com.huy.game.chess.manager;
 
 import com.badlogic.gdx.utils.Timer;
+import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.core.BoardSetting;
 import com.huy.game.chess.core.GameHistory;
 import com.huy.game.chess.enums.ChessMode;
+import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.interfaces.Stockfish;
@@ -21,11 +23,11 @@ public class ChessGameManager {
     private int plusTime;
     private final TimeType timeType;
 
-    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish, GameHistory history) {
+    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish, GameHistory history, ChessScreen screen) {
         this.timeType = timeType;
         int time = handleTime();
         setupPlayer(mode,isWhite, stockfish, time);
-        setupTime(time, history);
+        setupTime(time, history, screen);
     }
 
     private int handleTime() {
@@ -75,7 +77,7 @@ public class ChessGameManager {
     }
 
 
-    private void setupTime(int time, GameHistory history) {
+    private void setupTime(int time, GameHistory history, ChessScreen screen) {
         if (timeType != TimeType.NO_TIME) {
             timer = new Timer();
             timeList = new HashMap<>();
@@ -83,7 +85,7 @@ public class ChessGameManager {
             timeList.put("play2", 0);
             timeList.put("1", time);
             timeList.put("2", time);
-            handleTimer("1");
+            handleTimer("1", screen);
             history.addTimeRemain(0, time, time);
         }
     }
@@ -95,7 +97,7 @@ public class ChessGameManager {
         timeList.put("2", timeRemain[1]);
     }
 
-    public void switchPlayer(BoardSetting setting, ChessGameHistoryManager manager) {
+    public void switchPlayer(BoardSetting setting, ChessGameHistoryManager manager, ChessScreen screen) {
         if (timeType != TimeType.NO_TIME) {
             cancelTimer();
             manager.getHistory().addTimeRemain(manager.getIndex(), player1.getTimeRemain(), player2.getTimeRemain());
@@ -104,12 +106,12 @@ public class ChessGameManager {
                 timeList.put("1",timeRemain );
                 currentPlayer.setTimeRemain(timeRemain);
                 currentPlayer = player2;
-                handleTimer("2");
+                handleTimer("2", screen);
             }else {
                 timeList.put("2", timeRemain);
                 currentPlayer.setTimeRemain(timeRemain);
                 currentPlayer = player1;
-                handleTimer("1");
+                handleTimer("1", screen);
             }
         }else {
             if(currentPlayer == player1) {
@@ -154,7 +156,7 @@ public class ChessGameManager {
         }
     }
 
-    public void handleTimer(String key) {
+    public void handleTimer(String key, ChessScreen screen) {
         timeList.put("play"+ key, 1);
         Timer.Task task = new Timer.Task() {
             int remainingTime = currentPlayer.getTimeRemain();
@@ -168,6 +170,14 @@ public class ChessGameManager {
                 } else {
                     this.cancel();
                     timeList.put(key, 0);
+                    GameResult result;
+                    if (isDrawByInsufficientPieceAfterTimeout()) {
+                        result = GameResult.DRAW;
+                    }else {
+                        result = currentPlayer.isWhite() ? GameResult.BLACK_WIN : GameResult.WHITE_WIN;
+                    }
+                    screen.showEndGamePopup(result);
+                    screen.handleAfterShowEndGamePopup(result);
                 }
             }
         };
@@ -196,7 +206,7 @@ public class ChessGameManager {
         return currentPlayer;
     }
 
-    public void reset(GameHistory history) {
+    public void reset(GameHistory history, ChessScreen screen) {
         int time = handleTime();
         timer.clear();
         timeList.put("play1", 0);
@@ -205,7 +215,9 @@ public class ChessGameManager {
         timeList.put("2", time);
         player1.setTimeRemain(time);
         player2.setTimeRemain(time);
-        handleTimer("1");
+        player1.reset();
+        player2.reset();
+        handleTimer("1", screen);
         history.addTimeRemain(0, time, time);
         currentPlayer = player1.isWhite() ? player1 : player2;
     }
@@ -213,6 +225,20 @@ public class ChessGameManager {
     public void finish() {
         if (timeType != TimeType.NO_TIME)
             timer.clear();
+    }
+
+    public boolean isDrawByInsufficientPieceAfterTimeout() {
+        ChessPlayer chessPlayer = player1;
+        if (currentPlayer.isWhite() == player1.isWhite()) {
+            chessPlayer = player2;
+        }
+        if (chessPlayer.getPieceNumber(PieceType.QUEEN) == 0
+            && chessPlayer.getPieceNumber(PieceType.ROOK) == 0) {
+            int knightQuantity = chessPlayer.getPieceNumber(PieceType.KNIGHT);
+            int bishopQuantity = chessPlayer.getPieceNumber(PieceType.BISHOP);
+            return knightQuantity + bishopQuantity == 0 || knightQuantity + bishopQuantity == 1;
+        }
+        return false;
     }
 
     public boolean isDrawByInsufficientPiece() {

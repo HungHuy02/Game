@@ -183,11 +183,15 @@ public class StockfishAndroid implements Stockfish {
 
     @Override
     public void destroy() {
-        sendCommand(process,"quit");
-        process.destroy();
+        if (process != null) {
+            sendCommand(process,"quit");
+            process.destroy();
+            process = null;
+        }
         if (suggestProcess != null) {
             sendCommand(suggestProcess, "quit");
             suggestProcess.destroy();
+            suggestProcess = null;
         }
     }
 }

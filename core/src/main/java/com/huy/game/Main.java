@@ -110,15 +110,13 @@ public class Main extends Game {
         setScreen(chessMatchScreen);
     }
 
-    public void disposeCurrentScreen() {
-        if(getScreen() != null) {
-            getScreen().dispose();
-        }
-    }
-
     @Override
     public void dispose() {
         super.dispose();
         manager.dispose();
+        switch (mode) {
+            case AI -> stockfish.destroy();
+            case ONLINE -> socketClient.disconnect();
+        }
     }
 }

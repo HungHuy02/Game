@@ -38,6 +38,20 @@ public class ChessPlayer {
         pieceNumberMap.put(PieceType.ROOK, 2);
     }
 
+    public void reset() {
+        capturedPieceMap.put("p", 0);
+        capturedPieceMap.put("k", 0);
+        capturedPieceMap.put("b", 0);
+        capturedPieceMap.put("r", 0);
+        capturedPieceMap.put("q", 0);
+        capturedPieceMap.put("value", 0);
+        pieceNumberMap.put(PieceType.PAWN, 8);
+        pieceNumberMap.put(PieceType.QUEEN, 1);
+        pieceNumberMap.put(PieceType.KNIGHT, 2);
+        pieceNumberMap.put(PieceType.BISHOP, 2);
+        pieceNumberMap.put(PieceType.ROOK, 2);
+    }
+
     public Map<String, Integer> getCapturedPieceMap() {
         return capturedPieceMap;
     }

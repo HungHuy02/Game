@@ -13,7 +13,7 @@ import com.huy.game.chess.core.Spot;
 import java.util.List;
 
 public class ChessAI {
-    int evaluateScore(Spot[][] spots, boolean isWhite, Board board) {
+    static int evaluateScore(Spot[][] spots, boolean isWhite, Board board) {
         int score = 0;
         for(int i = 0; i <= 7; i++) {
             for(int j = 0; j <= 7; j++) {
@@ -43,8 +43,8 @@ public class ChessAI {
         return score;
     }
 
-    public int minimax(Board board , Spot[][] spots, boolean isWhite, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        if(depth == 0 || board.isEnd()) {
+    public static int minimax(Board board , Spot[][] spots, boolean isWhite, int depth, int alpha, int beta, boolean maximizingPlayer) {
+        if(depth == 0 ) {
             return evaluateScore(spots, isWhite, board);
         }
 
@@ -93,7 +93,7 @@ public class ChessAI {
         }
     }
 
-    public Move findBestMove(Board board, boolean isWhite) {
+    public static Move findBestMove(Board board, boolean isWhite) {
         int bestValue = Integer.MIN_VALUE;
         Move bestMove = null;
         Board testBoard = board.cloneBoard();
@@ -119,4 +119,3 @@ public class ChessAI {
         return bestMove;
     }
 }
-

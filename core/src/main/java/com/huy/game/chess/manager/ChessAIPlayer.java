@@ -2,9 +2,6 @@ package com.huy.game.chess.manager;
 
 import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.Move;
-import com.huy.game.chess.interfaces.Stockfish;
-
-import java.util.function.Consumer;
 
 public abstract class ChessAIPlayer extends ChessPlayer{
 
