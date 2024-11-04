@@ -22,10 +22,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.huy.game.R;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.models.response.ScalarBooleanResponse;
 import com.huy.game.android.utils.Constants;
+import com.huy.game.android.utils.NetworkWatcher;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.viewmodel.PlayFragmentViewModel;
 import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
@@ -64,6 +66,23 @@ public class PlayFragment extends Fragment {
         newButton();
         userImage();
         settingButton();
+        checkNetwork();
+    }
+
+    private void checkNetwork() {
+        new NetworkWatcher(requireContext()).observe(getViewLifecycleOwner(), on -> {
+            if (on) {
+                fragmentPlayBinding.userImage.setClickable(true);
+                fragmentPlayBinding.userImage.clearColorFilter();
+                activeButton(fragmentPlayBinding.btnTime, R.color.grey_800);
+                activeButton(fragmentPlayBinding.btnNew, R.color.light_green_700);
+            }else {
+                deActiveButton(fragmentPlayBinding.btnTime);
+                deActiveButton(fragmentPlayBinding.btnNew);
+                fragmentPlayBinding.userImage.setClickable(false);
+                fragmentPlayBinding.userImage.setColorFilter(R.color.grey_400);
+            }
+        });
     }
 
     @Override
@@ -269,6 +288,17 @@ public class PlayFragment extends Fragment {
             Intent intent = new Intent(this.getContext(), SettingActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void activeButton(MaterialButton button, int colorID) {
+        button.setClickable(true);
+        button.setBackgroundTintList(getResources().getColorStateList(colorID, requireContext().getTheme()));
+
+    }
+
+    private void deActiveButton(MaterialButton button) {
+        button.setClickable(false);
+        button.setBackgroundTintList(getResources().getColorStateList(R.color.grey_400, requireContext().getTheme()));
     }
 
 
