@@ -35,8 +35,8 @@ const newElo = (currentEloA, currentEloB, result, player1PieceColor) => {
         outcome = 0.5;
     }
     var {expectedProbabilityA, expectedProbabilityB} = expectedProbability(currentEloA, currentEloB);
-    var newEloA = currentEloA + k * (outcome - expectedProbabilityA);
-    const newEloB = currentEloB + k * ((1 - outcome) - expectedProbabilityB); 
+    var newEloA = Math.round(currentEloA + k * (outcome - expectedProbabilityA));
+    const newEloB = Math.round(currentEloB + k * ((1 - outcome) - expectedProbabilityB)); 
     return {
         newEloA: newEloA,
         newEloB: newEloB
