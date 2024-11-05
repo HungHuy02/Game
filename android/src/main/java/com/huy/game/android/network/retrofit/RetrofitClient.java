@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.local.Local;
 import com.huy.game.android.models.request.RefreshRequest;
 import com.huy.game.android.models.response.RefreshResponse;
@@ -71,7 +72,7 @@ public class RetrofitClient {
 
             Request newRequest = builder.build();
             Response response = chain.proceed(newRequest);
-            if (response.code() == 401) {
+            if (response.code() == 401 && !UserState.getInstance().isGuest()) {
                 if(chain.request().url().toString().endsWith("token")) {
                     Intent intent = new Intent( context, LoginWayActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

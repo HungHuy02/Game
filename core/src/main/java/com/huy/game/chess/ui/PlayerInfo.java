@@ -2,12 +2,9 @@ package com.huy.game.chess.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -87,7 +84,7 @@ public class PlayerInfo {
         float scale = chessImage.getScaledPieceSize() / image.getWidth();
         avatar.setOrigin(Align.center);
         avatar.setScale(scale);
-        if(imageUrl != null) {
+        if(imageUrl != null && !imageUrl.equals("")) {
             Pixmap.downloadFromUrl( imageUrl, new Pixmap.DownloadPixmapResponseListener() {
                 @Override
                 public void downloadComplete(Pixmap pixmap) {

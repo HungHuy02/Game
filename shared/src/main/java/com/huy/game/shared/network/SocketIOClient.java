@@ -2,6 +2,7 @@ package com.huy.game.shared.network;
 
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
+import com.huy.game.chess.enums.TimeType;
 import com.huy.game.chess.events.ChessGameOnlineEvent;
 import com.huy.game.interfaces.SocketClient;
 
@@ -42,6 +43,16 @@ public class SocketIOClient implements SocketClient {
         onConnect_error();
     }
 
+    @Override
+    public void guestConnect() {
+        try {
+            socket = IO.socket(Local.SocketIOGuestUrl);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        socket.connect();
+    }
+
     private void onConnect_error() {
         on(Socket.EVENT_CONNECT_ERROR, args -> {
             if (args.length > 0 && args[0] instanceof JSONObject) {
@@ -55,17 +66,18 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void requestToPlayGame(String playerName, String imageUrl,int elo) {
-        requestToPlay(playerName, imageUrl, elo);
+    public void requestToPlayGame(String playerName, String imageUrl, int elo, TimeType timeType) {
+        requestToPlay(playerName, imageUrl, elo, timeType);
         opponentFound();
     }
 
-    private void requestToPlay(String playerName, String imageUrl, int elo) {
+    private void requestToPlay(String playerName, String imageUrl, int elo, TimeType timeType) {
         try {
             socket.emit("request_to_play",
                 new JSONObject().put("playerName", playerName)
                     .put("imageUrl", imageUrl)
-                    .put("elo", elo));
+                    .put("elo", elo)
+                    .put("timeType", timeType));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -90,9 +102,14 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void makeMove(String from, String to, MoveType type) {
+    public void makeMove(String from, String to, MoveType type, int timeRemain) {
         try {
-            emit("playerMove", new JSONObject().put("from", from).put("to", to).put("moveType", type.toString()));
+            emit("playerMove",
+                new JSONObject()
+                    .put("from", from)
+                    .put("to", to)
+                    .put("moveType", type.toString())
+                    .put("timeRemain", timeRemain));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -106,7 +123,8 @@ public class SocketIOClient implements SocketClient {
                     String from = data.getString("from");
                     String to = data.getString("to");
                     MoveType type = MoveType.valueOf(data.getString("moveType"));
-                    ChessGameOnlineEvent.getInstance().notifyPlayerMove(from, to, type);
+                    int timeRemain = data.getInt("timeRemain");
+                    ChessGameOnlineEvent.getInstance().notifyPlayerMove(from, to, type, timeRemain);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }

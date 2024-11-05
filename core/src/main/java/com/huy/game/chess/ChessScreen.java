@@ -159,7 +159,7 @@ public class ChessScreen extends InputAdapter implements Screen {
     private void setupPlayOnline() {
         ChessGameOnlineEvent.getInstance().setPlayerMoveListener(new ChessGameOnlineEvent.PlayerActionListener() {
             @Override
-            public void onPlayerMove(String from, String to, MoveType type) {
+            public void onPlayerMove(String from, String to, MoveType type, int timeRemain) {
                 if(chessGameHistoryManager.isRePlay()) {
                     chessGameHistoryManager.setRePlay(false);
                     chessGameHistoryManager.returnOriginIndex();
@@ -168,6 +168,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                 Spot end = board.getSpot(to.charAt(0) - '0', to.charAt(1) - '0');
                 Move move = new Move(start,end);
                 move.setMoveType(type);
+                chessGameManager.setTimeRemainInOnlineMode(timeRemain);
                 handleMove(move);
             }
 
@@ -379,7 +380,11 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void handleMoveWithOtherMode(Move move) {
         switch (main.getMode()) {
-            case ONLINE -> main.socketClient.makeMove(move.getStart().getX() + "" + move.getStart().getY(), move.getEnd().getX() + "" + move.getEnd().getY(), move.getMoveType());
+            case ONLINE -> main.socketClient.makeMove(
+                move.getStart().getX() + "" + move.getStart().getY(),
+                move.getEnd().getX() + "" + move.getEnd().getY(),
+                move.getMoveType(),
+                chessGameManager.getTimeRemainForOnlineMode());
             case AI -> handleAIMove();
         }
     }

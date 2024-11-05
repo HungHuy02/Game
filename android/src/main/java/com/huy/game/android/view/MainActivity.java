@@ -1,84 +1,41 @@
 package com.huy.game.android.view;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.huy.game.R;
 import com.huy.game.android.base.BaseActivity;
-import com.huy.game.android.globalstate.UserState;
-import com.huy.game.android.models.User;
 import com.huy.game.android.utils.NetworkWatcher;
-import com.huy.game.android.viewmodel.apiservice.UserServiceViewModel;
 import com.huy.game.databinding.ActivityMainBinding;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
-    private UserServiceViewModel viewModel;
     private NetworkWatcher networkWatcher;
     private int bottomId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupViewModel();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        handleBottomNavigation();
         checkNetwork();
+        handleBottomNavigation();
     }
 
-    private void setupViewModel() {
-        viewModel = new ViewModelProvider(this).get(UserServiceViewModel.class);
-    }
+
 
     private void checkNetwork() {
          networkWatcher = new NetworkWatcher(this);
          networkWatcher.observe(this, on -> {
             if (on) {
-                if (UserState.getInstance().getName() == null) {
-                    getUser();
-                }
                 binding.bottomNavigation.setAlpha(1f);
             }else {
                 binding.bottomNavigation.setAlpha(0.4f);
             }
         });
     }
-
-    private void getUser() {
-        viewModel.getCurrentUser(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                if(response.isSuccessful()) {
-                    User user = response.body();
-                    assert user != null;
-                    UserState.getInstance().setName(user.getName());
-                    UserState.getInstance().setEmail(user.getEmail());
-                    if (user.getImageUrl() != null) {
-                        UserState.getInstance().setImageUrl(user.getImageUrl());
-                    }
-                    UserState.getInstance().setElo(user.getElo());
-                }else if(response.code() != 401){
-                    Toast.makeText(MainActivity.this, "Lỗi không xác định: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<User> call, @NonNull Throwable throwable) {
-                Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
 
     private void handleBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {

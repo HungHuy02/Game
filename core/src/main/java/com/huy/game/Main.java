@@ -47,12 +47,16 @@ public class Main extends Game {
         this.backInterface = backInterface;
     }
 
-    public Main(ChessMode mode, TimeType timeType, SocketClient client, BackInterface backInterface) {
+    public Main(ChessMode mode, TimeType timeType, SocketClient client, BackInterface backInterface, boolean isGuest) {
         this.mode = mode;
         this.timeType = timeType;
         this.socketClient = client;
         this.backInterface = backInterface;
-        client.connect();
+        if (isGuest) {
+            client.guestConnect();
+        }else {
+            client.connect();
+        }
     }
 
     public Main(ChessMode mode, boolean enableSuggesting, boolean enableTakeback, TimeType timeType, Stockfish stockfish, BackInterface backInterface) {

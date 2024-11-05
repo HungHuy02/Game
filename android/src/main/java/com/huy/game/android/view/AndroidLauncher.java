@@ -47,8 +47,12 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
             }
             case ONLINE -> {
                 String player1Name = intent.getStringExtra(Constants.BUNDLE_PLAYER1_NAME);
-                Player.getInstance().setData(player1Name, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
-                initialize(new Main(mode, type, new SocketIOClient(new AuthToken(getApplicationContext())), this), configuration);
+                if (UserState.getInstance().isGuest()) {
+                    Player.getInstance().setData(UserState.getInstance().getName());
+                }else {
+                    Player.getInstance().setData(player1Name, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
+                }
+                initialize(new Main(mode, type, new SocketIOClient(new AuthToken(getApplicationContext())), this, UserState.getInstance().isGuest()), configuration);
             }
         }
     }

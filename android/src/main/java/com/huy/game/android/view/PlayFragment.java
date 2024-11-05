@@ -67,6 +67,7 @@ public class PlayFragment extends Fragment {
         userImage();
         settingButton();
         checkNetwork();
+        setupLoginButtonForGuest();
     }
 
     private void checkNetwork() {
@@ -191,7 +192,7 @@ public class PlayFragment extends Fragment {
         viewModel.setPosition(position);
         fragmentPlayBinding.btnTime.setOnClickListener((v) -> {
             Intent intent = new Intent(fragmentPlayBinding.getRoot().getContext(), ChangeTimeActivity.class);
-            intent.putExtra(Constants.BUNDLE_POSITION, position == -1 ? 7 : position);
+            intent.putExtra(Constants.BUNDLE_POSITION, Optional.ofNullable(viewModel.getPosition().getValue()).orElse(7));
             launcher.launch(intent);
         });
     }
@@ -234,10 +235,14 @@ public class PlayFragment extends Fragment {
     }
 
     private void setupUserImage() {
-        if(UserState.getInstance().getImageUrl() != null) {
-            Glide.with(this)
-                .load(UserState.getInstance().getImageUrl())
-                .into(fragmentPlayBinding.userImage);
+        if (!UserState.getInstance().isGuest()) {
+            fragmentPlayBinding.loginBtn.setVisibility(View.GONE);
+            fragmentPlayBinding.userImage.setVisibility(View.VISIBLE);
+            if(UserState.getInstance().getImageUrl() != null) {
+                Glide.with(this)
+                    .load(UserState.getInstance().getImageUrl())
+                    .into(fragmentPlayBinding.userImage);
+            }
         }
     }
 
@@ -261,6 +266,7 @@ public class PlayFragment extends Fragment {
                             popupWindow.dismiss();
                             Toast.makeText(getContext(), "Đăng xuât thành công", Toast.LENGTH_SHORT).show();
                             StorageUtils.getInstance(V.getContext()).setStringValue(Constants.DATASTORE_ACCESS_TOKEN, "null");
+                            StorageUtils.getInstance(V.getContext()).setStringValue(Constants.DATASTORE_REFRESH_TOKEN, "null");
                             Intent intent = new Intent(V.getContext(), LoginWayActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -288,6 +294,15 @@ public class PlayFragment extends Fragment {
             Intent intent = new Intent(this.getContext(), SettingActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void setupLoginButtonForGuest() {
+        if (UserState.getInstance().isGuest()) {
+            fragmentPlayBinding.loginBtn.setOnClickListener((v) -> {
+                Intent intent = new Intent(this.getContext(), LoginWayActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void activeButton(MaterialButton button, int colorID) {

@@ -22,7 +22,7 @@ public class ChessGameOnlineEvent {
     }
 
     public interface PlayerActionListener {
-        void onPlayerMove(String from, String to, MoveType type);
+        void onPlayerMove(String from, String to, MoveType type, int timeRemain);
         void onPlayerWantToDraw();
         void onNewScore(int newScore);
     }
@@ -43,8 +43,8 @@ public class ChessGameOnlineEvent {
         listener.onSuccessfulMatch(name, isWhite, imageUrl);
     }
 
-    public void notifyPlayerMove(String from, String to, MoveType type) {
-        playerActionListener.onPlayerMove(from, to, type);
+    public void notifyPlayerMove(String from, String to, MoveType type, int timeRemain) {
+        playerActionListener.onPlayerMove(from, to, type, timeRemain);
     }
 
     public void notifyPlayerWantToDraw() {

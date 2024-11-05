@@ -51,4 +51,11 @@
     <string name="volume_off_text">Sound off</string>
     <string name="suggest_text">Suggest</string>
     <string name="level_text">Level</string>
+    <string name="email_can_not_blank_text">"Email cannot be blank"</string>
+    <string name="password_can_not_blank">Password cannot be blank</string>
+    <string name="name_can_not_blank_text">Name cannot be blank</string>
+    <string name="pass_must_at_least_7_char_text">Password must be at least 7 characters</string>
+    <string name="email_not_in_correct_format_text">Email is not in correct format</string>
+    <string name="email_or_pass_invalid_text">Incorrect email or password</string>
+    <string name="account_already_exists_text">Account already exists</string>
 </resources>

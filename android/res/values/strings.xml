@@ -69,4 +69,11 @@
     <string name="six_number_text" translatable="false">6</string>
     <string name="seven_number_text" translatable="false">7</string>
     <string name="eight_number_text" translatable="false">8</string>
+    <string name="email_can_not_blank_text">Email không được để trống</string>
+    <string name="password_can_not_blank">Mật khẩu không được để trống</string>
+    <string name="name_can_not_blank_text">Tên không được để trống</string>
+    <string name="pass_must_at_least_7_char_text">Mật khẩu phải có tối thiểu 7 ký tự</string>
+    <string name="email_not_in_correct_format_text">Email không đúng định dạng</string>
+    <string name="email_or_pass_invalid_text">Email hoặc mật khẩu không đúng</string>
+    <string name="account_already_exists_text">Tài khoản đã tồn tại</string>
 </resources>

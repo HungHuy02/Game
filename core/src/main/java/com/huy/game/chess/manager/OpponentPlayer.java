@@ -6,6 +6,7 @@ public class OpponentPlayer {
     private String name;
     private boolean isWhite;
     private String imageUrl;
+    private boolean isGuest;
 
     private OpponentPlayer() {
 
@@ -29,6 +30,11 @@ public class OpponentPlayer {
         this.imageUrl = imageUrl;
     }
 
+    public void setData(String name) {
+        this.name = name;
+        isGuest = true;
+    }
+
     public String getName() {
         return name;
     }
@@ -39,5 +45,9 @@ public class OpponentPlayer {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public boolean isGuest() {
+        return isGuest;
     }
 }

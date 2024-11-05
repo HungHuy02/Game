@@ -7,6 +7,7 @@ public class Player {
     private boolean isWhite;
     private String imageUrl;
     private int elo;
+    private boolean isGuest;
 
     private Player() {
 
@@ -32,6 +33,11 @@ public class Player {
         this.elo = elo;
     }
 
+    public void setData(String name) {
+        this.name = name;
+        isGuest = true;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -54,5 +60,9 @@ public class Player {
 
     public int getElo() {
         return elo;
+    }
+
+    public boolean isGuest() {
+        return isGuest;
     }
 }

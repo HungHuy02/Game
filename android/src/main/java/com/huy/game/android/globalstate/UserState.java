@@ -1,12 +1,18 @@
 package com.huy.game.android.globalstate;
 
+import com.huy.game.chess.manager.GameSetting;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class UserState {
 
     private static UserState Instance;
-    private String name;
+    private String name = GameSetting.getInstance().getLanguage().equals("vi-VN") ? "Bạn" : "You";
     private String email;
     private String imageUrl;
     private int elo;
+    private boolean isGuest = false;
 
     private UserState() {
 
@@ -24,6 +30,14 @@ public class UserState {
         this.email = email;
         this.imageUrl = imageUrl;
         this.elo = elo;
+    }
+
+    public void setGuestAccount() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String formattedTime = now.format(formatter);
+        isGuest = true;
+        name = "guest" + formattedTime;
     }
 
     public String getName() {
@@ -60,5 +74,13 @@ public class UserState {
 
     public void setElo(int elo) {
         this.elo = elo;
+    }
+
+    public void setGuest(boolean guest) {
+        isGuest = guest;
+    }
+
+    public boolean isGuest() {
+        return isGuest;
     }
 }

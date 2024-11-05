@@ -206,6 +206,20 @@ public class ChessGameManager {
         return currentPlayer;
     }
 
+    public void setTimeRemainInOnlineMode(int timeRemain) {
+        cancelTimer();
+        currentPlayer.setTimeRemain(timeRemain);
+        if (currentPlayer.isWhite() == player1.isWhite()) {
+            timeList.put("1", timeRemain);
+        }else {
+            timeList.put("2", timeRemain);
+        }
+    }
+
+    public int getTimeRemainForOnlineMode() {
+        return currentPlayer.isWhite() == player1.isWhite() ? player2.getTimeRemain() : player1.getTimeRemain();
+    }
+
     public void reset(GameHistory history, ChessScreen screen) {
         int time = handleTime();
         timer.clear();

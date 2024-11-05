@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.huy.game.android.base.BaseActivity;
+import com.huy.game.android.globalstate.UserState;
 import com.huy.game.databinding.ActivityLoginWayBinding;
 
 public class LoginWayActivity extends BaseActivity {
@@ -36,6 +37,7 @@ public class LoginWayActivity extends BaseActivity {
 
     private void guestButton() {
         binding.guestBtn.setOnClickListener((v) -> {
+            UserState.getInstance().setGuestAccount();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
