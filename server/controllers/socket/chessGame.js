@@ -62,9 +62,11 @@ module.exports = function(io) {
 
                 let opponentPlayerElo;
 
+                socket.emit("arePlaying");
+
                 opponentSocket.emit("opponentComeback");
 
-                opponentSocket.once("currentGameState", (data) => {
+                opponentSocket.once("sendCurrentGameState", (data) => {
                     opponentPlayerElo = data.elo;
                     socket.emit("currentGameState", {
                         ...data,
@@ -92,6 +94,18 @@ module.exports = function(io) {
                 });
 
                 socket.once("gameEnd", async (data) => {
+                    await redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", opponentSocket.user.id + ""]);
+                    const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayerElo, data.result, pieceColor);
+                    socket.emit("newScore", {
+                        newScore: newEloA,
+                    });
+                    opponentSocket.emit("newScore", {
+                        newScore: newEloB,
+                    });
+                    updateNewElo(socket.user.id, newEloA, opponentSocket.user.id, newEloB);
+                });
+
+                opponentSocket.once("gameEnd", async (data) => {
                     await redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", opponentSocket.user.id + ""]);
                     const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayerElo, data.result, pieceColor);
                     socket.emit("newScore", {
@@ -174,6 +188,18 @@ module.exports = function(io) {
                         });
                         updateNewElo(socket.user.id, newEloA, currentUser.playerName,opponentSocket.user.id, newEloB, opponentPlayer.playerName);
                     });
+
+                    opponentSocket.once("gameEnd", async (data) => {
+                        await redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", opponentSocket.user.id + ""]);
+                        const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayer.elo, data.result, pieceColor);
+                        socket.emit("newScore", {
+                            newScore: newEloA,
+                        });
+                        opponentSocket.emit("newScore", {
+                            newScore: newEloB,
+                        });
+                        updateNewElo(socket.user.id, newEloA, currentUser.playerName,opponentSocket.user.id, newEloB, opponentPlayer.playerName);
+                    });
                 }else {
                     socket.emit("OpponentNotFound");
                 }
@@ -182,7 +208,7 @@ module.exports = function(io) {
 
         socket.on("disconnect", asyncHandler(async() => {
             const opponentSocketId = await redisClient.HGET(REDIS_PLAYING_KEY, socket.user.id + "");
-            for(const i = 0; i < waitingList.length && i <= socket.index; i++) {
+            for(var i = 0; i < waitingList.length && i <= socket.index; i++) {
                 if(waitingList[i].id === socket.user.id) {
                     waitingList.splice(i, 1);
                     break;
@@ -196,13 +222,12 @@ module.exports = function(io) {
         }));
     });
 
-    const REDIS_GUEST_PLAYING_KEY = "guest_playing";
     const guestWaitingList = [];
 
     io.of("/guest").on("connection", (socket) => {
         allConnections[socket.id] = socket;
 
-        socket.on("request_to_play", (data) => {
+        socket.on("request_to_play", async(data) => {
 
             const currentUser = {};
             currentUser.playerName = data.playerName;
@@ -224,6 +249,14 @@ module.exports = function(io) {
             if(opponentPlayer) {
                 guestWaitingList.splice(waitingList.indexOf(currentUser), 1);
                 guestWaitingList.slice(waitingList.indexOf(opponentPlayer), 1);
+                redisClient.EVALSHA(await loadScripts.getAddToPlayingHashSHA(), {
+                    keys: [REDIS_PLAYING_KEY],
+                    arguments: [socket.id,
+                        opponentPlayer.socketId, 
+                        socket.id,
+                        opponentPlayer.socketId
+                    ]
+                });
                 
                 const pieceColor = Math.random() === 0;
 
@@ -260,25 +293,52 @@ module.exports = function(io) {
                 opponentSocket.on("canDraw", () => {
                     socket.emit("opponentWantToDraw");
                 });
+
+                socket.once("gameEnd", async (data) => {
+                    await redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", opponentSocket.user.id + ""]);
+                    const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayer.elo, data.result, pieceColor);
+                    socket.emit("newScore", {
+                        newScore: newEloA,
+                    });
+                    opponentSocket.emit("newScore", {
+                        newScore: newEloB,
+                    });
+                    updateNewElo(socket.user.id, newEloA, currentUser.playerName,opponentSocket.user.id, newEloB, opponentPlayer.playerName);
+                });
+
+                opponentSocket.once("gameEnd", async (data) => {
+                    await redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", opponentSocket.user.id + ""]);
+                    const {newEloA, newEloB} = eloUtil.newElo(currentUser.elo, opponentPlayer.elo, data.result, pieceColor);
+                    socket.emit("newScore", {
+                        newScore: newEloA,
+                    });
+                    opponentSocket.emit("newScore", {
+                        newScore: newEloB,
+                    });
+                    updateNewElo(socket.user.id, newEloA, currentUser.playerName,opponentSocket.user.id, newEloB, opponentPlayer.playerName);
+                });
             }else {
                 socket.emit("OpponentNotFound");
             }
         });
 
         socket.on("disconnect", asyncHandler(async() => {
-            const opponentSocketId = await redisClient.HGET(REDIS_GUEST_PLAYING_KEY, socket.id);
-            for(const i = 0; i < guestWaitingList.length && i <= socket.index; i++) {
-                if(guestWaitingList[i].id === socket.user.id) {
+            for(var i = 0; i < guestWaitingList.length && i <= socket.index; i++) {
+                if(guestWaitingList[i].id === socket.id) {
                     guestWaitingList.splice(i, 1);
                     break;
                 }
             }
+            const socketId = socket.id;
             delete allConnections[socket.id];
+            const opponentSocketId = await redisClient.HGET(REDIS_PLAYING_KEY, socket.id);
             if(opponentSocketId) {
-                const opponentSocket = allConnections[opponentSocketId];
-                opponentSocket.emit("opponentLeftMatch");
+                if(opponentSocketId) {
+                    const opponentSocket = allConnections[opponentSocketId];
+                    opponentSocket.emit("opponentLeftMatch");
+                }
+                redisClient.HDEL(REDIS_PLAYING_KEY, [socketId, opponentSocketId]);
             }
-            redisClient.HDEL(REDIS_GUEST_PLAYING_KEY, [socket.id, opponentSocketId]);
         }));
     });
 }
