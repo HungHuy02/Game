@@ -217,7 +217,12 @@ module.exports = function(io) {
             delete allConnections[socket.id];
             if(opponentSocketId) {
                 const opponentSocket = allConnections[opponentSocketId];
-                opponentSocket.emit("opponentLeftMatch");
+                if(opponentSocket) {
+                    opponentSocket.opponentId = socket.user.id;
+                    opponentSocket.emit("opponentLeftMatch");
+                }else {
+                    redisClient.HDEL(REDIS_PLAYING_KEY, [socket.user.id + "", socket.opponentId + ""]);
+                }
             }
         }));
     });
