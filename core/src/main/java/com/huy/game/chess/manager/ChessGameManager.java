@@ -216,23 +216,33 @@ public class ChessGameManager {
         }
     }
 
+    public int getPlayerTime(boolean isWhite) {
+        if (player1.isWhite() == isWhite) {
+            return player1.getTimeRemain();
+        }else  {
+            return player2.getTimeRemain();
+        }
+    }
+
     public int getTimeRemainForOnlineMode() {
         return currentPlayer.isWhite() == player1.isWhite() ? player2.getTimeRemain() : player1.getTimeRemain();
     }
 
     public void reset(GameHistory history, ChessScreen screen) {
         int time = handleTime();
-        timer.clear();
-        timeList.put("play1", 0);
-        timeList.put("play2", 0);
-        timeList.put("1", time);
-        timeList.put("2", time);
-        player1.setTimeRemain(time);
-        player2.setTimeRemain(time);
+        if (timeType != TimeType.NO_TIME) {
+            timer.clear();
+            timeList.put("play1", 0);
+            timeList.put("play2", 0);
+            timeList.put("1", time);
+            timeList.put("2", time);
+            player1.setTimeRemain(time);
+            player2.setTimeRemain(time);
+            handleTimer("1", screen);
+            history.addTimeRemain(0, time, time);
+        }
         player1.reset();
         player2.reset();
-        handleTimer("1", screen);
-        history.addTimeRemain(0, time, time);
         currentPlayer = player1.isWhite() ? player1 : player2;
     }
 

@@ -39,6 +39,10 @@ public class ChessGameHistoryManager {
         return board;
     }
 
+    public void setNewHistory(String fen, int[] time) {
+        history.setHistoryForComebackGame(fen, time);
+    }
+
     public void setBoard(int index, ChessImage chessImage) {
         board = history.changeFENToBoard(index, chessImage);
         this.index = index;

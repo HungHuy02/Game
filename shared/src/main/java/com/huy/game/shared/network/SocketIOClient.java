@@ -56,11 +56,8 @@ public class SocketIOClient implements SocketClient {
     private void onConnect_error() {
         on(Socket.EVENT_CONNECT_ERROR, args -> {
             if (args.length > 0 && args[0] instanceof JSONObject) {
-                Exception e = (Exception) args[0];
-                if (e.getMessage().startsWith("Authentication")) {
-                    authToken.getNewAccessToken();
-                    connect();
-                }
+                authToken.getNewAccessToken();
+                connect();
             }
         });
     }
@@ -168,6 +165,60 @@ public class SocketIOClient implements SocketClient {
                     throw new RuntimeException(e);
                 }
             }
+        });
+    }
+
+    @Override
+    public void opponentLeftMatch() {
+        on("opponentLeftMatch", args -> {
+            ChessGameOnlineEvent.getInstance().notifyOpponentLeftMatch();
+        });
+    }
+
+    @Override
+    public void opponentComeback() {
+        on("opponentComeback", args -> {
+            ChessGameOnlineEvent.getInstance().notifyOpponentComeback();
+        });
+    }
+
+    @Override
+    public void sendCurrentGameState(String fen, int elo, String move, int playerTime, int opponentTime) {
+        try {
+            emit("sendCurrentGameState",
+                new JSONObject()
+                    .put("fen", fen)
+                    .put("elo", elo)
+                    .put("move", move)
+                    .put("playerTime", playerTime)
+                    .put("opponentTime", opponentTime));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void currentGameState() {
+        on("currentGameState", args -> {
+            if (args.length > 0 && args[0] instanceof JSONObject data) {
+                try {
+                    String fen = data.getString("fen");
+                    int elo = data.getInt("elo");
+                    String move = data.getString("move");
+                    int opponentTime = data.getInt("playerTime");
+                    int playerTime = data.getInt("opponentTime");
+                    ChessGameOnlineEvent.getInstance().notifyCurrentGameState(fen, elo, move, playerTime, opponentTime);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void arePlaying() {
+        socket.once("arePlaying", args -> {
+            ChessGameOnlineEvent.getInstance().notifyArePlaying();
         });
     }
 

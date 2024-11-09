@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Bishop extends Piece {
 
-    private int[][] bishopMoves() {
+    public static int[][] bishopMoves() {
         return new int[][]{
             {1, -1}, {1, 1}, {-1, 1}, {-1, -1}
         };
@@ -134,36 +134,68 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
-        int count = 0;
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot, int number) {
         boolean row = true;
-        int directionX = Integer.signum(checkSpot.getX() - start.getX());
-        int directionY = Integer.signum(checkSpot.getY() - start.getY());
-        loop:
-        for (int[] move: bishopMoves()) {
-            if (move[0] != directionX || move[1] != directionY) {
-                int x = move[0] + checkSpot.getX();
-                int y = move[1] + checkSpot.getY();
-                while (board.isWithinBoard(x, y)) {
-                    Piece piece = spots[x][y].getPiece();
-                    if (piece != null) {
-                        if (piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite()) {
-                            if (y == start.getY()) {
-                                row = false;
+        int directionX = Integer.signum(start.getX() - checkSpot.getX());
+        int directionY = Integer.signum( start.getY() - checkSpot.getY());
+        if (number < 4) {
+            for (int[] move: bishopMoves()) {
+                if (move[0] != directionX || move[1] != directionY) {
+                    int x = move[0] + checkSpot.getX();
+                    int y = move[1] + checkSpot.getY();
+                    while (board.isWithinBoard(x, y)) {
+                        Piece piece = spots[x][y].getPiece();
+                        if (piece != null) {
+                            if (piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite()) {
+                                if (y == start.getY()) {
+                                    row = false;
+                                }
+                                return new AbstractMap.SimpleEntry<>(1, row);
                             }
-                            count++;
-                            if (count == 2) {
-                                break loop;
-                            }
-                        }else {
                             break;
                         }
+                        x += move[0];
+                        y += move[1];
                     }
-                    x += move[0];
-                    y += move[1];
                 }
             }
+        }else {
+            int count = 0;
+            row = false;
+            boolean col = false;
+            for (int[] move: Bishop.bishopMoves()) {
+                if (move[0] != directionX || move[1] != directionY) {
+                    int x = move[0] + checkSpot.getX();
+                    int y = move[1] + checkSpot.getY();
+                    while (board.isWithinBoard(x, y)) {
+                        Piece piece = spots[x][y].getPiece();
+                        if (piece != null) {
+                            if (piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite()) {
+                                count++;
+                                if (y == start.getY()) {
+                                    col = true;
+                                }
+                                if (x == start.getX()) {
+                                    row = true;
+                                }
+                                if (col && row) {
+                                    return new AbstractMap.SimpleEntry<>(2, true);
+                                }
+                            }
+                            break ;
+                        }
+                        x += move[0];
+                        y += move[1];
+                    }
+                }
+            }
+            if (col) {
+                return new AbstractMap.SimpleEntry<>(1, false);
+            }
+            if (row || count != 0) {
+                return new AbstractMap.SimpleEntry<>(1, true);
+            }
         }
-        return new AbstractMap.SimpleEntry<>(count, row);
+        return new AbstractMap.SimpleEntry<>(0, row);
     }
 }

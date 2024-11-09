@@ -1,6 +1,8 @@
 package com.huy.game.chess.core;
 
 import com.huy.game.chess.enums.MoveType;
+import com.huy.game.chess.enums.PieceType;
+import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 
 public class Move {
@@ -51,16 +53,16 @@ public class Move {
         isCheck = check;
     }
 
-    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage) {
+    public String makeRealMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage, ChessGameManager chessGameManager) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         board.setSpot(end.getX(), end.getY(), start.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
-        handleSpecialMove(board, chessImage);
+        handleSpecialMove(board, chessImage, chessGameManager);
         handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite());
         handleSpotColorAfterMove(start, end);
         board.increaseTurn();
-        return history.addMove(board , start, end, this);
+        return history.addMove(board , start, end, this, chessGameManager);
     }
 
     public void makeMove(Board board) {
@@ -70,18 +72,18 @@ public class Move {
         board.increaseTurn();
     }
 
-    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage) {
+    public String makeAIMove(Board board, ZobristHashing hashing, GameHistory history, ChessImage chessImage, ChessGameManager chessGameManager) {
         history.addStateHash(hashing.makeAMove(start, end, moveType));
         Spot startSpot = board.getSpot(start.getX(), start.getY());
         Spot endSpot = board.getSpot(end.getX(), end.getY());
         board.setSpot(end.getX(), end.getY(), startSpot.getPiece());
         board.setSpot(start.getX(), start.getY(), null);
-        handleSpecialMove(board, chessImage);
+        handleSpecialMove(board, chessImage, chessGameManager);
         handleSpotColorAfterMove(startSpot, endSpot);
         handleCheck(board);
         history.addFEN(board, end.getPiece().isWhite());
         board.increaseTurn();
-        return history.addMove(board, startSpot, board.getSpot(end.getX(), end.getY()), this);
+        return history.addMove(board, startSpot, board.getSpot(end.getX(), end.getY()), this, chessGameManager);
     }
 
     private void handleSpotColorAfterMove(Spot start, Spot end) {
@@ -195,7 +197,7 @@ public class Move {
         }
     }
 
-    public void handleSpecialMove(Board board, ChessImage chessImage) {
+    public void handleSpecialMove(Board board, ChessImage chessImage, ChessGameManager chessGameManager) {
         if (board.getPossibleEnPassantTargetsSpot() != null) {
             possibleEnPassantTargetsSpot = board.getPossibleEnPassantTargetsSpot();
             board.setPossibleEnPassantTargetsSpot(null);
@@ -246,6 +248,7 @@ public class Move {
             case EN_PASSANT -> {
                 possibleEnPassantTargetsSpot.setPiece(null);
                 board.setPossibleEnPassantTargetsSpot(null);
+                chessGameManager.putValue(PieceType.PAWN);
             }
             case PROMOTE -> {
                 board.setPromoting(true);
@@ -254,19 +257,26 @@ public class Move {
             case PROMOTE_TO_QUEEN -> {
                 Queen queen = new Queen(startPiece.isWhite(), startPiece.isWhite() ? chessImage.getwQueen() : chessImage.getbQueen());
                 board.getSpot(end.getX(),end.getY()).setPiece(queen);
+                chessGameManager.putValueForPromote(PieceType.QUEEN);
             }
             case PROMOTE_TO_KNIGHT -> {
                 Knight knight = new Knight(startPiece.isWhite(), startPiece.isWhite() ? chessImage.getwKnight() : chessImage.getbKnight());
                 board.getSpot(end.getX(),end.getY()).setPiece(knight);
+                chessGameManager.putValueForPromote(PieceType.KNIGHT);
             }
             case PROMOTE_TO_ROOK -> {
                 Rook rook = new Rook(startPiece.isWhite(), startPiece.isWhite() ? chessImage.getwRock() : chessImage.getbRook());
                 board.getSpot(end.getX(),end.getY()).setPiece(rook);
+                chessGameManager.putValueForPromote(PieceType.ROOK);
             }
             case PROMOTE_TO_BISHOP -> {
                 Bishop bishop = new Bishop(startPiece.isWhite(), startPiece.isWhite() ? chessImage.getwBishop() : chessImage.getbBishop());
                 board.getSpot(end.getX(),end.getY()).setPiece(bishop);
+                chessGameManager.putValueForPromote(PieceType.BISHOP);
             }
+        }
+        if (endPiece != null && moveType != MoveType.PROMOTE) {
+            chessGameManager.putValue(endPiece.getType());
         }
     }
 }

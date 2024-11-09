@@ -130,28 +130,13 @@ public class Board {
         return isWhite ? wKingSpot : bKingSpot;
     }
 
-    public void handleSoundAfterMove(Piece endPiece, Move move, ChessSound chessSound, ChessGameManager chessGameManager) {
+    public void handleSoundAfterMove(Move move, ChessSound chessSound) {
         switch (move.getMoveType()) {
             case NORMAL, DOUBLE_STEP_PAWN -> chessSound.playMoveSound();
-            case CAPTURE -> {
-                chessSound.playCaptureSound();
-                chessGameManager.putValue(endPiece.getType());
-            }
-            case EN_PASSANT -> {
-                chessSound.playCaptureSound();
-                chessGameManager.putValue(PieceType.PAWN);
-            }
+            case CAPTURE, EN_PASSANT -> chessSound.playCaptureSound();
             case CASTLING_KING_SIDE, CASTLING_QUEEN_SIDE -> chessSound.playCastleSound();
-            case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP -> {
+            case PROMOTE_TO_QUEEN, PROMOTE_TO_KNIGHT, PROMOTE_TO_ROOK, PROMOTE_TO_BISHOP ->
                 chessSound.playPromoteSound();
-                chessGameManager.putValueForPromote(switch (move.getMoveType()) {
-                    case PROMOTE_TO_QUEEN -> PieceType.QUEEN;
-                    case PROMOTE_TO_KNIGHT -> PieceType.KNIGHT;
-                    case PROMOTE_TO_ROOK -> PieceType.ROOK;
-                    case PROMOTE_TO_BISHOP -> PieceType.BISHOP;
-                    default -> throw new IllegalStateException("Unexpected value: " + move.getMoveType());
-                });
-            }
         }
         if (move.isCheck()) {
             chessSound.playCheckSound();
@@ -486,7 +471,7 @@ public class Board {
                                 }
                             }else {
                                 switch (checkPiece.getType()) {
-                                    case ROOK, QUEEN -> {
+                                    case ROOK, QUEEN, KING -> {
                                         return false;
                                     }
                                 }

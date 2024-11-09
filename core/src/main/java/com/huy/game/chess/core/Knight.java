@@ -101,30 +101,62 @@ public class Knight extends Piece {
     }
 
     @Override
-    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
-        int count = 0;
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot, int number) {
         boolean row = true;
-        for (int[] move: knightMoves()) {
-            int x = move[0] + checkSpot.getX();
-            int y = move[1] + checkSpot.getY();
-            if (board.isWithinBoard(x, y)) {
-                if (x != start.getX() || y != start.getY()) {
-                    Piece piece = spots[x][y].getPiece();
-                    if(piece != null) {
-                        if (piece.getType() == PieceType.KNIGHT && piece.isWhite() == isWhite()) {
-                            if (y == start.getY()) {
-                                row = false;
-                            }
-                            count++;
-                            if (count == 2) {
-                                break;
+        if (number == 2) {
+            for (int[] move: knightMoves()) {
+                int x = move[0] + checkSpot.getX();
+                int y = move[1] + checkSpot.getY();
+                if (board.isWithinBoard(x, y)) {
+                    if (x != start.getX() || y != start.getY()) {
+                        Piece piece = spots[x][y].getPiece();
+                        if(piece != null) {
+                            if (piece.getType() == PieceType.KNIGHT && piece.isWhite() == isWhite()) {
+                                if (y == start.getY()) {
+                                    row = false;
+                                }
+                                return new AbstractMap.SimpleEntry<>(1, row);
                             }
                         }
-                    }
 
+                    }
                 }
             }
+        }else {
+            int count = 0;
+            row = false;
+            boolean col = false;
+            for (int[] move: knightMoves()) {
+                int x = move[0] + checkSpot.getX();
+                int y = move[1] + checkSpot.getY();
+                if (board.isWithinBoard(x, y)) {
+                    if (x != start.getX() || y != start.getY()) {
+                        Piece piece = spots[x][y].getPiece();
+                        if(piece != null) {
+                            if (piece.getType() == PieceType.KNIGHT && piece.isWhite() == isWhite()) {
+                                count++;
+                                if (y == start.getY()) {
+                                    col = true;
+                                }
+                                if (x == start.getX()) {
+                                    row = true;
+                                }
+                                if (col && row) {
+                                    return new AbstractMap.SimpleEntry<>(2, true);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            if (col) {
+                return new AbstractMap.SimpleEntry<>(1, false);
+            }
+            if (row || count != 0) {
+                return new AbstractMap.SimpleEntry<>(1, true);
+            }
         }
-        return new AbstractMap.SimpleEntry<>(count, row);
+        return new AbstractMap.SimpleEntry<>(0, row);
     }
 }

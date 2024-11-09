@@ -16,7 +16,7 @@ public class Rook extends Piece {
         setType(PieceType.ROOK);
     }
 
-    private int[][] rookMoves() {
+    public static int[][] rookMoves() {
         return new int[][]{
             {1, 0}, {-1, 0}, {0, 1}, {0, -1}
         };
@@ -139,36 +139,34 @@ public class Rook extends Piece {
     }
 
     @Override
-    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot, int number) {
+        int directionX = Integer.signum( start.getX() - checkSpot.getX());
+        int directionY = Integer.signum( start.getY() - checkSpot.getY());
         int count = 0;
         boolean row = true;
-        int directionX = Integer.signum(checkSpot.getX() - start.getX());
-        int directionY = Integer.signum(checkSpot.getY() - start.getY());
-        loop:
         for (int[] move: rookMoves()) {
-            if (move[0] == directionX && move[1] == directionY) {
+            if (move[0] != directionX || move[1] != directionY) {
                 int x = move[0] + checkSpot.getX();
                 int y = move[1] + checkSpot.getY();
                 while (board.isWithinBoard(x, y)) {
                     Piece piece = spots[x][y].getPiece();
                     if (piece != null) {
                         if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite()) {
+                            count++;
                             if (y == start.getY()) {
                                 row = false;
                             }
-                            count++;
-                            if (count == 2) {
-                                break loop;
-                            }
-                        }else {
-                            break;
                         }
+                        break ;
                     }
                     x += move[0];
                     y += move[1];
                 }
             }
         }
-        return new AbstractMap.SimpleEntry<>(count, row);
+        if (count != 0) {
+            return new AbstractMap.SimpleEntry<>(1, row);
+        }
+        return new AbstractMap.SimpleEntry<>(0, false);
     }
 }

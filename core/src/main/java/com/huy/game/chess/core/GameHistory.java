@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
 import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.enums.GameResult;
+import com.huy.game.chess.manager.ChessGameManager;
 import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.ui.NotationHistoryScrollPane;
 
@@ -65,14 +66,25 @@ public class GameHistory {
         }
     }
 
-    public String addMove(Board board, Spot start, Spot end, Move move) {
+    public String addMove(Board board, Spot start, Spot end, Move move, ChessGameManager chessGameManager) {
         halfmoveClock++;
         String beforeMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(start);
         String afterMove = AlgebraicNotation.changePositionToSimpleAlgebraicNotation(end);
         StringBuilder builder = new StringBuilder(beforeMove);
         builder.append(afterMove);
         movedList.add(builder.toString());
-        return AlgebraicNotation.changeToFullAlgebraicNotation(board, start, end, move, this);
+        return AlgebraicNotation.changeToFullAlgebraicNotation(board, start, end, move, this, chessGameManager);
+    }
+
+    public void handleMoveColor(Board board, String move) {
+        board.getSpot(
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(1)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(0))
+        ).setShowColor(true);
+        board.getSpot(
+            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(3)),
+            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(2))
+        ).setShowColor(true);
     }
 
     public void handleMoveColor(Board board, int index) {
@@ -93,8 +105,19 @@ public class GameHistory {
         return board;
     }
 
+    public void setHistoryForComebackGame(String fen, int[] time) {
+        fenList.clear();
+        fenList.add(fen);
+        timeMap.clear();
+        timeMap.put(0, time);
+    }
+
     public String getMove(int index) {
         return movedList.get(index);
+    }
+
+    public String getNewestMove() {
+        return movedList.get(movedList.size() - 1);
     }
 
     public String getNewestFEN() {
@@ -125,7 +148,7 @@ public class GameHistory {
         int index = algebraicNotationList.size() - 1;
         if (index >= 0) {
             String notation = algebraicNotationList.get(index);
-            if (notation.charAt(notation.length() - 1) == '+') {
+            if (notation.charAt(notation.length() - 1) == '+' && result != GameResult.DRAW) {
                 algebraicNotationList.remove(index);
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < notation.length() - 1; i++) {
@@ -147,7 +170,20 @@ public class GameHistory {
 
     public String getPGN(){
         StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < algebraicNotationList.size(); i++) {
+        int i;
+        for(i = 0; i < algebraicNotationList.size() - 1; i++) {
+            if (i % 2 == 0) {
+                builder.append(i / 2 + 1);
+                builder.append('.');
+                builder.append(' ');
+            }
+            builder.append(algebraicNotationList.get(i));
+            builder.append(' ');
+        }
+        String lastString = algebraicNotationList.get(i);
+        if (lastString.startsWith("1") || lastString.startsWith("0")) {
+            builder.append(lastString);
+        }else {
             if (i % 2 == 0) {
                 builder.append(i / 2 + 1);
                 builder.append('.');

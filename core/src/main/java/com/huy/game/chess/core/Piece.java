@@ -89,7 +89,7 @@ public abstract class Piece {
 
     public abstract List<Move> getValidMoves(Board board, Spot[][] spots,Spot checkSpot);
 
-    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot) {
+    public Map.Entry<Integer, Boolean> countSamePieceCanMoveToOneSpot(Board board, Spot[][] spots, Spot start, Spot checkSpot, int number) {
         return new AbstractMap.SimpleEntry<>(0, true);
     }
 }

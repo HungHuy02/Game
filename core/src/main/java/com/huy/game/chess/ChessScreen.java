@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.Timer;
 import com.huy.game.Main;
 import com.huy.game.chess.core.Board;
 import com.huy.game.chess.core.BoardSetting;
@@ -24,6 +25,7 @@ import com.huy.game.chess.core.Move;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
+import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
@@ -47,6 +49,7 @@ import com.huy.game.chess.ui.NotationHistoryScrollPane;
 import com.huy.game.chess.ui.OptionsPopup;
 import com.huy.game.chess.ui.PlayerInfo;
 import com.huy.game.chess.ui.TopAppBar;
+import com.huy.game.chess.ui.WaitTime;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -101,8 +104,8 @@ public class ChessScreen extends InputAdapter implements Screen {
         chessGameManager = new ChessGameManager(main.getMode(), Player.getInstance().isWhite(), main.timeType, main.stockfish, gameHistory, this);
         selectedSpot = null;
         setupUI(gameHistory);
-        setupBoard(gameHistory);
         setupInputMultiplexer();
+        setupBoard(gameHistory);
         handleSetupWithSpecificMode(gameHistory);
     }
 
@@ -130,6 +133,9 @@ public class ChessScreen extends InputAdapter implements Screen {
         gameHistory.addFEN(board, false);
         board.increaseTurn();
         hashing = new ZobristHashing(board.getSpots(), gameHistory);
+        AlgebraicNotation.changePGNToBoard("\n" +
+            "1. e4 c5 2. Nc3 Nc6 3. Nge2 Nd4 4. Nxd4 cxd4 5. Ne2 e5 6. c3 d5 7. cxd4 exd4 8. Qa4+ Bd7 9. Qxd4 dxe4 10. Qxe4+ Be7 11. Qxb7 Nf6 12. Nc3 O-O 13. Be2 Bc5 14. O-O Rb8 15. Qa6 Qc7 16. d4 Bxd4 17. g3 Bh3 18. Nb5 Qe5 19. Nxd4 Bxf1 20. Bxf1 Qxd4 21. Be3 Qxb2 22. Rd1 Rfd8 23. Re1 Qb4 24. Ra1 Nd5 25. Bxa7 Ra8 26. Bg2 Qe7 27. Bxd5 Rxd5 28. Qc6 Rad8 29. Be3 Rd1+ 30. Rxd1 Rxd1+ 31. Kg2 Rd6 32. Qc2 Qb7+ 33. f3 Ra6 34. Bd4 Qa8 35. Qf5 Rxa2+ 36. Kh1 Qc6 37. h4 Qc1+ 38. Bg1 Ra1 39. Kh2 Qxg1+ 40. Kh3 Qf1+ 41. Kg4 Qc4+ 42. Qe4 h5+ 43. Kf5 Ra5+ 44. Qe5 g6+ 45. Kf6 Qc6+ 46. Qd6 Qxd6+ "
+            , board, true, this);
     }
 
     public void setupInputMultiplexer() {
@@ -157,6 +163,8 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void setupPlayOnline() {
+        Timer timer = new Timer();
+        WaitTime waitTime = new WaitTime(bitmapFont, bundle, timer);
         ChessGameOnlineEvent.getInstance().setPlayerMoveListener(new ChessGameOnlineEvent.PlayerActionListener() {
             @Override
             public void onPlayerMove(String from, String to, MoveType type, int timeRemain) {
@@ -185,10 +193,44 @@ public class ChessScreen extends InputAdapter implements Screen {
                 }
                 endGamePopup.setNewScore(Player.getInstance().getElo(), newScore);
             }
+
+            @Override
+            public void onOpponentLeftMatch() {
+                if (Player.getInstance().isGuest()) {
+                    if (endGamePopup == null) {
+                        showEndGamePopup(Player.getInstance().isWhite() ? GameResult.WHITE_WIN : GameResult.BLACK_WIN);
+                    }
+                }else {
+                    waitTime.setupTimer(ChessScreen.this);
+                    stage.addActor(waitTime.getHorizontalGroup());
+                }
+            }
+
+            @Override
+            public void onOpponentComeback() {
+                waitTime.getHorizontalGroup().remove();
+                timer.clear();
+                main.socketClient.sendCurrentGameState(
+                    chessGameHistoryManager.getHistory().getNewestFEN(),
+                    Player.getInstance().getElo(),
+                    chessGameHistoryManager.getHistory().getNewestMove(),
+                    chessGameManager.getPlayerTime(Player.getInstance().isWhite()),
+                    chessGameManager.getPlayerTime(OpponentPlayer.getInstance().isWhite()));
+            }
+
+            @Override
+            public void currentGameState(String fen, int elo, String move, int playerTime, int opponentTime) {
+                board = FEN.fenToBoard(fen, chessImage);
+                chessGameManager.setTimeRemain(new int[] { playerTime, opponentTime});
+                chessGameHistoryManager.setNewHistory(fen, new int[] { playerTime, opponentTime});
+                chessGameHistoryManager.getHistory().handleMoveColor(board, move);
+            }
         });
         main.socketClient.getMoveFromOpponent();
         main.socketClient.opponentWantToDraw();
         main.socketClient.newScoreAfterGameEnd();
+        main.socketClient.opponentLeftMatch();
+        main.socketClient.opponentComeback();
     }
 
     @Override
@@ -345,7 +387,7 @@ public class ChessScreen extends InputAdapter implements Screen {
                     handleMoveWithOtherMode(move);
                 }else {
                     handleTakeBack();
-                    move.handleSpecialMove(this.board, chessImage);
+                    move.handleSpecialMove(this.board, chessImage, chessGameManager);
                 }
                 selectedSpot = null;
             }else {
@@ -398,8 +440,8 @@ public class ChessScreen extends InputAdapter implements Screen {
                     chessGameHistoryManager.setRePlay(false);
                     chessGameHistoryManager.returnOriginIndex();
                 }
-                String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage);
-                board.handleSoundAfterMove(aiMove.getEndPiece(), aiMove, chessSound, chessGameManager);
+                String text = aiMove.makeAIMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage, chessGameManager);
+                board.handleSoundAfterMove(aiMove, chessSound);
                 Gdx.app.postRunnable(() -> scrollPane.addValue(text, bitmapFont, manager, chessGameHistoryManager, chessImage));
                 chessGameHistoryManager.increaseIndex();
                 chessGameManager.switchPlayer(setting, chessGameHistoryManager, this);
@@ -423,10 +465,10 @@ public class ChessScreen extends InputAdapter implements Screen {
         }));
     }
 
-    private void handleMove(Move move) {
+    public void handleMove(Move move) {
         chessGameHistoryManager.increaseIndex();
-        scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage), bitmapFont, manager, chessGameHistoryManager, chessImage);
-        board.handleSoundAfterMove(move.getEndPiece(), move, chessSound, chessGameManager);
+        scrollPane.addValue(move.makeRealMove(board, hashing, chessGameHistoryManager.getHistory(), chessImage, chessGameManager), bitmapFont, manager, chessGameHistoryManager, chessImage);
+        board.handleSoundAfterMove(move, chessSound);
         chessGameManager.switchPlayer(setting, chessGameHistoryManager, this);
         board.setSuggestMove(null);
         board.setPolygonSprite(null);
@@ -484,9 +526,9 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     public void handleAfterShowEndGamePopup(GameResult result) {
-        switch (main.getMode()) {
-            case AI -> main.stockfish.destroy();
-            case ONLINE -> main.socketClient.gameEnd(result);
+        if (Objects.requireNonNull(main.getMode()) == ChessMode.ONLINE) {
+            if (chessGameManager.getCurrentPlayer().isWhite() != Player.getInstance().isWhite())
+                main.socketClient.gameEnd(result);
         }
     }
 

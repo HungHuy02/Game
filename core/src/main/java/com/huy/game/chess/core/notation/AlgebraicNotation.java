@@ -102,7 +102,7 @@ public class AlgebraicNotation {
     }
 
     private static void handleSamePieceCanMoveToOneSpot(StringBuilder builder , Board board, Spot start, Spot end, int pieceNumber) {
-        if (pieceNumber != 1) {
+        if (pieceNumber >= 2) {
             Map.Entry<Integer, Boolean> result = end.getPiece().countSamePieceCanMoveToOneSpot(board, board.getSpots(), start, end, pieceNumber);
             switch (result.getKey()) {
                 case 1 -> {
@@ -311,10 +311,10 @@ public class AlgebraicNotation {
                 }else {
                     Spot startSpot = board.getSpot(
                         changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                        changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                        changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                     Spot endSpot = board.getSpot(
                         changeRowAlgebraicNotationToRowPosition(notation.charAt(4)),
-                        changeRowAlgebraicNotationToRowPosition(notation.charAt(3)));
+                        changeColAlgebraicNotationToColPosition(notation.charAt(3)));
                     move = new Move(startSpot, endSpot);
                     move.setMoveType(MoveType.NORMAL);
                 }
@@ -322,10 +322,10 @@ public class AlgebraicNotation {
             case 6 -> {
                 Spot startSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                 Spot endSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(5)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(4)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(4)));
                 move = new Move(startSpot, endSpot);
                 move.setMoveType(MoveType.CAPTURE);
             }
@@ -350,9 +350,8 @@ public class AlgebraicNotation {
                                 move = new Move(checkSpot, board.getSpot(x, y));
                                 move.setMoveType(MoveType.NORMAL);
                                 return move;
-                            }else {
-                                break;
                             }
+                            break;
                         }
                         checkX += bishopMove[0];
                         checkY += bishopMove[1];
@@ -375,29 +374,112 @@ public class AlgebraicNotation {
                                     move = new Move(checkSpot, board.getSpot(x, y));
                                     move.setMoveType(MoveType.CAPTURE);
                                     return move;
-                                }else {
-                                    break;
                                 }
+                                break;
                             }
                             checkX += bishopMove[0];
                             checkY += bishopMove[1];
                         }
-
                     }
                 }else {
                     char c = notation.charAt(1);
                     if (c < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(c);
-                        int distance = startX - x;
-                        Spot start = board.getSpot(startX, y + distance);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        int directionX = Integer.signum(startX - x);
+                        int distance = Math.abs(startX - x);
+                        int startY = y + distance;
+                        Spot start = board.getSpot(startX, startY);
+                        Piece piece = start.getPiece();
+                        boolean isSpot = true;
+                        if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                            int checkX = startX - directionX;
+                            int checkY = startY - 1;
+                            while (checkX != x) {
+                                Spot checkSpot = board.getSpot(checkX, checkY);
+                                if (checkSpot.getPiece() != null) {
+                                    isSpot = false;
+                                    break;
+                                }
+                                checkX -= directionX;
+                                checkY--;
+                            }
+                        }else {
+                            isSpot = false;
+                        }
+                        if (!isSpot) {
+                            startY = y - distance;
+                            start = board.getSpot(startX, startY);
+                            piece = start.getPiece();
+                            isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                                int checkX = startX - directionX;
+                                int checkY = startY + 1;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX -= directionX;
+                                    checkY++;
+                                }
+                            } else {
+                                isSpot = false;
+                            }
+
+                        }
+                        if (isSpot) {
+                            move = new Move(start, board.getSpot(x, y));
+                            move.setMoveType(MoveType.NORMAL);
+                        }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(c);
-                        int distance = startY - y;
-                        Spot start = board.getSpot(x + distance, y);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        int directionY = Integer.signum(startY - y);
+                        int distance = Math.abs(startY - y);
+                        int startX = x + distance;
+                        Spot start = board.getSpot(startX, startY);
+                        Piece piece = start.getPiece();
+                        boolean isSpot = true;
+                        if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                            int checkX = startX - 1;
+                            int checkY = startY - directionY;
+                            while (checkX != x) {
+                                Spot checkSpot = board.getSpot(checkX, checkY);
+                                if (checkSpot.getPiece() != null) {
+                                    isSpot = false;
+                                    break;
+                                }
+                                checkX--;
+                                checkY -= directionY;
+                            }
+                        }else {
+                            isSpot = false;
+                        }
+                        if (!isSpot) {
+                            startX = x - distance;
+                            start = board.getSpot(startX, startY);
+                            piece = start.getPiece();
+                            isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                                int checkX = startX + 1;
+                                int checkY = startY - directionY;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX++;
+                                    checkY -= directionY;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                        }
+                        if (isSpot) {
+                            move = new Move(start, board.getSpot(x, y));
+                            move.setMoveType(MoveType.NORMAL);
+                        }
                     }
                 }
             }
@@ -408,21 +490,106 @@ public class AlgebraicNotation {
                     char c = notation.charAt(1);
                     if (c < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(c);
-                        int distance = startX - x;
-                        Spot start = board.getSpot(startX, y + distance);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.CAPTURE);
+                        int directionX = Integer.signum(startX - x);
+                        int distance = Math.abs(startX - x);
+                        int startY = y + distance;
+                        Spot start = board.getSpot(startX, startY);
+                        Piece piece = start.getPiece();
+                        boolean isSpot = true;
+                        if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                            int checkX = startX - directionX;
+                            int checkY = startY - 1;
+                            while (checkX != x) {
+                                Spot checkSpot = board.getSpot(checkX, checkY);
+                                if (checkSpot.getPiece() != null) {
+                                    isSpot = false;
+                                    break;
+                                }
+                                checkX -= directionX;
+                                checkY--;
+                            }
+                        }else {
+                            isSpot = false;
+                        }
+                        if (!isSpot) {
+                            startY = y - distance;
+                            start = board.getSpot(startX, startY);
+                            piece = start.getPiece();
+                            isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                                int checkX = startX - directionX;
+                                int checkY = startY + 1;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX -= directionX;
+                                    checkY++;
+                                }
+                            } else {
+                                isSpot = false;
+                            }
+
+                        }
+                        if (isSpot) {
+                            move = new Move(start, board.getSpot(x, y));
+                            move.setMoveType(MoveType.NORMAL);
+                        }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(c);
-                        int distance = startY - y;
-                        Spot start = board.getSpot(x + distance, y);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.CAPTURE);
+                        int directionY = Integer.signum(startY - y);
+                        int distance = Math.abs(startY - y);
+                        int startX = x + distance;
+                        Spot start = board.getSpot(startX, startY);
+                        Piece piece = start.getPiece();
+                        boolean isSpot = true;
+                        if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                            int checkX = startX - 1;
+                            int checkY = startY - directionY;
+                            while (checkX != x) {
+                                Spot checkSpot = board.getSpot(checkX, checkY);
+                                if (checkSpot.getPiece() != null) {
+                                    isSpot = false;
+                                    break;
+                                }
+                                checkX--;
+                                checkY -= directionY;
+                            }
+                        }else {
+                            isSpot = false;
+                        }
+                        if (!isSpot) {
+                            startX = x - distance;
+                            start = board.getSpot(startX, startY);
+                            piece = start.getPiece();
+                            isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.BISHOP && piece.isWhite() == isWhite) {
+                                int checkX = startX + 1;
+                                int checkY = startY - directionY;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX++;
+                                    checkY -= directionY;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                        }
+                        if (isSpot) {
+                            move = new Move(start, board.getSpot(x, y));
+                            move.setMoveType(MoveType.NORMAL);
+                        }
                     }
                 }else {
                     Spot startSpot = board.getSpot(
                         changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                        changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                        changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                     move = new Move(startSpot, board.getSpot(x, y));
                     move.setMoveType(MoveType.NORMAL);
                 }
@@ -430,10 +597,10 @@ public class AlgebraicNotation {
             case 6 -> {
                 Spot startSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                 Spot endSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(5)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(4)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(4)));
                 move = new Move(startSpot, endSpot);
                 move.setMoveType(MoveType.CAPTURE);
             }
@@ -494,47 +661,198 @@ public class AlgebraicNotation {
                     char c = notation.charAt(1);
                     if (c < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(c);
-                        Spot spot = board.getSpot(startX, y);
-                        Piece piece = spot.getPiece();
-                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
-                            int directionX = Integer.signum(startX - x);
-                            int checkX = directionX + x;
-                            while (checkX != startX) {
-                                Spot checkSpot = board.getSpot(checkX, y);
-                                if (checkSpot.getPiece() != null) {
+                        if (startX == x) {
+                            int startY = y + 1;
+                            while(startY >= 0 && startY < 8) {
+                                Spot spot = board.getSpot(startX, startY);
+                                Piece piece = spot.getPiece();
+                                if (piece != null) {
+                                    if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                    }
                                     break;
                                 }
-                                checkX += directionX;
+                                startY++;
                             }
-                            move = new Move(spot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.NORMAL);
+                            if (move == null) {
+                                startY = y - 1;
+                                while(startY >= 0 && startY < 8) {
+                                    Spot spot = board.getSpot(startX, startY);
+                                    Piece piece = spot.getPiece();
+                                    if (piece != null) {
+                                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                            move = new Move(spot, board.getSpot(x, y));
+                                            move.setMoveType(MoveType.NORMAL);
+                                        }
+                                        break;
+                                    }
+                                    startY--;
+                                }
+                            }
                         }else {
-                            int distance = startX - x;
-                            Spot startSpot = board.getSpot(startX, y + distance);
-                            move = new Move(startSpot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.NORMAL);
+                            int directionX = Integer.signum(startX - x);
+                            int distance = Math.abs(startX - x);
+                            int startY = y + distance;
+                            Spot start = board.getSpot(startX, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                int checkX = startX - directionX;
+                                int checkY = startY - 1;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX -= directionX;
+                                    checkY--;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                            if (!isSpot) {
+                                start = board.getSpot(startX, y);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX - directionX;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, y);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX -= directionX;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (!isSpot) {
+                                startY = y - distance;
+                                start = board.getSpot(startX, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX - directionX;
+                                    int checkY = startY + 1;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX -= directionX;
+                                        checkY++;
+                                    }
+                                } else {
+                                    isSpot = false;
+                                }
+
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
                         }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(c);
-                        Spot spot = board.getSpot(x, startY);
-                        Piece piece = spot.getPiece();
-                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
-                            int directionY = Integer.signum(startY - y);
-                            int checkY = directionY + y;
-                            while (checkY != startY) {
-                                Spot checkSpot = board.getSpot(x, checkY);
-                                if (checkSpot.getPiece() != null) {
+                        if (startY == y) {
+                            int startX = x + 1;
+                            while(startX >= 0 && startX < 8) {
+                                Spot spot = board.getSpot(startX, startY);
+                                Piece piece = spot.getPiece();
+                                if (piece != null) {
+                                    if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                    }
                                     break;
                                 }
-                                checkY += directionY;
+                                startX++;
                             }
-                            move = new Move(spot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.NORMAL);
+                            if (move == null) {
+                                startX = x - 1;
+                                while(startX >= 0 && startX < 8) {
+                                    Spot spot = board.getSpot(startX, startY);
+                                    Piece piece = spot.getPiece();
+                                    if (piece != null) {
+                                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                            move = new Move(spot, board.getSpot(x, y));
+                                            move.setMoveType(MoveType.NORMAL);
+                                        }
+                                        break;
+                                    }
+                                    startX--;
+                                }
+                            }
                         }else {
-                            int distance = startY - y;
-                            Spot startSpot = board.getSpot(x + distance, startY);
-                            move = new Move(startSpot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.NORMAL);
+                            int directionY = Integer.signum(startY - y);
+                            int distance = Math.abs(startY - y);
+                            int startX = x + distance;
+                            Spot start = board.getSpot(startX, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                int checkX = startX - 1;
+                                int checkY = startY - directionY;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX--;
+                                    checkY -= directionY;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                            if (!isSpot) {
+                                start = board.getSpot(x, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkY = startY - directionY;
+                                    while (checkY != y) {
+                                        Spot checkSpot = board.getSpot(x, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkY -= directionY;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (!isSpot) {
+                                startX = x - distance;
+                                start = board.getSpot(startX, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX + 1;
+                                    int checkY = startY - directionY;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX++;
+                                        checkY -= directionY;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
                         }
                     }
                 }
@@ -546,53 +864,204 @@ public class AlgebraicNotation {
                     char c = notation.charAt(1);
                     if (c < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(c);
-                        Spot spot = board.getSpot(startX, y);
-                        Piece piece = spot.getPiece();
-                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
-                            int directionX = Integer.signum(startX - x);
-                            int checkX = directionX + x;
-                            while (checkX != startX) {
-                                Spot checkSpot = board.getSpot(checkX, y);
-                                if (checkSpot.getPiece() != null) {
+                        if (startX == x) {
+                            int startY = y + 1;
+                            while(startY >= 0 && startY < 8) {
+                                Spot spot = board.getSpot(startX, startY);
+                                Piece piece = spot.getPiece();
+                                if (piece != null) {
+                                    if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                    }
                                     break;
                                 }
-                                checkX += directionX;
+                                startY++;
                             }
-                            move = new Move(spot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.CAPTURE);
+                            if (move == null) {
+                                startY = y - 1;
+                                while(startY >= 0 && startY < 8) {
+                                    Spot spot = board.getSpot(startX, startY);
+                                    Piece piece = spot.getPiece();
+                                    if (piece != null) {
+                                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                            move = new Move(spot, board.getSpot(x, y));
+                                            move.setMoveType(MoveType.NORMAL);
+                                        }
+                                        break;
+                                    }
+                                    startY--;
+                                }
+                            }
                         }else {
-                            int distance = startX - x;
-                            Spot startSpot = board.getSpot(startX, y + distance);
-                            move = new Move(startSpot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.CAPTURE);
+                            int directionX = Integer.signum(startX - x);
+                            int distance = Math.abs(startX - x);
+                            int startY = y + distance;
+                            Spot start = board.getSpot(startX, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                int checkX = startX - directionX;
+                                int checkY = startY - 1;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX -= directionX;
+                                    checkY--;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                            if (!isSpot) {
+                                start = board.getSpot(startX, y);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX - directionX;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, y);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX -= directionX;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (!isSpot) {
+                                startY = y - distance;
+                                start = board.getSpot(startX, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX - directionX;
+                                    int checkY = startY + 1;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX -= directionX;
+                                        checkY++;
+                                    }
+                                } else {
+                                    isSpot = false;
+                                }
+
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
                         }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(c);
-                        Spot spot = board.getSpot(x, startY);
-                        Piece piece = spot.getPiece();
-                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
-                            int directionY = Integer.signum(startY - y);
-                            int checkY = directionY + y;
-                            while (checkY != startY) {
-                                Spot checkSpot = board.getSpot(x, checkY);
-                                if (checkSpot.getPiece() != null) {
+                        if (startY == y) {
+                            int startX = x + 1;
+                            while(startX >= 0 && startX < 8) {
+                                Spot spot = board.getSpot(startX, startY);
+                                Piece piece = spot.getPiece();
+                                if (piece != null) {
+                                    if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                    }
                                     break;
                                 }
-                                checkY += directionY;
+                                startX++;
                             }
-                            move = new Move(spot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.CAPTURE);
+                            if (move == null) {
+                                startX = x - 1;
+                                while(startX >= 0 && startX < 8) {
+                                    Spot spot = board.getSpot(startX, startY);
+                                    Piece piece = spot.getPiece();
+                                    if (piece != null) {
+                                        if (piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                            move = new Move(spot, board.getSpot(x, y));
+                                            move.setMoveType(MoveType.NORMAL);
+                                        }
+                                        break;
+                                    }
+                                    startX--;
+                                }
+                            }
                         }else {
-                            int distance = startY - y;
-                            Spot startSpot = board.getSpot(x + distance, startY);
-                            move = new Move(startSpot, board.getSpot(x, y));
-                            move.setMoveType(MoveType.CAPTURE);
+                            int directionY = Integer.signum(startY - y);
+                            int distance = Math.abs(startY - y);
+                            int startX = x + distance;
+                            Spot start = board.getSpot(startX, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                int checkX = startX - 1;
+                                int checkY = startY - directionY;
+                                while (checkX != x) {
+                                    Spot checkSpot = board.getSpot(checkX, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX--;
+                                    checkY -= directionY;
+                                }
+                            }else {
+                                isSpot = false;
+                            }
+                            if (!isSpot) {
+                                start = board.getSpot(x, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkY = startY - directionY;
+                                    while (checkY != y) {
+                                        Spot checkSpot = board.getSpot(x, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkY -= directionY;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (!isSpot) {
+                                startX = x - distance;
+                                start = board.getSpot(startX, startY);
+                                piece = start.getPiece();
+                                isSpot = true;
+                                if (piece != null && piece.getType() == PieceType.QUEEN && piece.isWhite() == isWhite) {
+                                    int checkX = startX + 1;
+                                    int checkY = startY - directionY;
+                                    while (checkX != x) {
+                                        Spot checkSpot = board.getSpot(checkX, checkY);
+                                        if (checkSpot.getPiece() != null) {
+                                            isSpot = false;
+                                            break;
+                                        }
+                                        checkX++;
+                                        checkY -= directionY;
+                                    }
+                                }else {
+                                    isSpot = false;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
                         }
                     }
                 }else {
                     Spot startSpot = board.getSpot(
                         changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                        changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                        changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                     move = new Move(startSpot, board.getSpot(x, y));
                     move.setMoveType(MoveType.NORMAL);
                 }
@@ -600,10 +1069,10 @@ public class AlgebraicNotation {
             case 6 -> {
                 Spot startSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                 Spot endSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(5)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(4)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(4)));
                 move = new Move(startSpot, endSpot);
                 move.setMoveType(MoveType.CAPTURE);
             }
@@ -664,14 +1133,108 @@ public class AlgebraicNotation {
                     char c = notation.charAt(1);
                     if (c < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(c);
-                        Spot start = board.getSpot(startX, y);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        if (startX == x) {
+                            int checkY = y + 1;
+                            while(checkY >= 0 && checkY < 8) {
+                                Spot spot = board.getSpot(x, checkY);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkY++;
+                            }
+                            checkY = y - 1;
+                            while (checkY >= 0 && checkY < 8) {
+                                Spot spot = board.getSpot(x, checkY);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkY--;
+                            }
+                        }else {
+                            int directionX = Integer.signum(startX - x);
+                            int checkX = x + directionX;
+                            Spot start = board.getSpot(startX, y);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                while (checkX != startX) {
+                                    Spot checkSpot = board.getSpot(checkX, y);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX += directionX;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
+                        }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(c);
-                        Spot start = board.getSpot(x, startY);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        if (startY == y) {
+                            int checkX = x + 1;
+                            while(checkX >= 0 && checkX < 8) {
+                                Spot spot = board.getSpot(checkX, y);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkX++;
+                            }
+                            checkX = x - 1;
+                            while (checkX >= 0 && checkX < 8) {
+                                Spot spot = board.getSpot(checkX, y);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.NORMAL);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkX--;
+                            }
+                        }else {
+                            int directionY = Integer.signum(startY - y);
+                            int checkY = y + directionY;
+                            Spot start = board.getSpot(x, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                while (checkY != startY) {
+                                    Spot checkSpot = board.getSpot(x, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkY += directionY;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.NORMAL);
+                            }
+                        }
                     }
                 }
             }
@@ -683,19 +1246,113 @@ public class AlgebraicNotation {
                     char check = notation.charAt(1);
                     if (check < 'a') {
                         int startX = changeRowAlgebraicNotationToRowPosition(check);
-                        Spot start = board.getSpot(startX, y);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.CAPTURE);
+                        if (startX == x) {
+                            int checkY = y + 1;
+                            while(checkY >= 0 && checkY < 8) {
+                                Spot spot = board.getSpot(x, checkY);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.CAPTURE);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkY++;
+                            }
+                            checkY = y - 1;
+                            while (checkY >= 0 && checkY < 8) {
+                                Spot spot = board.getSpot(x, checkY);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.CAPTURE);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkY--;
+                            }
+                        }else {
+                            int directionX = Integer.signum(startX - x);
+                            int checkX = x + directionX;
+                            Spot start = board.getSpot(startX, y);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                while (checkX != startX) {
+                                    Spot checkSpot = board.getSpot(checkX, y);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkX += directionX;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.CAPTURE);
+                            }
+                        }
                     }else {
                         int startY = changeColAlgebraicNotationToColPosition(check);
-                        Spot start = board.getSpot(x, startY);
-                        move = new Move(start, board.getSpot(x, y));
-                        move.setMoveType(MoveType.CAPTURE);
+                        if (startY == y) {
+                            int checkX = x + 1;
+                            while(checkX >= 0 && checkX < 8) {
+                                Spot spot = board.getSpot(checkX, y);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.CAPTURE);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkX++;
+                            }
+                            checkX = x - 1;
+                            while (checkX >= 0 && checkX < 8) {
+                                Spot spot = board.getSpot(checkX, y);
+                                Piece piece = spot.getPiece();
+                                if(piece != null) {
+                                    if (piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                        move = new Move(spot, board.getSpot(x, y));
+                                        move.setMoveType(MoveType.CAPTURE);
+                                        return move;
+                                    }
+                                    break;
+                                }
+                                checkX--;
+                            }
+                        }else {
+                            int directionY = Integer.signum(startY - y);
+                            int checkY = y + directionY;
+                            Spot start = board.getSpot(x, startY);
+                            Piece piece = start.getPiece();
+                            boolean isSpot = true;
+                            if (piece != null && piece.getType() == PieceType.ROOK && piece.isWhite() == isWhite) {
+                                while (checkY != startY) {
+                                    Spot checkSpot = board.getSpot(x, checkY);
+                                    if (checkSpot.getPiece() != null) {
+                                        isSpot = false;
+                                        break;
+                                    }
+                                    checkY += directionY;
+                                }
+                            }
+                            if (isSpot) {
+                                move = new Move(start, board.getSpot(x, y));
+                                move.setMoveType(MoveType.CAPTURE);
+                            }
+                        }
                     }
                 }else {
                     Spot startSpot = board.getSpot(
                         changeRowAlgebraicNotationToRowPosition(c),
-                        changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                        changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                     move = new Move(startSpot, board.getSpot(x, y));
                     move.setMoveType(MoveType.NORMAL);
                 }
@@ -703,10 +1360,10 @@ public class AlgebraicNotation {
             case 6 -> {
                 Spot startSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(2)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(1)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(1)));
                 Spot endSpot = board.getSpot(
                     changeRowAlgebraicNotationToRowPosition(notation.charAt(5)),
-                    changeRowAlgebraicNotationToRowPosition(notation.charAt(4)));
+                    changeColAlgebraicNotationToColPosition(notation.charAt(4)));
                 move = new Move(startSpot, endSpot);
                 move.setMoveType(MoveType.CAPTURE);
             }
@@ -726,20 +1383,20 @@ public class AlgebraicNotation {
                     Piece piece = checkSpot.getPiece();
                     if (piece != null && piece.getType() == PieceType.PAWN) {
                         move = new Move(checkSpot, board.getSpot(x, y));
-                        move.setMoveType(MoveType.DOUBLE_STEP_PAWN);
+                        move.setMoveType(MoveType.NORMAL);
                     } else {
                         move = new Move(board.getSpot(x - 2, y), board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        move.setMoveType(MoveType.DOUBLE_STEP_PAWN);
                     }
                 }else {
                     checkSpot = board.getSpot(x + 1, y);
                     Piece piece = checkSpot.getPiece();
                     if (piece != null && piece.getType() == PieceType.PAWN) {
                         move = new Move(checkSpot, board.getSpot(x, y));
-                        move.setMoveType(MoveType.DOUBLE_STEP_PAWN);
+                        move.setMoveType(MoveType.NORMAL);
                     } else {
                         move = new Move(board.getSpot(x + 2, y), board.getSpot(x, y));
-                        move.setMoveType(MoveType.NORMAL);
+                        move.setMoveType(MoveType.DOUBLE_STEP_PAWN);
                     }
                 }
             }
@@ -751,7 +1408,13 @@ public class AlgebraicNotation {
                     int startY = changeColAlgebraicNotationToColPosition(notation.charAt(0));
                     int startX = isWhite ? x - 1 : x + 1;
                     move = new Move(board.getSpot(startX, startY), board.getSpot(x, y));
-                    move.setMoveType(MoveType.CAPTURE);
+                    Spot checkSpot = board.getSpot(startX, y);
+                    Piece checkPiece = checkSpot.getPiece();
+                    if (checkPiece != null && checkPiece.getType() == PieceType.PAWN && checkPiece.isWhite() != isWhite) {
+                        move.setMoveType(MoveType.EN_PASSANT);
+                    }else {
+                        move.setMoveType(MoveType.CAPTURE);
+                    }
                 }else {
                     int x = changeRowAlgebraicNotationToRowPosition(c);
                     int y = changeColAlgebraicNotationToColPosition(notation.charAt(0));

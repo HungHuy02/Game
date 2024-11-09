@@ -14,5 +14,10 @@ public interface SocketClient {
     void opponentWantToDraw();
     void gameEnd(GameResult gameResult);
     void newScoreAfterGameEnd();
+    void opponentLeftMatch();
+    void opponentComeback();
+    void sendCurrentGameState(String fen, int elo, String move, int playerTime, int opponentTime);
+    void currentGameState();
+    void arePlaying();
     void disconnect();
 }

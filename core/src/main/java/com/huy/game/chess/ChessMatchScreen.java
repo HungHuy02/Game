@@ -80,19 +80,29 @@ public class ChessMatchScreen extends InputAdapter implements Screen {
         stage.addActor(bottomAppBar.getStack());
         Gdx.input.setInputProcessor(stage);
 
-        ChessGameOnlineEvent.getInstance().setMatchListener((name, isWhite, imageUrl) -> {
-            OpponentPlayer.getInstance().setData(name, isWhite, OpponentPlayer.getInstance().isGuest() ? null : imageUrl);
-            if(isWhite) {
-                setting.setRotate(true);
+        ChessGameOnlineEvent.getInstance().setMatchListener(new ChessGameOnlineEvent.MatchListener() {
+            @Override
+            public void onSuccessfulMatch(String name, boolean isWhite, String imageUrl) {
+                OpponentPlayer.getInstance().setData(name, isWhite, OpponentPlayer.getInstance().isGuest() ? null : imageUrl);
+                if(isWhite) {
+                    setting.setRotate(true);
+                }
+                Player.getInstance().setWhite(!isWhite);
+                Gdx.app.postRunnable(main::toChessScreen);
             }
-            Player.getInstance().setWhite(!isWhite);
-            Gdx.app.postRunnable(main::toChessScreen);
+
+            @Override
+            public void onArePlaying() {
+                Gdx.app.postRunnable(main::toChessScreen);
+            }
         });
         main.socketClient.requestToPlayGame(
             Player.getInstance().getName(),
             Player.getInstance().isGuest() ? "" : Player.getInstance().getImageUrl(),
             Player.getInstance().getElo(),
             main.timeType);
+        main.socketClient.arePlaying();
+        main.socketClient.currentGameState();
     }
 
     @Override
