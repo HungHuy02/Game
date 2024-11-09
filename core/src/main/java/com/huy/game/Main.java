@@ -37,7 +37,7 @@ public class Main extends Game {
     private final ChessMode mode;
     private boolean isRotateBoard;
     public TimeType timeType;
-    private boolean enableSuggesting = false;
+    public boolean enableSuggesting = false;
     private boolean enableTakeback = false;
 
     public Main(ChessMode mode, TimeType timeType,boolean isRotateBoard, BackInterface backInterface) {

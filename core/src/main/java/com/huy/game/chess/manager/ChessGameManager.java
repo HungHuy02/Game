@@ -172,7 +172,7 @@ public class ChessGameManager {
                     timeList.put(key, 0);
                     GameResult result;
                     if (isDrawByInsufficientPieceAfterTimeout()) {
-                        result = GameResult.DRAW;
+                        result = GameResult.DRAW_INSUFFICIENT;
                     }else {
                         result = currentPlayer.isWhite() ? GameResult.BLACK_WIN : GameResult.WHITE_WIN;
                     }

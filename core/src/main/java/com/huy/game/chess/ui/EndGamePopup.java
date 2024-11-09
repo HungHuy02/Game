@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -40,12 +41,12 @@ public class EndGamePopup {
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         endGamePopup = new Window("", skin);
-        endGamePopup.setSize(Gdx.graphics.getWidth() - 100, 396);
+        endGamePopup.setSize(Gdx.graphics.getWidth() - 100, 496);
         endGamePopup.setPosition((Gdx.graphics.getWidth() - endGamePopup.getWidth()) / 2,
             (Gdx.graphics.getHeight() - endGamePopup.getHeight()) / 2);
         endGamePopup.add(stack(manager, labelStyle,bundle)).fillX().expandX().height(100).padTop(32);
         endGamePopup.row();
-        endGamePopup.add(winText(labelStyle, bundle, result)).center().height(100);
+        endGamePopup.add(winText(labelStyle, bundle, result)).center().height(200);
         endGamePopup.row();
         newScore(labelStyle);
         endGamePopup.add(newScoreLabel).padBottom(32);
@@ -79,13 +80,44 @@ public class EndGamePopup {
         return stack;
     }
 
-    private Label winText(Label.LabelStyle style, I18NBundle bundle, GameResult result) {
-        String text = switch (result) {
-            case WHITE_WIN -> bundle.get("whiteWin");
-            case BLACK_WIN -> bundle.get("blackWin");
-            case DRAW -> bundle.get("draw");
+    private VerticalGroup winText(Label.LabelStyle style, I18NBundle bundle, GameResult result) {
+        VerticalGroup verticalGroup = new VerticalGroup();
+        String title;
+        String reason = switch (result) {
+            case WHITE_WIN -> {
+                title = bundle.get("whiteWin");
+                yield bundle.get("checkmate");
+            }
+            case BLACK_WIN -> {
+                title = bundle.get("blackWin");
+                yield bundle.get("checkmate");
+            }
+            case DRAW_STALEMATE -> {
+                title = bundle.get("draw");
+                yield bundle.get("stalemate");
+            }
+            case DRAW_THREEFOLD -> {
+                title = bundle.get("draw");
+                yield bundle.get("threefold");
+            }
+            case DRAW_FIFTY_MOVE -> {
+                title = bundle.get("draw");
+                yield bundle.get("fifty-move");
+            }
+            case DRAW_INSUFFICIENT -> {
+                title = bundle.get("draw");
+                yield bundle.get("insufficient");
+            }
+            case DRAW_AGREEMENT -> {
+                title = bundle.get("draw");
+                yield bundle.get("agreement");
+            }
         };
-        return new Label( text, style);
+        Label winText = new Label(title, style);
+        Label reasonText = new Label(reason, style);
+        verticalGroup.addActor(winText);
+        verticalGroup.addActor(reasonText);
+        return verticalGroup;
     }
 
     private void newScore(Label.LabelStyle style) {

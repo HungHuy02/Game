@@ -142,7 +142,7 @@ public class SocketIOClient implements SocketClient {
     @Override
     public void gameEnd(GameResult gameResult) {
         String result = switch (gameResult) {
-            case DRAW -> "draw";
+            case DRAW_AGREEMENT, DRAW_STALEMATE, DRAW_INSUFFICIENT, DRAW_FIFTY_MOVE, DRAW_THREEFOLD -> "draw";
             case WHITE_WIN -> "white";
             case BLACK_WIN -> "black";
         };

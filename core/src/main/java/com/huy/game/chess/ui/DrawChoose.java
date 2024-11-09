@@ -60,7 +60,7 @@ public class DrawChoose {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                main.socketClient.gameEnd(GameResult.DRAW);
+                main.socketClient.gameEnd(GameResult.DRAW_AGREEMENT);
                 timer.clear();
                 horizontalGroup.remove();
             }

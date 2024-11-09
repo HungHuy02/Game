@@ -224,6 +224,27 @@ public class Move {
                     }
                 }
             }
+            case CAPTURE -> {
+                switch (startPiece.getType()) {
+                    case ROOK -> {
+                        if(start.getY() == 7) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingKingSide(false);
+                            }
+                        }
+                        if (start.getY() == 0) {
+                            if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                                king.setCanCastlingQueenSide(false);
+                            }
+                        }
+                    }
+                    case KING -> {
+                        if (board.getKingSpot(startPiece.isWhite()).getPiece() instanceof King king) {
+                            king.setHasMove();
+                        }
+                    }
+                }
+            }
             case DOUBLE_STEP_PAWN -> {
                 Spot pawnSpot = board.getSpot(end.getX(), end.getY());
                 if(pawnSpot.getPiece() instanceof Pawn pawn) {

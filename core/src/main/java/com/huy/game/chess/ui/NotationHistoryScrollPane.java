@@ -142,7 +142,7 @@ public class NotationHistoryScrollPane {
     }
 
     public void handleEndGameWithCheckMate(GameResult result, String text) {
-        if (result != GameResult.DRAW) {
+        if (result == GameResult.WHITE_WIN || result == GameResult.BLACK_WIN) {
             Actor child = horizontalGroup.getChild(horizontalGroup.getChildren().size - 1);
             if(child instanceof TextButton button) {
                 button.setText(text);

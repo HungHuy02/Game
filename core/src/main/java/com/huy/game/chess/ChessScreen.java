@@ -133,9 +133,6 @@ public class ChessScreen extends InputAdapter implements Screen {
         gameHistory.addFEN(board, false);
         board.increaseTurn();
         hashing = new ZobristHashing(board.getSpots(), gameHistory);
-        AlgebraicNotation.changePGNToBoard("\n" +
-            "1. e4 c5 2. Nc3 Nc6 3. Nge2 Nd4 4. Nxd4 cxd4 5. Ne2 e5 6. c3 d5 7. cxd4 exd4 8. Qa4+ Bd7 9. Qxd4 dxe4 10. Qxe4+ Be7 11. Qxb7 Nf6 12. Nc3 O-O 13. Be2 Bc5 14. O-O Rb8 15. Qa6 Qc7 16. d4 Bxd4 17. g3 Bh3 18. Nb5 Qe5 19. Nxd4 Bxf1 20. Bxf1 Qxd4 21. Be3 Qxb2 22. Rd1 Rfd8 23. Re1 Qb4 24. Ra1 Nd5 25. Bxa7 Ra8 26. Bg2 Qe7 27. Bxd5 Rxd5 28. Qc6 Rad8 29. Be3 Rd1+ 30. Rxd1 Rxd1+ 31. Kg2 Rd6 32. Qc2 Qb7+ 33. f3 Ra6 34. Bd4 Qa8 35. Qf5 Rxa2+ 36. Kh1 Qc6 37. h4 Qc1+ 38. Bg1 Ra1 39. Kh2 Qxg1+ 40. Kh3 Qf1+ 41. Kg4 Qc4+ 42. Qe4 h5+ 43. Kf5 Ra5+ 44. Qe5 g6+ 45. Kf6 Qc6+ 46. Qd6 Qxd6+ "
-            , board, true, this);
     }
 
     public void setupInputMultiplexer() {
@@ -189,7 +186,7 @@ public class ChessScreen extends InputAdapter implements Screen {
             @Override
             public void onNewScore(int newScore) {
                 if (endGamePopup == null) {
-                    showEndGamePopup(GameResult.DRAW);
+                    showEndGamePopup(GameResult.DRAW_AGREEMENT);
                 }
                 endGamePopup.setNewScore(Player.getInstance().getElo(), newScore);
             }
@@ -427,7 +424,11 @@ public class ChessScreen extends InputAdapter implements Screen {
                 move.getEnd().getX() + "" + move.getEnd().getY(),
                 move.getMoveType(),
                 chessGameManager.getTimeRemainForOnlineMode());
-            case AI -> handleAIMove();
+            case AI -> {
+                if (endGamePopup == null) {
+                    handleAIMove();
+                }
+            }
         }
     }
 
@@ -487,13 +488,15 @@ public class ChessScreen extends InputAdapter implements Screen {
             if(move.isCheck()) {
                gameResult = chessGameManager.getCurrentPlayer().isWhite() ? GameResult.BLACK_WIN : GameResult.WHITE_WIN;
             }else {
-               gameResult = GameResult.DRAW;
+               gameResult = GameResult.DRAW_STALEMATE;
             }
         }else{
-            if (chessGameHistoryManager.getHistory().checkThreefoldRepetition()
-                || chessGameHistoryManager.getHistory().check50MovesRule()
-                || chessGameManager.isDrawByInsufficientPiece()) {
-                gameResult = GameResult.DRAW;
+            if (chessGameHistoryManager.getHistory().checkThreefoldRepetition()) {
+                gameResult = GameResult.DRAW_THREEFOLD;
+            } else if(chessGameHistoryManager.getHistory().check50MovesRule()) {
+                gameResult = GameResult.DRAW_FIFTY_MOVE;
+            } else if(chessGameManager.isDrawByInsufficientPiece()) {
+                gameResult = GameResult.DRAW_INSUFFICIENT;
             }
         }
         if (gameResult != null) {
@@ -526,9 +529,12 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     public void handleAfterShowEndGamePopup(GameResult result) {
-        if (Objects.requireNonNull(main.getMode()) == ChessMode.ONLINE) {
-            if (chessGameManager.getCurrentPlayer().isWhite() != Player.getInstance().isWhite())
-                main.socketClient.gameEnd(result);
+        switch (main.getMode()) {
+            case ONLINE -> {
+                if (chessGameManager.getCurrentPlayer().isWhite() != Player.getInstance().isWhite())
+                    main.socketClient.gameEnd(result);
+            }
+            case AI -> setting.setSuggestMove(false);
         }
     }
 
@@ -538,9 +544,13 @@ public class ChessScreen extends InputAdapter implements Screen {
         scrollPane.reset();
         setupInputMultiplexer();
         chessGameManager.reset(chessGameHistoryManager.getHistory(), this);
+        endGamePopup = null;
         if (main.getMode() != ChessMode.TWO_PERSONS) {
             if (main.getMode() == ChessMode.AI) {
                 main.stockfish.setupNewGame();
+                if (main.enableSuggesting) {
+                    setting.setSuggestMove(true);
+                }
             }
             handleSetupWithSpecificMode(chessGameHistoryManager.getHistory());
         }

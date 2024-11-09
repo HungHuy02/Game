@@ -148,7 +148,7 @@ public class GameHistory {
         int index = algebraicNotationList.size() - 1;
         if (index >= 0) {
             String notation = algebraicNotationList.get(index);
-            if (notation.charAt(notation.length() - 1) == '+' && result != GameResult.DRAW) {
+            if (notation.charAt(notation.length() - 1) == '+' && (result == GameResult.BLACK_WIN || result == GameResult.WHITE_WIN)) {
                 algebraicNotationList.remove(index);
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < notation.length() - 1; i++) {
@@ -163,7 +163,7 @@ public class GameHistory {
         switch (result) {
             case WHITE_WIN -> algebraicNotationList.add("1-0");
             case BLACK_WIN -> algebraicNotationList.add("0-1");
-            case DRAW -> algebraicNotationList.add("1/2-1/2");
+            case DRAW_THREEFOLD, DRAW_AGREEMENT, DRAW_INSUFFICIENT, DRAW_STALEMATE, DRAW_FIFTY_MOVE -> algebraicNotationList.add("1/2-1/2");
         }
 
     }
