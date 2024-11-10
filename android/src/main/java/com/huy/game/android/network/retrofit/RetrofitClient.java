@@ -15,6 +15,8 @@ import com.huy.game.android.utils.Constants;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.android.view.LoginWayActivity;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -61,6 +63,9 @@ public class RetrofitClient {
 
     private OkHttpClient setupOkHttpClient(Context context)  {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        httpClient.readTimeout(10, TimeUnit.SECONDS);
+        httpClient.connectTimeout(10, TimeUnit.SECONDS);
 
         httpClient.addInterceptor(chain -> {
             Request originalRequest = chain.request();

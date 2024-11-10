@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".android.view.LoginWayActivity">
+    tools:context=".android.view.LoginWayActivity"
+    android:background="@color/white">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"

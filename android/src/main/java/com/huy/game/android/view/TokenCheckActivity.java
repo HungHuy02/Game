@@ -88,5 +88,6 @@ public class TokenCheckActivity extends BaseActivity {
     private void toMainActivity() {
         Intent intent = new Intent(TokenCheckActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 }
