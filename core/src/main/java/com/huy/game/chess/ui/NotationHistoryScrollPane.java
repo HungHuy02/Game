@@ -66,6 +66,10 @@ public class NotationHistoryScrollPane {
             }
         });
         horizontalGroup.addActor(button);
+        updateScrollPaneToLastValue();
+    }
+
+    public void updateScrollPaneToLastValue() {
         scrollPane.layout();
         scrollPane.setScrollX(horizontalGroup.getWidth());
     }

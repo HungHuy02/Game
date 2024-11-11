@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.huy.game.Main;
 import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.network.socketio.AuthToken;
+import com.huy.game.android.roomdatabase.repository.HistoryRepository;
 import com.huy.game.android.stockfish.StockfishAndroid;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.chess.enums.ChessMode;
@@ -23,11 +24,13 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Main main = null;
         Intent intent = getIntent();
         ChessMode mode =  ChessMode.valueOf(intent.getStringExtra(Constants.BUNDLE_MODE));
         TimeType type = TimeType.valueOf(intent.getStringExtra(Constants.BUNDLE_TIME));
         AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
         configuration.useImmersiveMode = true;
+        boolean isWatching = intent.getBooleanExtra(Constants.BUNDLE_WATCHING_HISTORY, false);
         switch (mode) {
             case AI, TWO_PERSONS -> {
                 PieceColor player1Color = PieceColor.valueOf(intent.getStringExtra(Constants.BUNDLE_PLAYER1_COLOR));
@@ -40,9 +43,9 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
                     boolean enableSuggesting = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_SUGGEST, false);
                     boolean enableTakeback = intent.getBooleanExtra(Constants.BUNDLE_ENABLE_TAKEBACK, false);
                     int level = intent.getIntExtra(Constants.BUNDLE_AI_LEVEL, 1);
-                    initialize(new Main(mode, enableSuggesting, enableTakeback, type, new StockfishAndroid(getApplicationContext(), level, enableSuggesting), this), configuration);
+                    main = new Main(mode, enableSuggesting, enableTakeback, type, new StockfishAndroid(getApplicationContext(), level, enableSuggesting), this, new HistoryRepository(), isWatching);
                 }else {
-                    initialize(new Main(mode, type, isRotateBoard, this), configuration);
+                    main = new Main(mode, type, isRotateBoard, this, new HistoryRepository(), isWatching);
                 }
             }
             case ONLINE -> {
@@ -52,9 +55,12 @@ public class AndroidLauncher extends AndroidApplication implements BackInterface
                 }else {
                     Player.getInstance().setData(player1Name, UserState.getInstance().getImageUrl(), UserState.getInstance().getElo());
                 }
-                initialize(new Main(mode, type, new SocketIOClient(new AuthToken(getApplicationContext())), this, UserState.getInstance().isGuest()), configuration);
+                main = new Main(mode, type, new SocketIOClient(new AuthToken(getApplicationContext())), this, UserState.getInstance().isGuest(), new HistoryRepository(), isWatching);
             }
         }
+        String pgn = intent.getStringExtra(Constants.BUNDLE_PGN);
+        main.setPGN(pgn);
+        initialize(main, configuration);
     }
 
     @Override

@@ -52,13 +52,23 @@ public class MainActivity extends BaseActivity {
                     if (Boolean.TRUE.equals(networkWatcher.getValue())) {
                         getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment, new RankFragment())
+                            .replace(R.id.fragment, new HistoryFragment())
                             .commit();
                         bottomId = itemId;
                         return true;
                     }
                     return false;
-                }else {
+                }  else if (itemId == R.id.item_3) {
+                if (Boolean.TRUE.equals(networkWatcher.getValue())) {
+                    getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment, new RankFragment())
+                        .commit();
+                    bottomId = itemId;
+                    return true;
+                }
+                return false;
+            }else {
                     return false;
                 }
             }else {

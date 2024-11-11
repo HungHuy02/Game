@@ -21,13 +21,25 @@ public class ChessGameManager {
     private Timer timer;
     private Map<String, Integer> timeList;
     private int plusTime;
-    private final TimeType timeType;
+    private TimeType timeType;
 
-    public ChessGameManager(ChessMode mode, boolean isWhite, TimeType timeType,Stockfish stockfish, GameHistory history, ChessScreen screen) {
+    public ChessGameManager(
+        ChessMode mode,
+        boolean isWhite,
+        TimeType timeType,
+        Stockfish stockfish,
+        GameHistory history,
+        ChessScreen screen) {
         this.timeType = timeType;
         int time = handleTime();
         setupPlayer(mode,isWhite, stockfish, time);
         setupTime(time, history, screen);
+    }
+
+    public ChessGameManager(boolean isWhite) {
+        player1 = new ChessPlayer(isWhite, 0);
+        player2 = new ChessPlayer(!isWhite, 0);
+        currentPlayer = isWhite ? player1 : player2;
     }
 
     private int handleTime() {
@@ -85,7 +97,7 @@ public class ChessGameManager {
             timeList.put("play2", 0);
             timeList.put("1", time);
             timeList.put("2", time);
-            handleTimer("1", screen);
+            handleTimer(player1.isWhite() ? "1" : "2", screen);
             history.addTimeRemain(0, time, time);
         }
     }
@@ -123,6 +135,14 @@ public class ChessGameManager {
 
         if (setting.isAutoRotate()) {
             setting.setRotate(!setting.isRotate());
+        }
+    }
+
+    public void switchPlayer() {
+        if(currentPlayer == player1) {
+            currentPlayer = player2;
+        }else {
+            currentPlayer = player1;
         }
     }
 

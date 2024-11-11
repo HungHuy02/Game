@@ -42,7 +42,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private RankRowLayoutBinding binding;
+        private final RankRowLayoutBinding binding;
 
         public ViewHolder(RankRowLayoutBinding binding) {
             super(binding.getRoot());

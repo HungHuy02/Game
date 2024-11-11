@@ -40,6 +40,7 @@ import com.huy.game.chess.manager.ChessOnlinePlayer;
 import com.huy.game.chess.manager.ChessSound;
 import com.huy.game.chess.manager.OpponentPlayer;
 import com.huy.game.chess.manager.Player;
+import com.huy.game.chess.model.HistoryModel;
 import com.huy.game.chess.ui.BottomAppBar;
 import com.huy.game.chess.ui.CheckPopup;
 import com.huy.game.chess.ui.Colors;
@@ -535,6 +536,17 @@ public class ChessScreen extends InputAdapter implements Screen {
                     main.socketClient.gameEnd(result);
             }
             case AI -> setting.setSuggestMove(false);
+        }
+        if (main.localDatabase != null) {
+            HistoryModel model = new HistoryModel(
+                main.timeType,
+                OpponentPlayer.getInstance().getImageUrl(),
+                OpponentPlayer.getInstance().isWhite(),
+                OpponentPlayer.getInstance().getName(),
+                result,
+                main.getMode(),
+                chessGameHistoryManager.getHistory().getPGN());
+            main.localDatabase.insert(model);
         }
     }
 

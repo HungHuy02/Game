@@ -28,6 +28,10 @@ public class PlayerInfo {
         horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, timeList, timeType);
     }
 
+    public PlayerInfo(String name, Map<String, Integer> map, ChessImage chessImage, Texture image, boolean isWhite, boolean isPlayer1, BitmapFont font) {
+        horizontalGroup(name, map, chessImage, image, isWhite, isPlayer1, font, null, TimeType.NO_TIME);
+    }
+
     public PlayerInfo() {}
 
     public HorizontalGroup getInfo() {

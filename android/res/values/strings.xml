@@ -76,4 +76,6 @@
     <string name="email_not_in_correct_format_text">Email không đúng định dạng</string>
     <string name="email_or_pass_invalid_text">Email hoặc mật khẩu không đúng</string>
     <string name="account_already_exists_text">Tài khoản đã tồn tại</string>
+    <string name="history_text">Lịch sử</string>
+    <string name="game_history_text">Lịch sử ván đấu</string>
 </resources>

@@ -2,6 +2,7 @@ package com.huy.game.android.base;
 
 import com.huy.game.android.network.retrofit.RetrofitClient;
 import com.huy.game.android.utils.Constants;
+import com.huy.game.android.roomdatabase.HistoryDatabase;
 import com.huy.game.android.utils.StorageUtils;
 import com.huy.game.chess.manager.GameSetting;
 
@@ -11,6 +12,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         RetrofitClient.getInstance().createClient(this);
+        HistoryDatabase.getInstance(this);
         handleSetting();
     }
 
