@@ -60,4 +60,5 @@
     <string name="account_already_exists_text">Account already exists</string>
     <string name="history_text">History</string>
     <string name="game_history_text">Game History</string>
+    <string name="stockfish_level_text">Stockfish level %1$d</string>
 </resources>

@@ -2,11 +2,11 @@ package com.huy.game.android.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -15,6 +15,7 @@ import com.huy.game.android.globalstate.UserState;
 import com.huy.game.android.roomdatabase.entity.HistoryEntity;
 import com.huy.game.android.utils.Constants;
 import com.huy.game.android.view.AndroidLauncher;
+import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.Difficulty;
 import com.huy.game.chess.enums.PieceColor;
 import com.huy.game.databinding.HistoryRowLayoutBinding;
@@ -38,26 +39,46 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
         HistoryEntity history = historyList.get(position);
         switch (history.timeType) {
             case ONE_MINUTE, ONE_MINUTE_PLUS_ONE, TWO_MINUTE_PLUS_ONE
-                -> holder.binding.timeIcon.setImageDrawable(AppCompatResources.getDrawable( context, R.drawable.icons8_bullet_39));
+                -> holder.binding.timeIcon.setImageResource(R.drawable.icons8_bullet_39);
             case THREE_MINUTE, THREE_MINUTE_PLUS_TWO, FIVE_MINUTE, FIVE_MINUTE_PLUS_FIVE
-                -> holder.binding.timeIcon.setImageDrawable(AppCompatResources.getDrawable( context, R.drawable.flash_on_24px));
+                -> holder.binding.timeIcon.setImageResource(R.drawable.flash_on_24px);
             case TEN_MINUTE, FIFTEEN_MINUTE_PLUS_TEN, THIRTY_MINUTE
-                -> holder.binding.timeIcon.setImageDrawable(AppCompatResources.getDrawable( context, R.drawable.timer_24px));
+                -> holder.binding.timeIcon.setImageResource(R.drawable.timer_24px);
         }
-        String imageUrl = history.imageUrl;
-        if (("").equals(imageUrl) && imageUrl != null) {
-            Glide.with(context)
-                .load(imageUrl)
-                .into(holder.binding.opponentImage);
+        if (history.mode == ChessMode.AI) {
+            holder.binding.opponentImage.setImageResource(R.drawable.stockfish);
+        }else {
+            String imageUrl = history.imageUrl;
+            if (("").equals(imageUrl) && imageUrl != null) {
+                Glide.with(context)
+                    .load(imageUrl)
+                    .into(holder.binding.opponentImage);
+            }
         }
 
         holder.binding.tvOpponentName.setText(history.name);
         String text = switch (history.gameResult) {
-            case WHITE_WIN -> "1-0";
-            case BLACK_WIN -> "0-1";
+            case WHITE_WIN -> {
+                if (history.pieceColor) {
+                    holder.binding.tvResult.setTextColor(Color.RED);
+                    yield "0-1";
+                }else {
+                    holder.binding.tvResult.setTextColor(context.getColor(R.color.light_green_700));
+                    yield "1-0";
+                }
+
+            }
+            case BLACK_WIN -> {
+                if (history.pieceColor) {
+                    holder.binding.tvResult.setTextColor(context.getColor(R.color.light_green_700));
+                    yield "1-0";
+                }else {
+                    holder.binding.tvResult.setTextColor(Color.RED);
+                    yield "0-1";
+                }
+            }
             case DRAW_STALEMATE, DRAW_THREEFOLD, DRAW_FIFTY_MOVE, DRAW_INSUFFICIENT, DRAW_AGREEMENT -> "1/2-1/2";
         };
-        boolean pieceColor = history.pieceColor;
         holder.binding.tvResult.setText(text);
         holder.binding.rowHistory.setOnClickListener((v) -> {
             Intent intent = new Intent(context, AndroidLauncher.class);
@@ -68,7 +89,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
             intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, history.name);
             intent.putExtra(Constants.BUNDLE_WATCHING_HISTORY, true);
-            intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, pieceColor ? PieceColor.WHITE.toString() : PieceColor.BLACK.toString());
+            intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, history.pieceColor ? PieceColor.WHITE.toString() : PieceColor.BLACK.toString());
             context.startActivity(intent);
         });
     }

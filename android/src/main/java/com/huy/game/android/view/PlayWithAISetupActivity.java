@@ -251,10 +251,11 @@ public class PlayWithAISetupActivity extends BaseActivity implements View.OnClic
                 }
                 default -> PieceColor.BLACK;
             };
+            int level = Optional.ofNullable(viewModel.getLevel().getValue()).orElse(1);
             intent.putExtra(Constants.BUNDLE_PLAYER1_COLOR, pieceColor.toString());
             intent.putExtra(Constants.BUNDLE_PLAYER1_NAME, UserState.getInstance().getName());
-            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, Constants.AI_NAME);
-            intent.putExtra(Constants.BUNDLE_AI_LEVEL, viewModel.getLevel().getValue());
+            intent.putExtra(Constants.BUNDLE_PLAYER2_NAME, String.format(getResources().getString(R.string.stockfish_level_text), level));
+            intent.putExtra(Constants.BUNDLE_AI_LEVEL, level);
             intent.putExtra(Constants.BUNDLE_ENABLE_SUGGEST, binding.switchEnableSuggest.isChecked());
             intent.putExtra(Constants.BUNDLE_ENABLE_TAKEBACK, binding.switchEnableTackback.isChecked());
             startActivity(intent);

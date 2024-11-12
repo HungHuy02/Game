@@ -78,4 +78,6 @@
     <string name="account_already_exists_text">Tài khoản đã tồn tại</string>
     <string name="history_text">Lịch sử</string>
     <string name="game_history_text">Lịch sử ván đấu</string>
+    <string name="stockfish_text" translatable="false">Stockfish 17</string>
+    <string name="stockfish_level_text">Stockfish cấp độ %1$d</string>
 </resources>

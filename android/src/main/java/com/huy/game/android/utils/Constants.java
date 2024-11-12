@@ -24,5 +24,4 @@ public class Constants {
     public static final String DATASTORE_REFRESH_TOKEN = "refresh-token";
     public static final String DATASTORE_AI_LEVEL = "level";
 
-    public static final String AI_NAME = "AI";
 }
