@@ -126,6 +126,7 @@ public class Main extends Game {
             case ONLINE ->
                 setting.setShowGuidePoint(false);
             case AI -> {
+                manager.loadAIImage();
                 setting.setSuggestMove(enableSuggesting);
                 setting.setCanBack(enableTakeback);
             }

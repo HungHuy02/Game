@@ -59,6 +59,8 @@ public class ChessGameAssesManager {
         manager.load("chess/images/bqueen.png", Texture.class);
         manager.load("chess/images/brook.png", Texture.class);
 
+        manager.load("chess/images/user_image.png", Texture.class);
+
         manager.load("chess/images/icons8-left-100.png", Texture.class);
         manager.load("chess/images/icons8-bulleted-list-100.png", Texture.class);
         manager.load("chess/images/icons8-plus-100.png", Texture.class);
@@ -69,6 +71,19 @@ public class ChessGameAssesManager {
         manager.load("chess/images/overlay.png", Texture.class);
         manager.load("chess/images/close_24dp.png", Texture.class);
         manager.load("chess/images/check_24dp.png", Texture.class);
+    }
+
+    public void loadAIImage() {
+        manager.load("chess/images/stockfish.png", Texture.class);
+        manager.finishLoading();
+    }
+
+    public Texture getAIImage() {
+        return manager.get("chess/images/stockfish.png", Texture.class);
+    }
+
+    public Texture getUserImage() {
+        return manager.get("chess/images/user_image.png", Texture.class);
     }
 
     public Texture getChessBoard() {

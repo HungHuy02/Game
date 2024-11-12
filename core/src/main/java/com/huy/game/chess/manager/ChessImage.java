@@ -107,6 +107,10 @@ public class ChessImage {
         return manager.getBlackQueen();
     }
 
+    public Texture getUserImage() {
+        return manager.getUserImage();
+    }
+
     public Texture getbRook() {
         return manager.getBlackRook();
     }

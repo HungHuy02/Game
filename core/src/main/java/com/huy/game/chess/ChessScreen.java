@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,7 +26,6 @@ import com.huy.game.chess.core.Move;
 import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.core.ZobristHashing;
 import com.huy.game.chess.core.notation.AlgebraicNotation;
-import com.huy.game.chess.core.notation.FEN;
 import com.huy.game.chess.enums.ChessMode;
 import com.huy.game.chess.enums.GameResult;
 import com.huy.game.chess.enums.MoveType;
@@ -112,8 +112,9 @@ public class ChessScreen extends InputAdapter implements Screen {
 
     private void setupUI(GameHistory gameHistory) {
         stage = new Stage();
-        PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getCapturedPieceMap(), chessImage, chessImage.getbBishop(), Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList(), main.timeType);
-        PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, chessImage.getbQueen(), !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList(), main.timeType);
+        Texture image = chessImage.getUserImage();
+        PlayerInfo player1Info = new PlayerInfo(Player.getInstance().getName(), chessGameManager.getPlayer1().getCapturedPieceMap(), chessImage, image, Player.getInstance().isWhite(), true, bitmapFont, chessGameManager.getTimeList(), main.timeType);
+        PlayerInfo player2Info = new PlayerInfo(OpponentPlayer.getInstance().getName(), chessGameManager.getPlayer2().getCapturedPieceMap(), chessImage, main.getMode() == ChessMode.AI ? manager.getAIImage() : image, !Player.getInstance().isWhite(), false, bitmapFont, chessGameManager.getTimeList(), main.timeType);
         TopAppBar appBar = new TopAppBar(chessImage, bitmapFont, main, bundle);
         scrollPane = new NotationHistoryScrollPane();
         CheckPopup checkPopup = new CheckPopup(manager, bitmapFont, bundle, stage, this, true, null);
@@ -211,17 +212,16 @@ public class ChessScreen extends InputAdapter implements Screen {
                 main.socketClient.sendCurrentGameState(
                     chessGameHistoryManager.getHistory().getNewestFEN(),
                     Player.getInstance().getElo(),
-                    chessGameHistoryManager.getHistory().getNewestMove(),
+                    chessGameHistoryManager.getHistory().getPGN(),
                     chessGameManager.getPlayerTime(Player.getInstance().isWhite()),
                     chessGameManager.getPlayerTime(OpponentPlayer.getInstance().isWhite()));
             }
 
             @Override
-            public void currentGameState(String fen, int elo, String move, int playerTime, int opponentTime) {
-                board = FEN.fenToBoard(fen, chessImage);
+            public void currentGameState(String fen, int elo, String pgn, int playerTime, int opponentTime) {
                 chessGameManager.setTimeRemain(new int[] { playerTime, opponentTime});
                 chessGameHistoryManager.setNewHistory(fen, new int[] { playerTime, opponentTime});
-                chessGameHistoryManager.getHistory().handleMoveColor(board, move);
+                setupBoardFromPGN();
             }
         });
         main.socketClient.getMoveFromOpponent();
@@ -229,6 +229,24 @@ public class ChessScreen extends InputAdapter implements Screen {
         main.socketClient.newScoreAfterGameEnd();
         main.socketClient.opponentLeftMatch();
         main.socketClient.opponentComeback();
+    }
+
+    private void setupBoardFromPGN() {
+        Timer timer = new Timer();
+        timer.scheduleTask(new Timer.Task() {
+            @Override
+            public void run() {
+                Thread thread = new Thread(() -> {
+                    Board newBoard = new Board();
+                    newBoard.resetBoard(chessImage);
+                    AlgebraicNotation.changePGNToBoard(
+                        main.pgn, newBoard, true, ChessScreen.this);
+                    board = newBoard;
+                });
+                thread.start();
+            }
+        }, 2);
+        timer.start();
     }
 
     @Override

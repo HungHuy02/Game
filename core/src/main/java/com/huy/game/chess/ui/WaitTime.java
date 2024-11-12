@@ -6,10 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
-import com.huy.game.Main;
 import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.enums.GameResult;
-import com.huy.game.chess.manager.ChessImage;
 import com.huy.game.chess.manager.Player;
 
 public class WaitTime {

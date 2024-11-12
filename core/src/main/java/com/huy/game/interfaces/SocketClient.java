@@ -16,7 +16,7 @@ public interface SocketClient {
     void newScoreAfterGameEnd();
     void opponentLeftMatch();
     void opponentComeback();
-    void sendCurrentGameState(String fen, int elo, String move, int playerTime, int opponentTime);
+    void sendCurrentGameState(String fen, int elo, String pgn, int playerTime, int opponentTime);
     void currentGameState();
     void arePlaying();
     void disconnect();

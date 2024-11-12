@@ -39,6 +39,7 @@ public class ChessPlayer {
     }
 
     public void reset() {
+        value = 0;
         capturedPieceMap.put("p", 0);
         capturedPieceMap.put("k", 0);
         capturedPieceMap.put("b", 0);

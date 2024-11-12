@@ -1,6 +1,7 @@
 package com.huy.game.chess.core.notation;
 
 import com.badlogic.gdx.utils.StringBuilder;
+import com.huy.game.chess.ChessScreen;
 import com.huy.game.chess.WatchingHistoryScreen;
 import com.huy.game.chess.core.Bishop;
 import com.huy.game.chess.core.Board;
@@ -14,9 +15,7 @@ import com.huy.game.chess.core.Spot;
 import com.huy.game.chess.enums.MoveType;
 import com.huy.game.chess.enums.PieceType;
 import com.huy.game.chess.manager.ChessGameManager;
-import com.huy.game.chess.ui.NotationHistoryScrollPane;
 
-import java.awt.ScrollPane;
 import java.util.Map;
 
 public class AlgebraicNotation {
@@ -164,6 +163,24 @@ public class AlgebraicNotation {
         Move move = changeNotationToMove(lastNotation, board, isWhite);
         screen.handleMove(move, board);
         screen.checkForEndGame(move, board);
+    }
+
+    public static void changePGNToBoard(String pgn, Board board, boolean isWhite, ChessScreen screen) {
+        pgn = pgn.trim().replaceAll("(1-0|0-1|1/2-1/2)$", "").trim();
+        String[] notations = pgn.replaceAll("\\d+\\.", "").trim().split("\\s+");
+        int length = notations.length - 1;
+        int i;
+        for (i = 0; i < length; i++) {
+            Move move = changeNotationToMove(notations[i], board, isWhite);
+            screen.handleMove(move);
+            isWhite = !isWhite;
+        }
+        String lastNotation = notations[i];
+        if (lastNotation.endsWith("#")) {
+            lastNotation = lastNotation.substring(0, lastNotation.length() - 1);
+        }
+        Move move = changeNotationToMove(lastNotation, board, isWhite);
+        screen.handleMove(move);
     }
 
     public static Move changeNotationToMove(String notation, Board board, boolean isWhite) {

@@ -42,6 +42,7 @@ public class PlayerInfo {
         info = new HorizontalGroup();
         info.setSize(Gdx.graphics.getWidth() ,chessImage.getScaledPieceSize());
         info.padRight(16);
+        info.space(16f);
         if(isPlayer1) {
             info.setPosition(0, ((float) Gdx.graphics.getHeight() / 5) - chessImage.getScaledPieceSize());
             info.addActor(image(image, chessImage, Player.getInstance().getImageUrl()));
@@ -85,9 +86,8 @@ public class PlayerInfo {
     private Container<Image> image(Texture image, ChessImage chessImage, String imageUrl) {
         Container<Image> container = new Container<>();
         Image avatar = new Image(image);
-        float scale = chessImage.getScaledPieceSize() / image.getWidth();
-        avatar.setOrigin(Align.center);
-        avatar.setScale(scale);
+        avatar.setScaling(Scaling.contain);
+        container.prefSize(chessImage.getSpotSize(), chessImage.getSpotSize());
         if(imageUrl != null && !imageUrl.equals("")) {
             Pixmap.downloadFromUrl( imageUrl, new Pixmap.DownloadPixmapResponseListener() {
                 @Override
@@ -105,6 +105,7 @@ public class PlayerInfo {
             });
         }
         container.setActor(avatar);
+        container.padLeft(16f);
         return container;
     }
 
