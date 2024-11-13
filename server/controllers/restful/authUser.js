@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const jwtUtil = require('../../utils/jwtUtil');
 const jwt = require("jsonwebtoken");
 const redis = require('../../utils/redisRankUtil');
+const firebase = require('../../config/firebaseConfig');
+const generateRandomPassword = require('../../utils/randomPassword');
 
 const checkExistingUser = asyncHandler(async (req, res) => {
     const { email } = req.query;
@@ -102,6 +104,55 @@ const login = asyncHandler(async (req, res) => {
     }
 });
 
+const loginGoogle = asyncHandler(async(req, res) => {
+    const {token} = req.body;
+    const decodedToken = await firebase.auth().verifyIdToken(token); 
+    let user = await prisma.user.findUnique({
+        where: { email: decodedToken.email}
+    });
+    if (!user) {
+        const password = generateRandomPassword(10);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        user = await prisma.user.create({
+            data: {
+                name: decodedToken.name,
+                email: decodedToken.email,
+                password: hashedPassword,
+                image_url: decodedToken.picture,
+                elo: 400,
+            }
+        });
+
+        await redis.updateUserScore(user.id, 400, decodedToken.name);
+    }
+    const accessToken = jwtUtil.generateAccessToken(user.id, user.name);
+    const refreshToken = jwtUtil.generateRefreshToken(user.id);
+    const updateUser = await prisma.user.update({
+        where: {email: user.email},
+        data: {refresh_token: refreshToken}
+    });
+
+    if(!updateUser) {
+        res.status(400);
+        throw new Error('error');
+    }
+
+    return res.status(200).json({
+        success: true,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userData: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            elo: user.elo,
+            imageUrl: user.image_url
+        }
+    });
+    
+});
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
@@ -133,5 +184,6 @@ module.exports = {
     checkExistingUser,
     register,
     login,
+    loginGoogle,
     refreshAccessToken,
   };

@@ -45,6 +45,8 @@ const io = socketIO(server, {
   },
 });
 
+const socketRanking = require('./controllers/socket/SocketRanking');
+socketRanking.initialize(io);
 const chessGame = require('./controllers/socket/chessGame');
 chessGame(io);
 

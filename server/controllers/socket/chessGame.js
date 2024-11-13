@@ -6,6 +6,7 @@ const loadScripts = require("../../luaScripts/loadScripts");
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const redis = require('../../utils/redisRankUtil');
+const socketRanking = require('./SocketRanking');
 
 
 const REDIS_PLAYING_KEY = "playing";
@@ -25,6 +26,8 @@ const updateNewElo = async (playerId, newElo, playerName, opponentId, newOpponen
         }
     });
     await redis.updateUserScore(opponentId, newOpponentElo, opponentName);
+    socketRanking.updateRanking();
+
 };
 
 module.exports = function(io) {
@@ -37,7 +40,7 @@ module.exports = function(io) {
             jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
                 if (err) return next(new Error('Authentication error'));
                 socket.user = decode;
-                next();     
+                next();
             });
         }else {
             next(new Error('Authentication error'));
@@ -118,7 +121,7 @@ module.exports = function(io) {
                 });
             }else {
                 socket.index = waitingList.push(currentUser) - 1;
-            
+
                 let opponentPlayer;
 
                 for (let i = 0; i < waitingList.length; i++) {
@@ -135,12 +138,12 @@ module.exports = function(io) {
                     redisClient.EVALSHA(await loadScripts.getAddToPlayingHashSHA(), {
                         keys: [REDIS_PLAYING_KEY],
                         arguments: [currentUser.id + '',
-                            opponentPlayer.id + '', 
+                            opponentPlayer.id + '',
                             socket.id,
                             opponentPlayer.socketId
                         ]
                     });
-                
+
                     const pieceColor = Math.random() === 0;
 
                     const opponentSocket = allConnections[opponentPlayer.socketId];
@@ -240,7 +243,7 @@ module.exports = function(io) {
             currentUser.socketId = socket.id;
 
             socket.index = guestWaitingList.push(currentUser) - 1;
-            
+
             let opponentPlayer;
 
             for (let i = 0; i < guestWaitingList.length; i++) {
@@ -257,12 +260,12 @@ module.exports = function(io) {
                 redisClient.EVALSHA(await loadScripts.getAddToPlayingHashSHA(), {
                     keys: [REDIS_PLAYING_KEY],
                     arguments: [socket.id,
-                        opponentPlayer.socketId, 
+                        opponentPlayer.socketId,
                         socket.id,
                         opponentPlayer.socketId
                     ]
                 });
-                
+
                 const pieceColor = Math.random() === 0;
 
                 const opponentSocket = allConnections[opponentPlayer.socketId];

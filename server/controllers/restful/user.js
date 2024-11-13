@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const cloudinary = require("../../config/cloudinaryConfig");
 const redis = require('../../utils/redisRankUtil');
+const socketRanking = require('../socket/SocketRanking');
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const { id } = req.user;
@@ -60,6 +61,7 @@ const updateUser = asyncHandler(async (req, res) => {
     if(elo) {
         updateData.elo = elo;
         await redis.updateUserScore(id, elo, name);
+        socketRanking.updateRanking();
     }
     if (Object.keys(updateData).length === 0) {
         return res.status(400).json({
