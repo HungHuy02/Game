@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.huy.game.android.models.request.LoginRequest;
 import com.huy.game.android.models.request.RegisterRequest;
+import com.huy.game.android.models.request.TokenRequest;
 import com.huy.game.android.models.response.LoginResponse;
 import com.huy.game.android.models.response.RefreshResponse;
 import com.huy.game.android.models.response.RegisterResponse;
@@ -26,5 +27,9 @@ public class AuthServiceViewModel extends ViewModel {
 
     public void login(LoginRequest request, Callback<LoginResponse> callback) {
         repository.login(request, callback);
+    }
+
+    public void loginGoogle(TokenRequest request, Callback<LoginResponse> callback) {
+        repository.loginGoogle(request, callback);
     }
 }

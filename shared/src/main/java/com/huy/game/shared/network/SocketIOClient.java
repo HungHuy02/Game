@@ -183,13 +183,13 @@ public class SocketIOClient implements SocketClient {
     }
 
     @Override
-    public void sendCurrentGameState(String fen, int elo, String move, int playerTime, int opponentTime) {
+    public void sendCurrentGameState(boolean isWhite, int elo, String pgn, int playerTime, int opponentTime) {
         try {
             emit("sendCurrentGameState",
                 new JSONObject()
-                    .put("fen", fen)
+                    .put("isWhite", isWhite)
                     .put("elo", elo)
-                    .put("move", move)
+                    .put("pgn", pgn)
                     .put("playerTime", playerTime)
                     .put("opponentTime", opponentTime));
         } catch (JSONException e) {
@@ -202,12 +202,12 @@ public class SocketIOClient implements SocketClient {
         on("currentGameState", args -> {
             if (args.length > 0 && args[0] instanceof JSONObject data) {
                 try {
-                    String fen = data.getString("fen");
+                    boolean isWhite = data.getBoolean("isWhite");
                     int elo = data.getInt("elo");
-                    String move = data.getString("move");
+                    String pgn = data.getString("pgn");
                     int opponentTime = data.getInt("playerTime");
                     int playerTime = data.getInt("opponentTime");
-                    ChessGameOnlineEvent.getInstance().notifyCurrentGameState(fen, elo, move, playerTime, opponentTime);
+                    ChessGameOnlineEvent.getInstance().notifyCurrentGameState(isWhite, elo, pgn, playerTime, opponentTime);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }

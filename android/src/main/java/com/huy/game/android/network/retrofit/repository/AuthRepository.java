@@ -3,6 +3,7 @@ package com.huy.game.android.network.retrofit.repository;
 import com.huy.game.android.models.request.LoginRequest;
 import com.huy.game.android.models.request.RefreshRequest;
 import com.huy.game.android.models.request.RegisterRequest;
+import com.huy.game.android.models.request.TokenRequest;
 import com.huy.game.android.models.response.LoginResponse;
 import com.huy.game.android.models.response.RefreshResponse;
 import com.huy.game.android.models.response.RegisterResponse;
@@ -37,5 +38,9 @@ public class AuthRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void loginGoogle(TokenRequest request, Callback<LoginResponse> callback) {
+        authApi.loginGoogle(request).enqueue(callback);
     }
 }

@@ -28,7 +28,7 @@ public class ChessGameOnlineEvent {
         void onNewScore(int newScore);
         void onOpponentLeftMatch();
         void onOpponentComeback();
-        void currentGameState(String fen, int elo, String move, int playerTime, int opponentTime);
+        void currentGameState(boolean isWhite, int elo, String pgn, int playerTime, int opponentTime);
     }
 
     private MatchListener listener;
@@ -72,7 +72,7 @@ public class ChessGameOnlineEvent {
         playerActionListener.onOpponentComeback();
     }
 
-    public void notifyCurrentGameState(String fen, int elo, String move, int playerTime, int opponentTime) {
-        playerActionListener.currentGameState(fen, elo, move, playerTime, opponentTime);
+    public void notifyCurrentGameState(boolean isWhite, int elo, String png, int playerTime, int opponentTime) {
+        playerActionListener.currentGameState(isWhite, elo, png, playerTime, opponentTime);
     }
 }

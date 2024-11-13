@@ -209,18 +209,26 @@ public class ChessScreen extends InputAdapter implements Screen {
             public void onOpponentComeback() {
                 waitTime.getHorizontalGroup().remove();
                 timer.clear();
-                main.socketClient.sendCurrentGameState(
-                    chessGameHistoryManager.getHistory().getNewestFEN(),
-                    Player.getInstance().getElo(),
-                    chessGameHistoryManager.getHistory().getPGN(),
-                    chessGameManager.getPlayerTime(Player.getInstance().isWhite()),
-                    chessGameManager.getPlayerTime(OpponentPlayer.getInstance().isWhite()));
+                Timer delay = new Timer();
+                delay.scheduleTask(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        main.socketClient.sendCurrentGameState(
+                            Player.getInstance().isWhite(),
+                            Player.getInstance().getElo(),
+                            chessGameHistoryManager.getHistory().getPGN(),
+                            chessGameManager.getPlayerTime(Player.getInstance().isWhite()),
+                            chessGameManager.getPlayerTime(OpponentPlayer.getInstance().isWhite()));
+                    }
+                }, 1);
             }
 
             @Override
-            public void currentGameState(String fen, int elo, String pgn, int playerTime, int opponentTime) {
+            public void currentGameState(boolean isWhite, int elo, String pgn, int playerTime, int opponentTime) {
+                setting.setRotate(isWhite);
                 chessGameManager.setTimeRemain(new int[] { playerTime, opponentTime});
-                chessGameHistoryManager.setNewHistory(fen, new int[] { playerTime, opponentTime});
+                chessGameHistoryManager.setNewHistory(new int[] { playerTime, opponentTime});
+                main.pgn = pgn;
                 setupBoardFromPGN();
             }
         });
@@ -232,21 +240,8 @@ public class ChessScreen extends InputAdapter implements Screen {
     }
 
     private void setupBoardFromPGN() {
-        Timer timer = new Timer();
-        timer.scheduleTask(new Timer.Task() {
-            @Override
-            public void run() {
-                Thread thread = new Thread(() -> {
-                    Board newBoard = new Board();
-                    newBoard.resetBoard(chessImage);
-                    AlgebraicNotation.changePGNToBoard(
-                        main.pgn, newBoard, true, ChessScreen.this);
-                    board = newBoard;
-                });
-                thread.start();
-            }
-        }, 2);
-        timer.start();
+        AlgebraicNotation.changePGNToBoard(
+            main.pgn, board, true, ChessScreen.this);
     }
 
     @Override

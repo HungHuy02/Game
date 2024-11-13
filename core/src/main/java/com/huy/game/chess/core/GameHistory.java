@@ -76,17 +76,6 @@ public class GameHistory {
         return AlgebraicNotation.changeToFullAlgebraicNotation(board, start, end, move, this, chessGameManager);
     }
 
-    public void handleMoveColor(Board board, String move) {
-        board.getSpot(
-            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(1)),
-            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(0))
-        ).setShowColor(true);
-        board.getSpot(
-            AlgebraicNotation.changeRowAlgebraicNotationToRowPosition(move.charAt(3)),
-            AlgebraicNotation.changeColAlgebraicNotationToColPosition(move.charAt(2))
-        ).setShowColor(true);
-    }
-
     public void handleMoveColor(Board board, int index) {
         String move = getMove(index);
         board.getSpot(
@@ -105,19 +94,14 @@ public class GameHistory {
         return board;
     }
 
-    public void setHistoryForComebackGame(String fen, int[] time) {
+    public void setHistoryForComebackGame(int[] time) {
         fenList.clear();
-        fenList.add(fen);
         timeMap.clear();
         timeMap.put(0, time);
     }
 
     public String getMove(int index) {
         return movedList.get(index);
-    }
-
-    public String getNewestMove() {
-        return movedList.get(movedList.size() - 1);
     }
 
     public String getNewestFEN() {

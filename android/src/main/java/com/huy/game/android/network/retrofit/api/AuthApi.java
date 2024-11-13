@@ -3,6 +3,7 @@ package com.huy.game.android.network.retrofit.api;
 import com.huy.game.android.models.request.LoginRequest;
 import com.huy.game.android.models.request.RefreshRequest;
 import com.huy.game.android.models.request.RegisterRequest;
+import com.huy.game.android.models.request.TokenRequest;
 import com.huy.game.android.models.response.LoginResponse;
 import com.huy.game.android.models.response.RefreshResponse;
 import com.huy.game.android.models.response.RegisterResponse;
@@ -27,4 +28,7 @@ public interface AuthApi {
 
     @POST("/auth/user/refresh-token")
     Call<RefreshResponse> refreshToken(@Body RefreshRequest request);
+
+    @POST("/auth/user/login-with-google")
+    Call<LoginResponse> loginGoogle(@Body TokenRequest request);
 }

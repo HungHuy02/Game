@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="web_client_id" translatable="false">63838831646-sj3u5ddt51413f2ccrlgbhr3mqu8tmln.apps.googleusercontent.com</string>
     <string name="app_name">Game</string>
     <string name="login_text">Đăng nhập</string>
     <string name="continue_email">Tiếp tục bằng email</string>

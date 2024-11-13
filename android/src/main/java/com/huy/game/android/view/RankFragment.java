@@ -20,6 +20,7 @@ import com.huy.game.android.models.RankInfo;
 import com.huy.game.android.models.response.GetAllRankResponse;
 import com.huy.game.android.viewmodel.apiservice.RankServiceViewModel;
 import com.huy.game.databinding.FragmentRankBinding;
+import com.huy.game.shared.network.RankingSocket;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class RankFragment extends Fragment {
 
     private FragmentRankBinding fragmentRankBinding;
     private RankServiceViewModel viewModel;
+    private RankingSocket socket;
 
     @Nullable
     @Override
@@ -43,10 +45,15 @@ public class RankFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupViewModel();
+        getAllRank();
+        setupSocket();
     }
 
     private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(RankServiceViewModel.class);
+    }
+
+    private void getAllRank() {
         viewModel.getAllRank(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<GetAllRankResponse> call, @NonNull Response<GetAllRankResponse> response) {
@@ -65,6 +72,12 @@ public class RankFragment extends Fragment {
         });
     }
 
+    private void setupSocket() {
+        socket = new RankingSocket();
+        socket.connect();
+        socket.newRankingAvailable(this::getAllRank);
+    }
+
     private void setupRecyclerView(List<RankInfo> list) {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter();
         adapter.setList(list);
@@ -77,5 +90,11 @@ public class RankFragment extends Fragment {
         fragmentRankBinding.tvIndex.setText(String.format(getResources().getString(R.string.ranking_text), rank));
         fragmentRankBinding.tvName.setText(UserState.getInstance().getName());
         fragmentRankBinding.tvScore.setText(String.format(getResources().getString(R.string.elo_text), UserState.getInstance().getElo()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        socket.disconnect();
     }
 }
